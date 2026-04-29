@@ -171,11 +171,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '82세 고혈압 환자, ACE억제제(enalapril) 복용 중 마른기침이 3주째 계속됩니다.',
           stem: '이 환자에게 ACE억제제 대신 투여할 수 있는 적절한 대체 약물은?',
           choices: [
-            '암로디핀(amlodipine)',
-            '푸로세미드(furosemide)',
-            '메토프롤롤(metoprolol)',
-            '발사르탄(valsartan)',
-            '스피로노락톤(spironolactone)'
+            { text: '암로디핀(amlodipine)' },
+            { text: '푸로세미드(furosemide)' },
+            { text: '메토프롤롤(metoprolol)' },
+            { text: '발사르탄(valsartan)' },
+            { text: '스피로노락톤(spironolactone)' }
           ],
           answerKey: 4,
           explanation: 'ACE억제제의 가장 흔한 부작용은 브래디키닌 축적으로 인한 마른기침(10~20%). ARB(Angiotensin Receptor Blocker)는 브래디키닌 경로에 영향을 주지 않아 기침 부작용이 거의 없으며, ACE억제제와 동일한 혈압 강하·신장 보호 효과를 가집니다.',
@@ -191,11 +191,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '78세 심부전 환자, 디곡신(digoxin) 0.25mg/일 복용 중. 식욕부진·구역·맥박 48회/분 측정됨.',
           stem: '이 상황에서 간호사가 가장 먼저 취해야 할 행동은?',
           choices: [
-            '디곡신 투여 후 증상 경과 관찰',
-            '칼륨 보충제를 즉시 투여',
-            '맥박 60회/분 이상이 될 때까지 기다림',
-            '디곡신 용량을 절반으로 줄임',
-            '디곡신 투여를 보류하고 의사에게 보고'
+            { text: '디곡신 투여 후 증상 경과 관찰' },
+            { text: '칼륨 보충제를 즉시 투여' },
+            { text: '맥박 60회/분 이상이 될 때까지 기다림' },
+            { text: '디곡신 용량을 절반으로 줄임' },
+            { text: '디곡신 투여를 보류하고 의사에게 보고' }
           ],
           answerKey: 5,
           explanation: '구역·식욕부진·서맥(48회/분)은 디기탈리스 중독의 전형적 증상. 투약 전 맥박 60회/분 미만이면 투여 보류하고 의사에게 보고하는 것이 우선입니다. 혈중 디곡신 농도·전해질 측정이 필요합니다.',
@@ -211,11 +211,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '75세 남성, 안정형 협심증으로 설하 NTG를 처방받았습니다. 흉통 발생 시 복용법을 교육합니다.',
           stem: '다음 중 NTG 설하 복용에 대한 올바른 교육 내용은?',
           choices: [
-            '통증 시 1정 설하 투여 후 5분 간격으로 최대 3정까지 투여한다',
-            '통증이 없어질 때까지 1분마다 반복 투여한다',
-            '누워서 복용해야 효과가 있다',
-            '복용 후 즉시 운전해도 된다',
-            '효과가 없으면 경구로 삼킨다'
+            { text: '통증 시 1정 설하 투여 후 5분 간격으로 최대 3정까지 투여한다' },
+            { text: '통증이 없어질 때까지 1분마다 반복 투여한다' },
+            { text: '누워서 복용해야 효과가 있다' },
+            { text: '복용 후 즉시 운전해도 된다' },
+            { text: '효과가 없으면 경구로 삼킨다' }
           ],
           answerKey: 1,
           explanation: 'NTG 설하: 흉통 발생 시 1정(0.4mg) 설하 투여 → 5분 후에도 통증 지속 시 1정 추가 → 15분 내 3정 투여 후에도 통증 지속 시 즉시 응급실 방문(심근경색 의심). 복용 후 기립성 저혈압 예방을 위해 앉거나 눕습니다.',
@@ -231,11 +231,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '85세 고혈압 환자에게 스피로노락톤(spironolactone) 25mg/일이 처방되었습니다.',
           stem: '이 약물 복용 시 제한해야 할 식품은?',
           choices: [
-            '우유·유제품(칼슘 식품)',
-            '바나나·오렌지·토마토(칼륨 식품)',
-            '시금치·브로콜리(비타민K 식품)',
-            '자몽주스',
-            '철분이 풍부한 식품'
+            { text: '우유·유제품(칼슘 식품)' },
+            { text: '바나나·오렌지·토마토(칼륨 식품)' },
+            { text: '시금치·브로콜리(비타민K 식품)' },
+            { text: '자몽주스' },
+            { text: '철분이 풍부한 식품' }
           ],
           answerKey: 2,
           explanation: '스피로노락톤은 칼륨 보존 이뇨제(알도스테론 길항제)로 혈중 K+가 상승합니다. 고칼륨혈증 예방을 위해 칼륨이 풍부한 식품(바나나·오렌지·토마토·감자) 섭취를 제한해야 합니다.',
@@ -251,11 +251,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '80세 고콜레스테롤혈증 환자에게 atorvastatin(리피토) 40mg이 처방되었습니다. 2주 후 근육통과 전신 쇠약감을 호소합니다.',
           stem: '간호사가 우선적으로 시행해야 할 검사는?',
           choices: [
-            'LDL 콜레스테롤 측정',
-            '간기능(AST/ALT) 측정',
-            'CPK(CK) 측정 및 의사 보고',
-            '혈당 측정',
-            '갑상선 기능 검사'
+            { text: 'LDL 콜레스테롤 측정' },
+            { text: '간기능(AST/ALT) 측정' },
+            { text: 'CPK(CK) 측정 및 의사 보고' },
+            { text: '혈당 측정' },
+            { text: '갑상선 기능 검사' }
           ],
           answerKey: 3,
           explanation: '스타틴 복용 중 근육통·쇠약감은 근육병증(myopathy)의 증상. CPK(creatine phosphokinase) 상승 확인 필수. CPK가 정상 상한치의 10배 이상이면 스타틴 중단 고려(횡문근용해증 위험). 즉시 의사에게 보고합니다.',
@@ -317,11 +317,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '68세 천식 환자, ICS(부데소니드 흡입) 사용 3주 후 입 안이 하얗게 변하고 따갑습니다.',
           stem: '이 증상의 원인과 예방 교육 내용으로 가장 적절한 것은?',
           choices: [
-            'ICS의 전신 흡수로 인한 부신 억제 → 스테로이드 감량',
-            '기관지 확장에 따른 점막 건조 → 수분 섭취 증가',
-            '알레르기 반응 → 항히스타민제 추가',
-            '흡입 후 구강 내 약물 잔류로 인한 칸디다증 → 사용 후 반드시 양치',
-            '베타작용제 부작용 → 흡입기 교체'
+            { text: 'ICS의 전신 흡수로 인한 부신 억제 → 스테로이드 감량' },
+            { text: '기관지 확장에 따른 점막 건조 → 수분 섭취 증가' },
+            { text: '알레르기 반응 → 항히스타민제 추가' },
+            { text: '흡입 후 구강 내 약물 잔류로 인한 칸디다증 → 사용 후 반드시 양치' },
+            { text: '베타작용제 부작용 → 흡입기 교체' }
           ],
           answerKey: 4,
           explanation: 'ICS 흡입 후 구강 내 잔류한 스테로이드가 구강 칸디다증(oral candidiasis, 아구창)을 유발합니다. 예방: 흡입 직후 물로 충분히 양치 및 가글 시행.',
@@ -337,11 +337,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '75세 COPD 환자에게 tiotropium(스피리바) 18mcg 흡입이 처방되었습니다. 전립선 비대증 기왕력이 있습니다.',
           stem: '이 환자에서 특별히 모니터링해야 할 부작용은?',
           choices: [
-            '저칼륨혈증',
-            '기관지 수축',
-            '고혈당',
-            '저혈압',
-            '요저류 및 배뇨 곤란'
+            { text: '저칼륨혈증' },
+            { text: '기관지 수축' },
+            { text: '고혈당' },
+            { text: '저혈압' },
+            { text: '요저류 및 배뇨 곤란' }
           ],
           answerKey: 5,
           explanation: '티오트로피움(LAMA)은 항콜린 작용으로 방광 평활근 이완 억제 → 요저류 유발 가능. 전립선 비대증 환자는 이미 배뇨 장애가 있으므로 악화 위험↑. 배뇨 불편감·핍뇨 모니터링 필수.',
@@ -408,11 +408,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '79세 우울증 환자에게 amitriptyline(아미트리프틸린)이 처방되려 합니다.',
           stem: '노인 간호사가 처방에 대해 우려해야 하는 이유로 가장 적절한 것은?',
           choices: [
-            'Beers Criteria 고위험 약물로 항콜린 부작용·심독성·낙상 위험↑',
-            '효과가 너무 강해서',
-            'SSRI보다 비용이 비싸서',
-            '1일 1회 복용이 불가능해서',
-            '신장 배설이 안 되어서'
+            { text: 'Beers Criteria 고위험 약물로 항콜린 부작용·심독성·낙상 위험↑' },
+            { text: '효과가 너무 강해서' },
+            { text: 'SSRI보다 비용이 비싸서' },
+            { text: '1일 1회 복용이 불가능해서' },
+            { text: '신장 배설이 안 되어서' }
           ],
           answerKey: 1,
           explanation: '아미트리프틸린(TCA)은 강한 항콜린 작용(구강건조·변비·요저류·혼돈)과 기립성 저혈압·심독성을 유발합니다. Beers Criteria에서 노인 피해야 할 약물로 분류. 노인 우울증 1차 선택은 SSRI(에스시탈로프람, 설트랄린)입니다.',
@@ -428,11 +428,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '80세 알츠하이머 환자에게 donepezil(아리셉트) 5mg이 처방되었습니다. 보호자가 "이 약이 치매를 낫게 하냐"고 묻습니다.',
           stem: '도네페질 효과에 대한 가장 정확한 설명은?',
           choices: [
-            '치매를 완치시키는 약물이다',
-            '증상을 일시적으로 완화하고 진행을 6~12개월 지연시킬 수 있지만 근본 치료는 아니다',
-            '모든 치매에 효과가 있다',
-            '2~3일 내 확실한 효과가 나타난다',
-            '투약 중단 시 증상이 천천히 악화된다'
+            { text: '치매를 완치시키는 약물이다' },
+            { text: '증상을 일시적으로 완화하고 진행을 6~12개월 지연시킬 수 있지만 근본 치료는 아니다' },
+            { text: '모든 치매에 효과가 있다' },
+            { text: '2~3일 내 확실한 효과가 나타난다' },
+            { text: '투약 중단 시 증상이 천천히 악화된다' }
           ],
           answerKey: 2,
           explanation: 'AChE 억제제(도네페질·리바스티그민·갈란타민)는 아세틸콜린 농도를 증가시켜 증상을 완화하고 진행을 늦추지만, 알츠하이머를 근본 치료하거나 완치할 수는 없습니다. 갑자기 중단 시 인지기능 급격히 악화.',
@@ -448,11 +448,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '72세 불면증 환자에게 diazepam(Valium) 5mg이 처방되었습니다.',
           stem: '이 처방에서 노인전문간호사가 가장 우려해야 할 것은?',
           choices: [
-            '비용이 많이 든다',
-            '수면에 전혀 효과가 없다',
-            '노인에서 반감기 연장으로 낙상·인지저하 위험↑, Beers Criteria 고위험 약물',
-            '혈압을 과도하게 상승시킨다',
-            '신장에 독성이 있다'
+            { text: '비용이 많이 든다' },
+            { text: '수면에 전혀 효과가 없다' },
+            { text: '노인에서 반감기 연장으로 낙상·인지저하 위험↑, Beers Criteria 고위험 약물' },
+            { text: '혈압을 과도하게 상승시킨다' },
+            { text: '신장에 독성이 있다' }
           ],
           answerKey: 3,
           explanation: 'BZD(diazepam 등)는 지용성으로 노인에서 Vd↑ → 반감기 연장(최대 200시간) → 과잉 진정·낙상·골절·인지 저하 위험. Beers Criteria 고위험 약물. 단기 사용 불가피 시 단기작용 제제(lorazepam, oxazepam) 선호, non-BZD(zolpidem)도 노인에서 주의.',
@@ -468,11 +468,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '파킨슨병 환자에게 levodopa/carbidopa(시네메트)가 처방되었습니다.',
           stem: '이 약물 복용 시 가장 중요한 식이 교육은?',
           choices: [
-            '철분이 풍부한 식품을 충분히 섭취한다',
-            '자몽주스를 매일 마신다',
-            '칼슘이 풍부한 식품을 늘린다',
-            '고단백 식이와 피리독신(비타민B6) 보충제를 제한한다',
-            '식전 공복에 복용해야 한다'
+            { text: '철분이 풍부한 식품을 충분히 섭취한다' },
+            { text: '자몽주스를 매일 마신다' },
+            { text: '칼슘이 풍부한 식품을 늘린다' },
+            { text: '고단백 식이와 피리독신(비타민B6) 보충제를 제한한다' },
+            { text: '식전 공복에 복용해야 한다' }
           ],
           answerKey: 4,
           explanation: '고단백 식이의 아미노산이 레보도파와 장에서 경쟁적으로 흡수 → 레보도파 흡수↓. 피리독신(Vit B6)은 말초에서 레보도파→도파민 조기 전환 촉진 → 뇌로 전달되는 레보도파 감소. 식사와 함께 또는 식후 복용(소화기 부작용 완화).',
@@ -539,11 +539,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '75세 무릎 관절염 환자, 위궤양 기왕력 있고 크레아티닌 1.6mg/dL. 심한 통증으로 진통제가 필요합니다.',
           stem: '이 환자에게 가장 적절한 1차 진통제는?',
           choices: [
-            '이부프로펜(ibuprofen) 400mg tid',
-            '아스피린 650mg qid',
-            '나프록센(naproxen) 250mg bid',
-            '인도메타신(indomethacin) 25mg tid',
-            '아세트아미노펜(acetaminophen) 500mg q6h'
+            { text: '이부프로펜(ibuprofen) 400mg tid' },
+            { text: '아스피린 650mg qid' },
+            { text: '나프록센(naproxen) 250mg bid' },
+            { text: '인도메타신(indomethacin) 25mg tid' },
+            { text: '아세트아미노펜(acetaminophen) 500mg q6h' }
           ],
           answerKey: 5,
           explanation: '위궤양 기왕력 + 신기능 저하(Cr 1.6) → NSAIDs는 GI 출혈·신기능 추가 악화 위험으로 금기. 아세트아미노펜이 노인 골관절염의 1차 진통제. 최대 3g/일(신기능 저하 시 감량).',
@@ -559,11 +559,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '82세 말기암 환자에게 morphine 10mg IV가 투여되었습니다. 30분 후 호흡수 8회/분, SpO2 88%로 떨어졌습니다.',
           stem: '간호사가 즉시 취해야 할 행동 순서로 가장 적절한 것은?',
           choices: [
-            '날록손(naloxone) 0.4mg IV 투여 및 의사 보고',
-            '모르핀 추가 투여 후 경과 관찰',
-            '의사 보고만 한 후 기다림',
-            '산소를 마스크로 공급 후 경과 관찰',
-            '체위 변경 후 재측정'
+            { text: '날록손(naloxone) 0.4mg IV 투여 및 의사 보고' },
+            { text: '모르핀 추가 투여 후 경과 관찰' },
+            { text: '의사 보고만 한 후 기다림' },
+            { text: '산소를 마스크로 공급 후 경과 관찰' },
+            { text: '체위 변경 후 재측정' }
           ],
           answerKey: 1,
           explanation: '호흡수 8회/분, SpO2 88%는 오피오이드 과다 복용으로 인한 호흡억제. 즉시 날록손(opioid 길항제) 0.4~2mg IV 투여(2~3분마다 반복), 산소 공급, 의사 즉시 보고. 날록손 반감기(30~90분)가 모르핀보다 짧아 재투여 필요.',
@@ -631,11 +631,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '79세 남성, 심방세동으로 와파린(warfarin) 복용 중. 최근 무릎 통증으로 이부프로펜(ibuprofen) 자가 복용을 시작했습니다.',
           stem: '이 조합에서 발생할 수 있는 가장 심각한 위험은?',
           choices: [
-            '혈압 상승',
-            '출혈 위험 극도 증가(GI 출혈·뇌출혈)',
-            '소화 불량',
-            '혈당 상승',
-            '피부 발진'
+            { text: '혈압 상승' },
+            { text: '출혈 위험 극도 증가(GI 출혈·뇌출혈)' },
+            { text: '소화 불량' },
+            { text: '혈당 상승' },
+            { text: '피부 발진' }
           ],
           answerKey: 2,
           explanation: '와파린(항응고)+NSAIDs(COX-1 억제→혈소판 기능↓ + 단백결합 경쟁→와파린 유리형↑ + GI점막 손상)의 조합은 출혈 위험을 극도로 상승시킵니다. 통증 대체제로 아세트아미노펜 권고. 반드시 INR 모니터링 강화.',
@@ -651,11 +651,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '다음 중 Beers Criteria에서 노인에게 피해야 한다고 분류된 약물을 모두 고르면?',
           stem: '다음 중 Beers Criteria 고위험 약물이 아닌 것은?',
           choices: [
-            '디펜히드라민(diphenhydramine, 1세대 항히스타민)',
-            '아미트리프틸린(amitriptyline, TCA)',
-            '에스시탈로프람(escitalopram, SSRI)',
-            '디아제팜(diazepam, BZD)',
-            '인도메타신(indomethacin, NSAID)'
+            { text: '디펜히드라민(diphenhydramine, 1세대 항히스타민)' },
+            { text: '아미트리프틸린(amitriptyline, TCA)' },
+            { text: '에스시탈로프람(escitalopram, SSRI)' },
+            { text: '디아제팜(diazepam, BZD)' },
+            { text: '인도메타신(indomethacin, NSAID)' }
           ],
           answerKey: 3,
           explanation: 'SSRI(에스시탈로프람)는 노인 우울증 1차 선택 약물로 Beers Criteria 고위험 목록에 포함되지 않습니다. 1세대 항히스타민, TCA, BZD, 강력한 NSAIDs(indomethacin)는 모두 Beers Criteria 고위험 약물입니다.',
@@ -671,11 +671,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '82세 심부전 환자, furosemide + digoxin 복용 중. 혈청 K+ 2.8 mEq/L 측정됨.',
           stem: '저칼륨혈증이 digoxin 독성을 악화시키는 기전은?',
           choices: [
-            '디곡신 신장 배설 감소',
-            '디곡신 간 대사 감소',
-            '심근 수축력 직접 저하',
-            'K+가 Na+/K+ ATPase 수용체 경쟁에서 줄어 → 디곡신 결합↑ → 독성↑',
-            '혈장 알부민 감소로 디곡신 유리형 증가'
+            { text: '디곡신 신장 배설 감소' },
+            { text: '디곡신 간 대사 감소' },
+            { text: '심근 수축력 직접 저하' },
+            { text: 'K+가 Na+/K+ ATPase 수용체 경쟁에서 줄어 → 디곡신 결합↑ → 독성↑' },
+            { text: '혈장 알부민 감소로 디곡신 유리형 증가' }
           ],
           answerKey: 4,
           explanation: 'Na+/K+ ATPase에서 K+와 digoxin은 같은 결합부위를 경쟁합니다. 저칼륨혈증으로 K+↓ → 상대적으로 digoxin 결합↑ → 독성 위험↑. 루프이뇨제(furosemide)는 K+↓ 유발 → 반드시 K+ 보충 및 모니터링.',
@@ -691,11 +691,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '75세 당뇨 환자에게 신장조영검사(CT 조영증강)가 예정되어 있습니다. 현재 metformin 1,000mg bid 복용 중.',
           stem: '조영제 투여와 관련하여 metformin 복용에 대한 올바른 처치는?',
           choices: [
-            '조영제 투여 전날부터 metformin 중단 불필요',
-            '조영제 투여 당일만 metformin 중단',
-            'metformin 용량을 절반으로 감량',
-            'metformin을 다른 당뇨약으로 교체',
-            '조영제 투여 전후 48시간 metformin 중단'
+            { text: '조영제 투여 전날부터 metformin 중단 불필요' },
+            { text: '조영제 투여 당일만 metformin 중단' },
+            { text: 'metformin 용량을 절반으로 감량' },
+            { text: 'metformin을 다른 당뇨약으로 교체' },
+            { text: '조영제 투여 전후 48시간 metformin 중단' }
           ],
           answerKey: 5,
           explanation: '조영제는 신기능을 일시적으로 저하시킬 수 있어 metformin의 신장 배설이 감소 → 유산산증(lactic acidosis) 위험. 조영제 투여 전 48시간·투여 후 48시간 동안 metformin 중단, 신기능 재확인 후 재복용.',
@@ -761,11 +761,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '78세 만성 심부전 환자, ACEi(enalapril) 복용을 시작한 지 3주가 됩니다. 최근 마른기침이 지속되어 환자가 약을 중단하려 합니다.',
           stem: '이 상황에서 간호사의 가장 적절한 처치는?',
           choices: [
-            'ACEi를 즉시 중단하고 기침약 처방을 요청한다',
-            'ACEi는 심부전 치료의 핵심이므로 기침을 참으라고만 교육한다',
-            '마른기침은 ACEi의 흔한 부작용(브래디키닌 축적)이며, 지속 시 의사와 ARB로 교체 검토를 논의한다',
-            '항히스타민제를 추가 처방받아 기침을 억제한다',
-            '기침이 심각한 부작용이므로 즉시 응급실로 이송한다'
+            { text: 'ACEi를 즉시 중단하고 기침약 처방을 요청한다' },
+            { text: 'ACEi는 심부전 치료의 핵심이므로 기침을 참으라고만 교육한다' },
+            { text: '마른기침은 ACEi의 흔한 부작용(브래디키닌 축적)이며, 지속 시 의사와 ARB로 교체 검토를 논의한다' },
+            { text: '항히스타민제를 추가 처방받아 기침을 억제한다' },
+            { text: '기침이 심각한 부작용이므로 즉시 응급실로 이송한다' }
           ],
           answerKey: 3,
           explanation: 'ACEi의 마른기침은 브래디키닌 분해 억제로 인한 부작용으로 복용자의 10~20%에서 발생합니다. 기침이 불편하다면 심부전 치료 효과가 유사한 ARB(로사르탄, 발사르탄)로 교체를 의사와 상의합니다. 임의 중단은 심부전 악화 위험이 있어 반드시 의료진 상의 후 결정합니다.',
@@ -781,11 +781,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '73세 심부전 환자, digoxin 0.25mg + furosemide 40mg 복용 중. 혈청 K+ 2.8 mEq/L, 맥박 48회/분, 구역과 시력 흐림을 호소합니다.',
           stem: '이 환자에서 가장 우선적으로 취해야 할 간호 행위는?',
           choices: [
-            '다음 digoxin 용량을 즉시 투여한다',
-            '맥박 48회/분이므로 강심제(dobutamine)를 추가 투여한다',
-            'digoxin 투여를 보류하고 즉시 의사에게 보고한다',
-            'furosemide를 중단하면 자연적으로 회복된다',
-            '칼륨 보충제만 투여하고 경과 관찰한다'
+            { text: '다음 digoxin 용량을 즉시 투여한다' },
+            { text: '맥박 48회/분이므로 강심제(dobutamine)를 추가 투여한다' },
+            { text: 'digoxin 투여를 보류하고 즉시 의사에게 보고한다' },
+            { text: 'furosemide를 중단하면 자연적으로 회복된다' },
+            { text: '칼륨 보충제만 투여하고 경과 관찰한다' }
           ],
           answerKey: 3,
           explanation: '맥박 48회/분 + 저칼륨혈증(K+ 2.8) + 구역·시력 이상 = 디곡신 독성의 전형적 증상. 즉시 투약 보류 후 의사 보고 필수. 저칼륨혈증이 Na+/K+ ATPase에서 K+와 디곡신의 경쟁을 감소시켜 독성을 악화시킵니다. 디곡신 TDM + 전해질 확인 + 의사 보고 순서.',
@@ -848,11 +848,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '75세 남성, 급성 심근경색 후 심실빈맥(VT)이 발생했습니다. 항부정맥제 투여가 필요합니다.',
           stem: '이 상황에서 가장 적절한 1차 항부정맥제는?',
           choices: [
-            '플레카이나이드(Flecainide, Class Ic)',
-            '리도카인(Lidocaine, Class Ib)',
-            '베라파밀(Verapamil, Class IV)',
-            '아데노신(Adenosine)',
-            '프로카인아미드(Procainamide, Class Ia)'
+            { text: '플레카이나이드(Flecainide, Class Ic)' },
+            { text: '리도카인(Lidocaine, Class Ib)' },
+            { text: '베라파밀(Verapamil, Class IV)' },
+            { text: '아데노신(Adenosine)' },
+            { text: '프로카인아미드(Procainamide, Class Ia)' }
           ],
           answerKey: 2,
           explanation: '리도카인(Class Ib)은 허혈 조직과 심근경색 후 발생하는 심실성 부정맥에 선택적으로 효과적입니다. 반면 플레카이나이드(Class Ic)는 구조적 심장질환(AMI 후) 환자에서 사망률을 높이므로 금기(CAST 연구). 베라파밀·아데노신은 심실상성빈맥(PSVT)에 사용합니다.',
@@ -868,11 +868,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '68세 심방세동 환자, 아미오다론을 6개월째 복용 중입니다. 오늘 마른기침과 점진적인 호흡곤란을 호소합니다.',
           stem: '이 증상과 가장 관련 있는 아미오다론 부작용과 모니터링 항목은?',
           choices: [
-            '간독성 — 간기능 검사(AST/ALT)',
-            '갑상선 기능 항진증 — 갑상선 기능 검사',
-            '폐독성(간질성폐렴·폐섬유증) — 흉부 X선·폐기능 검사',
-            'QT 연장 — ECG 모니터링',
-            '피부 광과민증 — 자외선 차단'
+            { text: '간독성 — 간기능 검사(AST/ALT)' },
+            { text: '갑상선 기능 항진증 — 갑상선 기능 검사' },
+            { text: '폐독성(간질성폐렴·폐섬유증) — 흉부 X선·폐기능 검사' },
+            { text: 'QT 연장 — ECG 모니터링' },
+            { text: '피부 광과민증 — 자외선 차단' }
           ],
           answerKey: 3,
           explanation: '아미오다론의 폐독성(폐섬유증·간질성폐렴)은 마른기침·호흡곤란·저산소증으로 나타납니다. 치료 중 정기적 흉부X선(6~12개월마다)·폐기능검사·갑상선기능·간기능검사가 필수입니다. 폐독성 의심 시 즉각 보고·투약 중단 검토.',
@@ -932,11 +932,11 @@ window.NORI_DATA['pharmacology'] = {
           caseStory: '72세 고혈압 환자, hydrochlorothiazide(HCTZ) 복용 중. 혈청 K+ 3.0 mEq/L. 의사가 칼륨 보존 이뇨제를 추가하려 합니다. 그런데 현재 enalapril(ACEi)도 복용 중입니다.',
           stem: '이 약물 조합에서 가장 우선적으로 확인해야 할 전해질 문제는?',
           choices: [
-            '저나트륨혈증(Na+ 감소)',
-            '저마그네슘혈증(Mg2+ 감소)',
-            '고칼슘혈증(Ca2+ 증가)',
-            '고칼륨혈증(K+ 증가) — 칼륨보존이뇨제 + ACEi 병용',
-            '저인산혈증(P 감소)'
+            { text: '저나트륨혈증(Na+ 감소)' },
+            { text: '저마그네슘혈증(Mg2+ 감소)' },
+            { text: '고칼슘혈증(Ca2+ 증가)' },
+            { text: '고칼륨혈증(K+ 증가) — 칼륨보존이뇨제 + ACEi 병용' },
+            { text: '저인산혈증(P 감소)' }
           ],
           answerKey: 4,
           explanation: '칼륨보존이뇨제(스피로노락톤)는 K+ 배설을 줄이고, ACEi(에날라프릴)는 알도스테론 분비↓로 K+ 저류를 유발합니다. 두 약을 병용하면 고칼륨혈증(K+>5.5 mEq/L) 위험이 크게 증가합니다. 이미 K+ 3.0(저칼륨)이므로 K+를 올리는 것은 필요하나, K+ 모니터링을 강화해야 합니다.',
