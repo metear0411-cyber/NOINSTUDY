@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>노인전문간호사 시험준비 v2</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6b3fa0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="노인전문간호사">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- 데이터 파일 (전역 window 변수 방식 — file:// CORS 우회) -->
+  <!-- v=20260428 : 캐시 갱신용 버전 — 데이터 수정 시 숫자 증가 -->
+  <script src="data/subjects.js?v=20260429"></script>
+  <script src="data/major/gero-disease.js?v=20260429"></script>
+  <script src="data/major/gero-ltc.js?v=20260429"></script>
+  <script src="data/major/gero-promotion.js?v=20260429"></script>
+  <script src="data/major/gero-eol.js?v=20260429"></script>
+  <script src="data/major/gero-nursing.js?v=20260429"></script>
+  <script src="data/common/assessment.js?v=20260429"></script>
+  <script src="data/common/pharmacology.js?v=20260429"></script>
+  <script src="data/common/pathophysiology.js?v=20260429"></script>
+  <script src="data/common/nursing-theory.js?v=20260429"></script>
+  <script src="data/common/nursing-research.js?v=20260429"></script>
+  <script src="data/common/advanced-practice.js?v=20260429"></script>
+</head>
+<body>
+
+  <!-- 모바일 오버레이 -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="app-shell">
+
+    <!-- 좌측 Rail -->
+    <aside class="subject-rail" id="subjectRail">
+      <div class="rail-header">
+        <div class="brand-block">
+          <p class="kicker">노인전문간호사</p>
+          <h1>2026 합격 스터디</h1>
+        </div>
+        <div class="exam-meter">
+          <span id="daysLeft">D-???</span>
+          <span>2026.07.25 시험</span>
+        </div>
+      </div>
+
+      <!-- 학습 기록 내보내기/불러오기 -->
+      <div class="rail-data-actions">
+        <button class="data-action-btn" id="exportMarksBtn" type="button" title="학습 기록 JSON으로 내보내기">📤 내보내기</button>
+        <button class="data-action-btn" id="importMarksBtn" type="button" title="학습 기록 JSON 불러오기">📥 불러오기</button>
+        <input type="file" id="importMarksInput" accept=".json" style="display:none;">
+      </div>
+
+      <!-- 검색 -->
+      <div class="rail-search">
+        <input type="search" id="searchInput" placeholder="전체 토픽·키워드 검색" autocomplete="off">
+      </div>
+
+      <!-- 필터 탭 -->
+      <div class="mode-row">
+        <button class="mode-button is-active" data-filter="all" type="button">전체</button>
+        <button class="mode-button" data-filter="major" type="button">전공</button>
+        <button class="mode-button" data-filter="common" type="button">공통</button>
+      </div>
+
+      <!-- 과목 목록 -->
+      <div class="subject-list" id="subjectList"></div>
+    </aside>
+
+    <!-- 우측 메인 -->
+    <main class="study-workspace" id="studyWorkspace">
+
+      <!-- 모바일 햄버거 -->
+      <button class="hamburger" id="hamburgerBtn" type="button" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- 과목 헤더 -->
+      <div class="overview-band" id="overviewBand">
+        <div class="weight-ring" id="weightRing" style="--value:0">
+          <strong>0%</strong>
+          <span>출제 비중</span>
+        </div>
+        <div class="overview-copy">
+          <p class="subject-meta" id="subjectMeta"></p>
+          <h2 id="subjectTitle"></h2>
+          <p id="subjectSummary"></p>
+          <div class="chip-row" id="focusChips"></div>
+        </div>
+      </div>
+
+      <!-- 토픽 + 학습 그리드 -->
+      <div class="content-grid">
+
+        <!-- 토픽 패널 -->
+        <div class="part-panel">
+          <div class="panel-heading">
+            <h3>토픽</h3>
+            <button class="tool-button" id="memoryToggle" type="button" aria-pressed="false">암기 집중</button>
+          </div>
+          <div class="part-list" id="partList"></div>
+        </div>
+
+        <!-- 학습 패널 -->
+        <div class="lesson-panel">
+          <div class="lesson-head">
+            <div>
+              <p class="priority-label" id="topicPriority"></p>
+              <h3 id="topicTitle"></h3>
+            </div>
+            <div class="lesson-actions">
+              <!-- 학습 모드 탭 -->
+              <div class="mode-tabs-inline">
+                <button class="tab-btn is-active" data-mode="study" type="button">학습</button>
+                <button class="tab-btn" data-mode="quiz" type="button">퀴즈</button>
+                <button class="tab-btn" data-mode="flash" type="button">플래시카드</button>
+              </div>
+              <!-- 마크 버튼 -->
+              <button class="icon-button" id="printButton" title="A4 인쇄" type="button">🖨</button>
+              <button class="icon-button" id="bookmarkButton" title="북마크" type="button" aria-pressed="false">★</button>
+              <button class="icon-button" id="doneButton" title="완료" type="button" aria-pressed="false">✓</button>
+              <button class="icon-button" id="weakButton" title="약점" type="button" aria-pressed="false">!</button>
+            </div>
+          </div>
+
+          <!-- 학습 모드 -->
+          <div id="modeStudy" class="lesson-body"></div>
+
+          <!-- 퀴즈 모드 -->
+          <div id="modeQuiz" class="lesson-body" style="display:none;"></div>
+
+          <!-- 플래시카드 모드 -->
+          <div id="modeFlash" class="lesson-body" style="display:none;"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+  <!-- Service Worker 등록 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('[SW] 등록 완료:', reg.scope))
+          .catch(err => console.warn('[SW] 등록 실패:', err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# 개발 내부 문서 (공개 불필요)
+docs/
+.claude/
+
+# 백업 파일
+*.backup.js
+
+# 빌드/유틸 스크립트 (앱 동작에 불필요)
+scripts/
+data/major/parse_mcq.js
+data/topic-map.md
+
+# 로컬 서버 (GitHub Pages에선 불필요)
+server.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
