@@ -405,10 +405,14 @@
   // flowStep 텍스트를 '. ' 기준으로 번호 리스트로 분리
   function formatFlowText(text) {
     if (!text) return '';
-    // '. ' 뒤에 한국어·대문자·숫자·【 로 시작하는 패턴에서 분리
+    // '. ' 뒤에 한국어·대문자·숫자·【·원형숫자 로 시작하는 패턴에서 분리
     const parts = text
-      .split(/\.\s+(?=[가-힣A-Z【①②③④⑤\d])/)
-      .map(p => p.replace(/\.\s*$/, '').trim())
+      .split(/\.\s+(?=[가-힣A-Z【①②③④⑤⑥⑦⑧⑨⑩\d])/)
+      .map(p => p
+        .replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '') // 분리 후 앞에 남은 원형숫자 제거
+        .replace(/\.\s*$/, '')
+        .trim()
+      )
       .filter(Boolean);
     if (parts.length <= 1) return `<span>${esc(text)}</span>`;
     return `<ol class="flow-text-list">${parts.map(p => `<li>${esc(p)}</li>`).join('')}</ol>`;
