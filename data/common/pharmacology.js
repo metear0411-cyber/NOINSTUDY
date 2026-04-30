@@ -493,7 +493,7 @@ window.NORI_DATA['pharmacology'] = {
         {
           id: 'cns-q4',
           type: 'mcq',
-          caseStory: '파킨슨병 환자에게 levodopa/carbidopa(시네메트)가 처방되었습니다.',
+          caseStory: '파킨슨병 환자에게 levodopa/carbidopa가 처방되었습니다.',
           stem: '이 약물 복용 시 가장 중요한 식이 교육은?',
           choices: [
             { text: '철분이 풍부한 식품을 충분히 섭취한다' },
@@ -987,7 +987,7 @@ window.NORI_DATA['pharmacology'] = {
         {
           id: 'diur-q1',
           type: 'mcq',
-          caseStory: '72세 고혈압 환자, hydrochlorothiazide(HCTZ) 복용 중. 혈청 K+ 3.0 mEq/L. 의사가 칼륨 보존 이뇨제를 추가하려 합니다. 그런데 현재 enalapril(ACEi)도 복용 중입니다.',
+          caseStory: '72세 고혈압 환자, hydrochlorothiazide 복용 중. 혈청 K+ 3.0 mEq/L. 의사가 칼륨 보존 이뇨제를 추가하려 합니다. 그런데 현재 enalapril도 복용 중입니다.',
           stem: '이 약물 조합에서 가장 우선적으로 확인해야 할 전해질 문제는?',
           choices: [
             { text: '저나트륨혈증(Na+ 감소)' },

@@ -1518,11 +1518,11 @@ window.NORI_DATA['gero-ltc'] = {
           type: 'mcq',
           stem: 'Beers Criteria에서 노인에게 피해야 할 약물은?',
           choices: [
-            { text: 'Amlodipine (칼슘채널차단제)' },
-            { text: 'Metformin (메트포르민)' },
-            { text: 'Diphenhydramine (1세대 항히스타민)' },
-            { text: 'Losartan (ARB)' },
-            { text: 'Metoprolol (베타차단제)' }
+            { text: 'Amlodipine' },
+            { text: 'Metformin' },
+            { text: 'Diphenhydramine' },
+            { text: 'Losartan' },
+            { text: 'Metoprolol' }
           ],
           answerKey: 3,
           explanation: 'Diphenhydramine(1세대 항히스타민)은 강한 항콜린 작용으로 노인에게 섬망·요저류·낙상 위험. 시중 감기약·수면보조제에 포함. Beers Criteria 대표 약물.',
