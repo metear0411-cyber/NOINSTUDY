@@ -474,10 +474,10 @@
       </div>`;
     }
 
-    // 핵심 단서 읽기 (stemHighlights)
+    // 핵심 단서 읽기 (stemHighlights) — 답 선택 후 자동 공개
     if (q.stemHighlights?.length) {
-      html += `<div style="padding:10px 14px;background:var(--gold-soft);border-radius:8px;font-size:13px;">
-        <strong style="display:block;margin-bottom:6px;color:var(--gold)">⚡ 핵심 단서</strong>
+      html += `<div id="quizStemHighlights" style="display:none;padding:10px 14px;background:var(--gold-soft);border-radius:8px;font-size:13px;">
+        <strong style="display:block;margin-bottom:6px;color:var(--gold)">⚡ 핵심 단서 (답 선택 후 공개)</strong>
         ${q.stemHighlights.map(h => {
           const color = h.risk === 'high' ? '#c0392b' : h.risk === 'medium' ? '#d68910' : '#1e8449';
           const icon  = h.risk === 'high' ? '🔴' : h.risk === 'medium' ? '🟡' : '🟢';
@@ -579,6 +579,10 @@
     });
 
     el.querySelector('#quizExplanation')?.classList.add('show');
+
+    // 핵심 단서 자동 공개 (답 선택 후)
+    const stemHints = el.querySelector('#quizStemHighlights');
+    if (stemHints) stemHints.style.display = '';
 
     if (q.learnerSupport) {
       const hintBtn = el.querySelector('#quizHintToggle');
