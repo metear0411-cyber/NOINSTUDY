@@ -6,7 +6,28 @@
 
   const EXAM_DATE = new Date('2026-07-25');
   const LS_KEY     = 'nori_marks_v2';
-  const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
+  const LS_CAT_KEY = 'nori_cat_v2';
+
+  const MODES = { STUDY: 'study', QUIZ: 'quiz', FLASH: 'flash' };
+  const PRIORITIES = { HIGH: 'high', MEDIUM: 'medium', LOW: 'low' };
+  const PRIORITY_LABELS = {
+    high:   '★ 핵심 주제',
+    medium: '▷ 중요 주제',
+    low:    ''
+  };
+  const PRIORITY_ICONS = {
+    high:   '★ 핵심',
+    medium: '▷ 중요',
+    low:    ''
+  };
+  const FLOW_LABELS = {
+    clinical:  ['병태생리', '노인 특이성', '사정', '중재', '평가'],
+    policy:    ['제도 배경', '대상·기준', '급여 유형', '운영 원칙', '평가·관리'],
+    nursing:   ['역할 배경', '노인 특수성', '사정·도구', '간호중재', '평가기준'],
+    promotion: ['개요·근거', '노인 특이성', '사정·스크리닝', '중재·프로그램', '효과 평가']
+  };
+  const SEARCH_DEBOUNCE_MS = 300;
+  const FLOW_STEP_REGEX = /\.\s+(?=[가-힣A-Z【①②③④⑤⑥⑦⑧⑨⑩\d])/;
 
   // ─── 앱 상태 ──────────────────────────────────────
   const state = {
@@ -102,7 +123,7 @@
     if (!s) return 0;
     const d = state.data[s.dataKey];
     if (!d?.topics.length) return 0;
-    const done = d.topics.filter(t => state.marks[`${subjectId}:${t.id}`]?.done).length;
+    const done = d.topics.filter(t => state.marks[getTopicMarkKey(subjectId, t.id)]?.done).length;
     return Math.round((done / d.topics.length) * 100);
   }
 
@@ -171,7 +192,7 @@
       }
 
       list.innerHTML = allMatches.map(({ topic: t, subjectId, subjectTitle }) => {
-        const mark   = state.marks[`${subjectId}:${t.id}`] || {};
+        const mark   = state.marks[getTopicMarkKey(subjectId, t.id)] || {};
         const active = t.id === state.currentTopicId && subjectId === state.currentSubjectId;
         return `<button class="part-button${active ? ' is-active' : ''} search-result-btn"
           data-topic="${esc(t.id)}" data-subject="${esc(subjectId)}" type="button">
@@ -218,14 +239,20 @@
     list.innerHTML = Array.from(catMap.entries()).map(([cat, catTopics]) => {
       const catKey   = `${state.currentSubjectId}:${cat}`;
       const collapsed = state.catCollapsed[catKey] || false;
-      const hasDone  = catTopics.some(t => state.marks[`${state.currentSubjectId}:${t.id}`]?.done);
-      const hasWeak  = catTopics.some(t => state.marks[`${state.currentSubjectId}:${t.id}`]?.weak);
-      const hasBookmark = catTopics.some(t => state.marks[`${state.currentSubjectId}:${t.id}`]?.bookmark);
+
+      const badges = { done: false, weak: false, bookmark: false };
+      for (const t of catTopics) {
+        const mark = state.marks[getTopicMarkKey(state.currentSubjectId, t.id)] || {};
+        if (mark.done) badges.done = true;
+        if (mark.weak) badges.weak = true;
+        if (mark.bookmark) badges.bookmark = true;
+        if (badges.done && badges.weak && badges.bookmark) break;
+      }
 
       const badgeHtml = [
-        hasBookmark ? '<span class="cat-badge cat-badge--bm">★</span>' : '',
-        hasDone     ? '<span class="cat-badge cat-badge--done">✓</span>' : '',
-        hasWeak     ? '<span class="cat-badge cat-badge--weak">!</span>'  : ''
+        badges.bookmark ? '<span class="cat-badge cat-badge--bm">★</span>' : '',
+        badges.done     ? '<span class="cat-badge cat-badge--done">✓</span>' : '',
+        badges.weak     ? '<span class="cat-badge cat-badge--weak">!</span>'  : ''
       ].filter(Boolean).join('');
 
       return `
@@ -244,14 +271,14 @@
   }
 
   function renderTopicBtn(t) {
-    const mark   = state.marks[`${state.currentSubjectId}:${t.id}`] || {};
+    const mark   = state.marks[getTopicMarkKey(state.currentSubjectId, t.id)] || {};
     const states = [
       mark.bookmark ? 'bookmark' : '',
       mark.done     ? 'done'     : '',
       mark.weak     ? 'weak'     : ''
     ].filter(Boolean).join(' ');
     const active = t.id === state.currentTopicId;
-    const sub    = t.priority === 'high' ? '★ 핵심' : t.priority === 'medium' ? '▷ 중요' : '';
+    const sub    = PRIORITY_ICONS[t.priority] || '';
     return `<button class="part-button${active ? ' is-active' : ''}"
                      data-topic="${esc(t.id)}"
                      ${states ? `data-state="${states}"` : ''}
@@ -277,19 +304,17 @@
     const topic = getCurrentTopic();
     if (!topic?.id) return;
 
-    document.getElementById('topicPriority').textContent =
-      topic.priority === 'high' ? '★ 핵심 주제' :
-      topic.priority === 'medium' ? '▷ 중요 주제' : '';
+    document.getElementById('topicPriority').textContent = PRIORITY_LABELS[topic.priority] || '';
     document.getElementById('topicTitle').textContent = topic.title;
 
-    ['study', 'quiz', 'flash'].forEach(m => {
+    Object.values(MODES).forEach(m => {
       const el = document.getElementById(`mode${cap(m)}`);
       if (el) el.style.display = state.currentMode === m ? '' : 'none';
     });
 
-    if      (state.currentMode === 'study') renderStudy(topic);
-    else if (state.currentMode === 'quiz')  renderQuiz(topic);
-    else                                     renderFlash(topic);
+    if      (state.currentMode === MODES.STUDY) renderStudy(topic);
+    else if (state.currentMode === MODES.QUIZ)  renderQuiz(topic);
+    else                                         renderFlash(topic);
   }
 
   function clearLesson() {
@@ -309,13 +334,6 @@
     return d?.topics.find(t => t.id === state.currentTopicId) || null;
   }
 
-  // ─── 토픽 유형별 플로우 레이블 ──────────────────────
-  const FLOW_LABELS = {
-    clinical:  ['병태생리', '노인 특이성', '사정', '중재', '평가'],
-    policy:    ['제도 배경', '대상·기준', '급여 유형', '운영 원칙', '평가·관리'],
-    nursing:   ['역할 배경', '노인 특수성', '사정·도구', '간호중재', '평가기준'],
-    promotion: ['개요·근거', '노인 특이성', '사정·스크리닝', '중재·프로그램', '효과 평가']
-  };
 
   // ─── 학습 모드 ────────────────────────────────────
   function renderStudy(topic) {
@@ -324,18 +342,15 @@
 
     let html = '';
 
-    // 초보자 배너 + 왜 중요한가
     if (topic.beginner)    html += `<div class="beginner-banner"><strong>초보자 포인트&nbsp;</strong>${esc(topic.beginner)}</div>`;
     if (topic.whyImportant) html += `<div class="why-banner"><strong>왜 시험에 나오는가?&nbsp;</strong>${esc(topic.whyImportant)}</div>`;
 
-    // Red Flags
     if (topic.redFlags?.length) {
       html += section('🚨 즉시 대응 신호 (Red Flags)',
         `<ul class="trap-list">${topic.redFlags.map(f => `<li>🚨 ${esc(f)}</li>`).join('')}</ul>`);
     }
 
     if (state.memoryMode) {
-      // 암기 집중 모드
       if (topic.memory?.length) {
         html += section('핵심 암기 포인트',
           `<ul class="memory-list">${topic.memory.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`);
@@ -345,7 +360,6 @@
           `<ul class="trap-list">${topic.traps.map(t => `<li>⚠ ${esc(t)}</li>`).join('')}</ul>`);
       }
     } else {
-      // 이해 모드 — 임상 추론 플로우
       const u = topic.understand || {};
       const lbl = FLOW_LABELS[topic.topicType || 'clinical'];
       const flowTitle = topic.topicType === 'policy'   ? '제도 구조 개요' :
@@ -363,7 +377,6 @@
           </div>`);
       }
 
-      // 약물치료 섹션 (medications 필드가 있는 토픽에서만 표시)
       if (topic.medications?.length) {
         const medsHtml = topic.medications.map(med => {
           const sideArr = Array.isArray(med.sideEffects) ? med.sideEffects : (med.sideEffects ? [med.sideEffects] : []);
@@ -389,7 +402,6 @@
       }
     }
 
-    // 2차 답안 틀
     if (topic.caseFrame) {
       html += section('2차 사례형 답안 틀 (SOAP)',
         `<div class="why-banner" style="white-space:pre-line;">${esc(topic.caseFrame)}</div>`);
@@ -402,14 +414,12 @@
     return `<div class="study-section"><h4>${title}</h4>${bodyHtml}</div>`;
   }
 
-  // flowStep 텍스트를 '. ' 기준으로 번호 리스트로 분리
   function formatFlowText(text) {
     if (!text) return '';
-    // '. ' 뒤에 한국어·대문자·숫자·【·원형숫자 로 시작하는 패턴에서 분리
     const parts = text
-      .split(/\.\s+(?=[가-힣A-Z【①②③④⑤⑥⑦⑧⑨⑩\d])/)
+      .split(FLOW_STEP_REGEX)
       .map(p => p
-        .replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '') // 분리 후 앞에 남은 원형숫자 제거
+        .replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '')
         .replace(/\.\s*$/, '')
         .trim()
       )
@@ -418,7 +428,6 @@
     return `<ol class="flow-text-list">${parts.map(p => `<li>${esc(p)}</li>`).join('')}</ol>`;
   }
 
-  // 간호포인트 중 금기·주의·위험 키워드 포함 여부 감지
   function isCriticalNurse(text) {
     return /금기|금지|절대\s|주의|위험|즉시|응급|반드시|중단\s|독성|사망/.test(text);
   }
@@ -430,7 +439,6 @@
     </div>`;
   }
 
-  // ─── 퀴즈 모드 ───────────────────────────────────
   function renderQuiz(topic) {
     const el = document.getElementById('modeQuiz');
     if (!el) return;
@@ -441,7 +449,6 @@
       return;
     }
 
-    // 첫 진입 시 초기화
     if (!state.quiz.questions.length) {
       state.quiz.questions = shuffle([...questions]);
       state.quiz.current   = 0;
@@ -466,7 +473,6 @@
         <p class="quiz-counter">${idx + 1} / ${total}</p>
       </div>`;
 
-    // 임상 사례 (case 유형)
     if (q.caseStory) {
       html += `<div class="beginner-banner">
         <strong>📋 임상 사례</strong><br>
@@ -474,7 +480,6 @@
       </div>`;
     }
 
-    // 핵심 단서 읽기 (stemHighlights) — 답 선택 후 자동 공개
     if (q.stemHighlights?.length) {
       html += `<div id="quizStemHighlights" style="display:none;padding:10px 14px;background:var(--gold-soft);border-radius:8px;font-size:13px;">
         <strong style="display:block;margin-bottom:6px;color:var(--gold)">⚡ 핵심 단서 (답 선택 후 공개)</strong>
@@ -490,10 +495,8 @@
       </div>`;
     }
 
-    // 문제 stem
     html += `<p class="quiz-question">${esc(q.stem)}</p>`;
 
-    // 선택지
     html += `<div class="quiz-options">`;
     (q.choices || []).forEach((c, i) => {
       const text = typeof c === 'string' ? c : c.text;
@@ -504,12 +507,10 @@
     });
     html += `</div>`;
 
-    // 해설 (숨김)
     html += `<div class="quiz-explanation" id="quizExplanation">
       <strong>해설</strong><br>${esc(q.explanation || '해설을 준비 중입니다.')}
     </div>`;
 
-    // 무경력자 가이드 (토글 버튼 + 접힌 내용)
     if (q.learnerSupport) {
       const ls = q.learnerSupport;
       html += `<button id="quizHintToggle" class="quiz-hint-toggle" style="display:none;" type="button">📖 핵심단서 보기 ▶</button>`;
@@ -528,7 +529,6 @@
       </div>`;
     }
 
-    // 네비게이션
     html += `<div class="quiz-nav" id="quizNav">
       <button class="quiz-btn quiz-btn-secondary" id="quizSkipBtn" type="button">건너뛰기</button>
     </div></div>`;
@@ -705,8 +705,9 @@
     });
   }
 
-  // ─── 마크 (북마크·완료·약점) ──────────────────────
-  function getMarkKey() { return `${state.currentSubjectId}:${state.currentTopicId}`; }
+  function getTopicMarkKey(subjectId, topicId) { return `${subjectId}:${topicId}`; }
+
+  function getMarkKey() { return getTopicMarkKey(state.currentSubjectId, state.currentTopicId); }
 
   function updateMarkButtons() {
     const mark = state.marks[getMarkKey()] || {};
@@ -725,7 +726,6 @@
     buildTopicList();
   }
 
-  // ─── 모드 전환 ────────────────────────────────────
   function setMode(mode) {
     state.currentMode = mode;
     document.querySelectorAll('.tab-btn').forEach(btn =>
@@ -734,17 +734,14 @@
     renderCurrentMode();
   }
 
-  // ─── 이벤트 바인딩 ────────────────────────────────
+  let searchTimeout;
   function bindEvents() {
-    // 과목 클릭
     document.getElementById('subjectList')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-subject]');
       if (btn) selectSubject(btn.dataset.subject);
     });
 
-    // 토픽 클릭 + 카테고리 헤더 토글
     document.getElementById('partList')?.addEventListener('click', e => {
-      // 카테고리 헤더 토글
       const catBtn = e.target.closest('[data-cat-toggle]');
       if (catBtn) {
         const catKey   = catBtn.dataset.catToggle;
@@ -759,17 +756,14 @@
         }
         return;
       }
-      // 토픽 버튼 선택
       const btn = e.target.closest('[data-topic]');
       if (btn) selectTopic(btn.dataset.topic);
     });
 
-    // 모드 탭
     document.querySelectorAll('.tab-btn').forEach(btn =>
       btn.addEventListener('click', () => setMode(btn.dataset.mode))
     );
 
-    // 필터 버튼
     document.querySelectorAll('[data-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         state.filter = btn.dataset.filter;
@@ -780,37 +774,35 @@
       });
     });
 
-    // 검색
     document.getElementById('searchInput')?.addEventListener('input', e => {
+      clearTimeout(searchTimeout);
       state.search = e.target.value.trim();
-      buildSubjectList();
-      if (state.currentSubjectId) buildTopicList();
+      searchTimeout = setTimeout(() => {
+        buildSubjectList();
+        if (state.currentSubjectId) buildTopicList();
+      }, SEARCH_DEBOUNCE_MS);
     });
 
-    // 학습 기록 내보내기/불러오기
     document.getElementById('exportMarksBtn')?.addEventListener('click', exportMarks);
     const importInput = document.getElementById('importMarksInput');
     document.getElementById('importMarksBtn')?.addEventListener('click', () => importInput?.click());
     importInput?.addEventListener('change', e => {
       importMarks(e.target.files[0]);
-      e.target.value = '';   // 같은 파일 재선택 허용
+      e.target.value = '';
     });
 
-    // 마크 버튼
     document.getElementById('bookmarkButton')?.addEventListener('click', () => toggleMark('bookmark'));
     document.getElementById('doneButton')    ?.addEventListener('click', () => toggleMark('done'));
     document.getElementById('weakButton')    ?.addEventListener('click', () => toggleMark('weak'));
     document.getElementById('printButton')   ?.addEventListener('click', printTopic);
 
-    // 암기 집중 토글
     document.getElementById('memoryToggle')?.addEventListener('click', function () {
       state.memoryMode = !state.memoryMode;
       this.classList.toggle('is-active', state.memoryMode);
       this.textContent = state.memoryMode ? '이해 모드' : '암기 집중';
-      if (state.currentMode === 'study') renderCurrentMode();
+      if (state.currentMode === MODES.STUDY) renderCurrentMode();
     });
 
-    // 모바일 햄버거
     const rail    = document.getElementById('subjectRail');
     const overlay = document.getElementById('sidebarOverlay');
     document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
@@ -823,7 +815,6 @@
     });
   }
 
-  // ─── 유틸리티 ─────────────────────────────────────
   function esc(str) {
     if (!str) return '';
     return String(str)
@@ -843,7 +834,6 @@
     return arr;
   }
 
-  // ─── 학습 기록 내보내기/불러오기 ──────────────────
   function exportMarks() {
     const data = {
       version: 2,
@@ -879,21 +869,17 @@
     reader.readAsText(file);
   }
 
-  // ─── 인쇄 ─────────────────────────────────────────
   function printTopic() {
     const topic = getCurrentTopic();
     if (!topic?.id) { alert('인쇄할 토픽을 먼저 선택하세요'); return; }
-    // 현재 학습 모드 내용이 보이도록 study 모드로 전환 후 인쇄
     const prevMode = state.currentMode;
-    if (prevMode !== 'study') setMode('study');
+    if (prevMode !== MODES.STUDY) setMode(MODES.STUDY);
     setTimeout(() => {
       window.print();
-      if (prevMode !== 'study') setTimeout(() => setMode(prevMode), 500);
+      if (prevMode !== MODES.STUDY) setTimeout(() => setMode(prevMode), 500);
     }, 150);
   }
 
-  // ─── answerKey 유효성 검증 (콘솔 유틸) ───────────
-  // 브라우저 콘솔에서 noriValidate() 실행하면 의심 문항 목록 출력
   window.noriValidate = function () {
     const issues = [];
     Object.entries(state.data).forEach(([dataKey, d]) => {
@@ -923,6 +909,5 @@
     return issues;
   };
 
-  // ─── 부트 ─────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', init);
 })();
