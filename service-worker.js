@@ -1,6 +1,6 @@
 // 노인전문간호사 2026 — Service Worker
 // 버전을 올리면 캐시 갱신됨
-const CACHE_NAME = 'nori-study-v1';
+const CACHE_NAME = 'nori-study-v2';
 
 // 설치 시 미리 캐시할 핵심 파일
 const PRECACHE_URLS = [
@@ -10,6 +10,7 @@ const PRECACHE_URLS = [
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg',
+  './notes-bridge.js',
 ];
 
 // 데이터 파일 — fetch 시 자동 캐시됨
