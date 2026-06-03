@@ -11,9 +11,13 @@
     { icon: '🧠', label: '신경계',        desc: '뇌졸중·치매·섬망·파킨슨',         file: '05_신경계_학습노트.html' },
     { icon: '❤️', label: '심혈관계',      desc: 'ECG·죽상경화·심근표지자·심방세동', file: '02_심혈관계_학습노트.html' },
     { icon: '🫁', label: '호흡기계',      desc: '천식·COPD·폐렴·결핵·폐암',       file: '03_호흡기계_학습노트.html' },
+    { icon: '🍽️', label: '소화기계',      desc: '소화성궤양·GERD·위/대장암·간담', file: '06_소화기계_학습노트.html' },
+    { icon: '🦴', label: '근골격계',      desc: '골관절염·골다공증·골절',         file: '07_근골격계_학습노트.html' },
+    { icon: '💉', label: '내분비계',      desc: '당뇨·갑상샘',                     file: '08_내분비계_학습노트.html' },
     { icon: '🩹', label: '피부·감각계',   desc: '욕창단계·대상포진·백내장·난청',   file: '01_피부감각계_학습노트.html' },
     { icon: '📚', label: '간호이론·연구', desc: '노화이론·연구설계·통계',          file: '04_간호이론·간호연구_학습노트.html' },
-    { icon: '🗂️', label: '학습 허브',     desc: '4과목 + 학습플랜 모아보기',        file: '00_학습허브_시작.html' }
+    { icon: '🕊️', label: '장기요양·생애말기', desc: '장기요양 등급·호스피스·임종',   file: '09_장기요양·생애말기_학습노트.html' },
+    { icon: '🗂️', label: '학습 허브',     desc: '전 과목 + 학습플랜 모아보기',      file: '00_학습허브_시작.html' }
   ];
 
   var PURPLE = '#6b3fa0';
