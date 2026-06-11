@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const EXAM_DATE = new Date('2026-07-25');
+  const EXAM_DATE = new Date(2026, 6, 5);  // 2026-07-05 로컬 자정 (월은 0-indexed) — UTC 파싱 시 타임존 오차로 D-Day 하루 밀림 방지
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
 
