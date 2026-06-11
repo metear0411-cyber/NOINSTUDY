@@ -42,7 +42,7 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);color:v
   <div class="kicker">2026 노인전문간호사 자격시험 대비</div>
   <h1>📚 학습 허브</h1>
   <div class="sub">4과목 학습노트 · 능동회상 자가퀴즈 · Anki 암기카드 · 8주 학습플랜</div>
-  <div class="dday">시험: 2026.07.25 (약 D-8주) — 지금부터가 합격을 가르는 구간</div>
+  <div class="dday" id="ddayLine">시험: 2026.07.05 — 지금부터가 합격을 가르는 구간</div>
 </div></header>
 
 <div class="wrap">
@@ -110,7 +110,7 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);color:v
   </ol>
 </div>
 
-<h2 class="sec">🗓️ 8주 학습플랜 (시험 2026.07.25 · 간격반복 적용)</h2>
+<h2 class="sec">🗓️ 학습플랜 (시험 2026.07.05 · 간격반복 적용)</h2>
 <table class="plan">
   <tr><th>주차</th><th>새 학습 (1회독: 이해+인출)</th><th>복습 (간격반복 인출)</th></tr>
   <tr><td class="wk">1주차</td><td>심혈관계 정독, 암기 모드로 인출, ⭐ 고빈출 집중</td><td>매일 끝에 그날 ⭐ 빠른 인출 + Anki 심혈관 카드 시작</td></tr>
@@ -121,4 +121,22 @@ footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);color:v
   <tr><td class="wk">6주차</td><td>약점·오답 집중 보강 + <b>교차학습</b>(2~3과목 번갈아)</td><td>4과목 종합 자가퀴즈 전부 풀기 + Anki 전체</td></tr>
   <tr><td class="wk">7주차</td><td>⭐⭐ 매회 빈출(욕창·IHD/ECG·심방세동·천식/COPD·노화이론) 마무리 + 통합앱 MCQ 드릴</td><td>약점 토픽 재시험 + 어려운 Anki만</td></tr>
   <tr><td class="wk">8주차</td><td>최종 점검 — 전 과목 빠른 순회</td><td>시험 전 3~4일: <b>백지 인출</b>(안 보고 떠올려 쓰기) + 오답·어려운 Anki만</td></tr>
-</tabl
+</table>
+
+</div><!-- /wrap -->
+
+<script>
+  // 시험일 기준 D-Day 자동 계산 (시점이 지나도 항상 정확하게)
+  (function () {
+    var exam  = new Date(2026, 6, 5);            // 2026-07-05 로컬 자정 (월은 0-indexed)
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var d = Math.ceil((exam - today) / 86400000);
+    var el = document.getElementById('ddayLine');
+    if (el) {
+      var label = d > 0 ? 'D-' + d : d === 0 ? 'D-Day!' : 'D+' + Math.abs(d);
+      el.textContent = '시험: 2026.07.05 (' + label + ') — 지금부터가 합격을 가르는 구간';
+    }
+  })();
+</script>
+</body>
+</html>
