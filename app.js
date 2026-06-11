@@ -21,7 +21,9 @@
     marks: {},
     catCollapsed: {},        // { 'subjectId:카테고리명': true } → 접힘
     quiz: { questions: [], current: 0, answered: false, scores: [] },
-    flash: { cards: [], current: 0, flipped: false }
+    flash: { cards: [], current: 0, flipped: false },
+    gichulMode: false,
+    gichul: { questions: [], current: 0, answered: false, scores: [] }
   };
 
   // ─── 초기화 ───────────────────────────────────────
@@ -789,6 +791,10 @@
       if (state.currentSubjectId) buildTopicList();
     });
 
+    // 기출문제 버튼
+    document.getElementById('gichulEntryBtn')?.addEventListener('click', enterGichulMode);
+    document.getElementById('gichulExitBtn')?.addEventListener('click', exitGichulMode);
+
     // 학습 기록 내보내기/불러오기
     document.getElementById('exportMarksBtn')?.addEventListener('click', exportMarks);
     const importInput = document.getElementById('importMarksInput');
@@ -838,10 +844,168 @@
     document.addEventListener('keydown', handleKeyboard);
   }
 
+  // ─── 기출문제 모드 ──────────────────────────────────
+  function enterGichulMode() {
+    const qs = window.NORI_GICHUL?.questions || [];
+    if (!qs.length) { alert('기출문제 데이터를 불러올 수 없습니다.'); return; }
+
+    state.gichulMode = true;
+    state.gichul = { questions: shuffle([...qs]), current: 0, answered: false, scores: [] };
+
+    document.getElementById('overviewBand').style.display = 'none';
+    document.getElementById('contentGrid').style.display  = 'none';
+    document.getElementById('gichulPanel').style.display  = '';
+
+    document.getElementById('subjectRail')?.classList.remove('is-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('is-open');
+
+    renderGichulQuestion();
+  }
+
+  function exitGichulMode() {
+    state.gichulMode = false;
+    document.getElementById('overviewBand').style.display = '';
+    document.getElementById('contentGrid').style.display  = '';
+    document.getElementById('gichulPanel').style.display  = 'none';
+  }
+
+  function renderGichulQuestion() {
+    const el = document.getElementById('gichulContent');
+    if (!el) return;
+    const { questions, current } = state.gichul;
+    const total = questions.length;
+    if (current >= total) { renderGichulResult(el, total); return; }
+
+    const q    = questions[current];
+    const pct  = Math.round((current / total) * 100);
+    const nums = '①②③④⑤';
+
+    document.getElementById('gichulProgress').textContent = `${current + 1} / ${total}`;
+
+    let html = `<div class="quiz-wrapper">
+      <div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+        <p class="quiz-counter">${current + 1} / ${total}</p>
+      </div>`;
+
+    if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
+
+    html += `<p class="quiz-question">${esc(q.stem).replace(/\n/g, '<br>')}</p>`;
+    html += `<div class="quiz-options">`;
+    (q.choices || []).forEach((c, i) => {
+      html += `<button class="quiz-option" data-opt="${i + 1}" type="button">
+        <span class="opt-num">${nums[i] || (i + 1) + '.'}</span>
+        <span>${esc(c)}</span>
+      </button>`;
+    });
+    html += `</div>`;
+    html += `<div class="quiz-explanation" id="quizExplanation">
+      <strong>해설</strong><br>${esc(q.explanation || '해설을 준비 중입니다.')}
+    </div>`;
+    html += `<div class="quiz-nav" id="quizNav">
+      <button class="quiz-btn quiz-btn-secondary" id="gichulSkipBtn" type="button">건너뛰기</button>
+    </div></div>`;
+
+    el.innerHTML = html;
+    el.scrollTop = 0;
+
+    el.querySelectorAll('.quiz-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (state.gichul.answered) return;
+        handleGichulAnswer(btn, q, el);
+      });
+    });
+
+    el.querySelector('#gichulSkipBtn')?.addEventListener('click', () => {
+      state.gichul.scores.push(null);
+      state.gichul.answered = false;
+      state.gichul.current++;
+      renderGichulQuestion();
+    });
+  }
+
+  function handleGichulAnswer(btn, q, el) {
+    state.gichul.answered = true;
+    const chosen  = parseInt(btn.dataset.opt, 10);
+    const correct = q.answerKey;
+    const isOk    = chosen === correct;
+
+    state.gichul.scores.push(isOk);
+
+    el.querySelectorAll('.quiz-option').forEach((b, i) => {
+      b.classList.add('disabled');
+      if (i + 1 === correct)              b.classList.add('correct');
+      else if (i + 1 === chosen && !isOk) b.classList.add('wrong');
+    });
+    el.querySelector('#quizExplanation')?.classList.add('show');
+
+    const nav = el.querySelector('#quizNav');
+    if (nav) {
+      const more = state.gichul.current + 1 < state.gichul.questions.length;
+      nav.innerHTML = `<button class="quiz-btn quiz-btn-primary" id="gichulNextBtn" type="button">
+        ${more ? '다음 문제 →' : '결과 확인 →'}
+      </button>`;
+      nav.querySelector('#gichulNextBtn').addEventListener('click', () => {
+        state.gichul.answered = false;
+        state.gichul.current++;
+        renderGichulQuestion();
+      });
+    }
+  }
+
+  function renderGichulResult(el, total) {
+    const correct   = state.gichul.scores.filter(s => s === true).length;
+    const pct       = Math.round((correct / total) * 100);
+    const pass      = pct >= 60;
+    const wrongQs   = state.gichul.questions.filter((q, i) => state.gichul.scores[i] !== true);
+
+    document.getElementById('gichulProgress').textContent = '완료!';
+
+    el.innerHTML = `<div class="quiz-result">
+      <p class="quiz-score" style="color:${pass ? 'var(--green)' : 'var(--clay)'}">${pct}%</p>
+      <p class="quiz-score-label">${correct} / ${total} 정답</p>
+      <p class="quiz-result-msg">${pass ? '합격권 🎉 잘 하셨어요!' : '조금 더 연습해봐요'}</p>
+      <p class="quiz-result-sub">60% 이상이 합격 기준입니다</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;">
+        <button class="quiz-btn quiz-btn-primary"   id="gichulRetryBtn"      type="button">전체 다시 풀기</button>
+        ${wrongQs.length > 0
+          ? `<button class="quiz-btn quiz-btn-wrong" id="gichulRetryWrongBtn" type="button">❌ 오답만 다시 풀기 (${wrongQs.length}문제)</button>`
+          : `<button class="quiz-btn quiz-btn-wrong" disabled style="opacity:0.4;cursor:not-allowed">❌ 오답 없음 🎉</button>`
+        }
+        <button class="quiz-btn quiz-btn-secondary" id="gichulBackBtn"       type="button">← 학습으로 돌아가기</button>
+      </div>
+    </div>`;
+
+    el.querySelector('#gichulRetryBtn').addEventListener('click', () => {
+      state.gichul = { questions: shuffle([...(window.NORI_GICHUL?.questions || [])]), current: 0, answered: false, scores: [] };
+      renderGichulQuestion();
+    });
+    if (wrongQs.length > 0) {
+      el.querySelector('#gichulRetryWrongBtn').addEventListener('click', () => {
+        state.gichul = { questions: shuffle([...wrongQs]), current: 0, answered: false, scores: [] };
+        renderGichulQuestion();
+      });
+    }
+    el.querySelector('#gichulBackBtn').addEventListener('click', exitGichulMode);
+  }
+
   function handleKeyboard(e) {
     // 입력창에 포커스가 있으면 무시
     const tag = (e.target.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') return;
+
+    // 기출문제 모드 키보드
+    if (state.gichulMode) {
+      if (/^[1-5]$/.test(e.key) && !state.gichul.answered) {
+        const opt = document.querySelector(`#gichulContent .quiz-option[data-opt="${e.key}"]`);
+        if (opt) { e.preventDefault(); opt.click(); }
+      } else if (e.key === 'Enter') {
+        const next = document.getElementById('gichulNextBtn') || document.getElementById('gichulSkipBtn');
+        if (next) { e.preventDefault(); next.click(); }
+      }
+      return;
+    }
+
     if (!state.currentTopicId) return;
 
     if (state.currentMode === 'flash') {
