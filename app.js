@@ -130,6 +130,10 @@
     buildSubjectList();
     buildTopicList();
     clearLesson();
+
+    // 모바일에서 과목 선택 시 사이드바 자동 닫기 (선택 후 바로 내용이 보이도록)
+    document.getElementById('subjectRail')?.classList.remove('is-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('is-open');
   }
 
   // ─── 토픽 목록 ────────────────────────────────────
@@ -430,6 +434,12 @@
     </div>`;
   }
 
+  // 문제 전환 시 퀴즈 패널 상단으로 스크롤 (긴 사례형에서 새 문제 시작점이 화면 밖으로 밀리는 문제 방지)
+  function scrollQuizTop() {
+    const panel = document.querySelector('.lesson-panel');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   // ─── 퀴즈 모드 ───────────────────────────────────
   function renderQuiz(topic) {
     const el = document.getElementById('modeQuiz');
@@ -543,17 +553,7 @@
       });
     });
 
-    // 핵심단서 토글
-    el.addEventListener('click', e => {
-      const hintBtn = e.target.closest('#quizHintToggle');
-      if (hintBtn) {
-        const isOpen = hintBtn.classList.toggle('is-open');
-        const content = el.querySelector('#quizLearnerSupport');
-        if (content) content.style.display = isOpen ? '' : 'none';
-        hintBtn.textContent = isOpen ? '📖 핵심단서 접기 ▼' : '📖 핵심단서 보기 ▶';
-        return;
-      }
-    });
+    // 핵심단서 토글 — 위임 리스너는 bindEvents에서 1회만 등록 (중복 방지)
 
     // 건너뛰기
     el.querySelector('#quizSkipBtn')?.addEventListener('click', () => {
@@ -561,6 +561,7 @@
       state.quiz.answered = false;
       state.quiz.current++;
       renderQuiz({ questions: state.quiz.questions });
+      scrollQuizTop();
     });
   }
 
@@ -599,6 +600,7 @@
         state.quiz.answered = false;
         state.quiz.current++;
         renderQuiz({ questions: state.quiz.questions });
+        scrollQuizTop();
       });
     }
   }
@@ -821,6 +823,49 @@
       rail?.classList.remove('is-open');
       overlay?.classList.remove('is-open');
     });
+
+    // 퀴즈 핵심단서 토글 — 컨테이너에 위임 리스너 1회만 등록 (문제마다 중복 등록되던 버그 수정)
+    document.getElementById('modeQuiz')?.addEventListener('click', e => {
+      const hintBtn = e.target.closest('#quizHintToggle');
+      if (!hintBtn) return;
+      const isOpen  = hintBtn.classList.toggle('is-open');
+      const content = document.getElementById('quizLearnerSupport');
+      if (content) content.style.display = isOpen ? '' : 'none';
+      hintBtn.textContent = isOpen ? '📖 핵심단서 접기 ▼' : '📖 핵심단서 보기 ▶';
+    });
+
+    // 키보드 단축키 — 플래시카드(Space 뒤집기, ←/→ 이동), 퀴즈(1~5 선택, Enter 다음)
+    document.addEventListener('keydown', handleKeyboard);
+  }
+
+  function handleKeyboard(e) {
+    // 입력창에 포커스가 있으면 무시
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (!state.currentTopicId) return;
+
+    if (state.currentMode === 'flash') {
+      const card = document.getElementById('flashCard');
+      if (!card) return;
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        card.click();
+      } else if (e.key === 'ArrowLeft') {
+        document.getElementById('fcPrev')?.click();
+      } else if (e.key === 'ArrowRight') {
+        document.getElementById('fcNext')?.click();
+      }
+    } else if (state.currentMode === 'quiz') {
+      // 1~5 선택지
+      if (/^[1-5]$/.test(e.key) && !state.quiz.answered) {
+        const opt = document.querySelector(`.quiz-option[data-opt="${e.key}"]`);
+        if (opt) { e.preventDefault(); opt.click(); }
+      } else if (e.key === 'Enter') {
+        // 답한 뒤 Enter → 다음 문제 / 결과 확인
+        const next = document.getElementById('quizNextBtn');
+        if (next) { e.preventDefault(); next.click(); }
+      }
+    }
   }
 
   // ─── 유틸리티 ─────────────────────────────────────

@@ -939,7 +939,7 @@ a { color: var(--teal); }
 .flashcard {
   width: 100%;
   max-width: 560px;
-  height: 220px;
+  height: 300px;
   cursor: pointer;
   perspective: 1000px;
 }
@@ -964,6 +964,8 @@ a { color: var(--teal); }
   justify-content: center;
   padding: 24px;
   text-align: center;
+  overflow-y: auto;          /* 긴 텍스트는 카드 안에서 스크롤 (잘림 방지) */
+  overscroll-behavior: contain;
 }
 .flashcard-front {
   background: linear-gradient(135deg, var(--navy), #1e40af);
@@ -975,6 +977,7 @@ a { color: var(--teal); }
   transform: rotateY(180deg);
   border: 2px solid var(--teal);
   box-shadow: var(--shadow-md);
+  justify-content: flex-start;  /* 긴 답변은 위에서부터 시작 (flex center + overflow 상단 잘림 회피) */
 }
 .flashcard-front p { font-size: 16px; font-weight: 700; line-height: 1.6; }
 .flashcard-back p  { font-size: 14px; line-height: 1.8; white-space: pre-line; }
