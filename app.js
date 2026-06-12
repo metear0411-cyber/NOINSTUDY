@@ -23,6 +23,8 @@
     quiz: { questions: [], current: 0, answered: false, scores: [] },
     flash: { cards: [], current: 0, flipped: false },
     gichulMode: false,
+    gichulChapter: '전체',   // 기출 탭 챕터 필터
+    gichulType: '기출',      // '기출' | '변형' | '전체'
     gichul: { questions: [], current: 0, answered: false, scores: [] }
   };
 
@@ -845,12 +847,94 @@
   }
 
   // ─── 기출문제 모드 ──────────────────────────────────
+
+  // 현재 타입·챕터 필터에 해당하는 문항 목록
+  function gichulPool() {
+    const gqs = window.NORI_GICHUL?.questions || [];
+    const vqs = (window.NORI_VARIATION?.questions || []).map(q => ({...q, type: 'variation'}));
+    let pool;
+    if (state.gichulType === '기출') pool = gqs;
+    else if (state.gichulType === '변형') pool = vqs;
+    else pool = [...gqs, ...vqs];
+    if (state.gichulChapter === '전체') return pool;
+    return pool.filter(q => q.chapter === state.gichulChapter);
+  }
+
+  // 타입 풀 (챕터 필터 제외) — 챕터 뱃지 계산용
+  function gichulTypePool() {
+    const gqs = window.NORI_GICHUL?.questions || [];
+    const vqs = (window.NORI_VARIATION?.questions || []).map(q => ({...q, type: 'variation'}));
+    if (state.gichulType === '기출') return gqs;
+    if (state.gichulType === '변형') return vqs;
+    return [...gqs, ...vqs];
+  }
+
+  // 타입 선택 바 (기출 / 변형 / 전체)
+  function buildGichulTypeBar() {
+    const bar = document.getElementById('gichulTypeBar');
+    if (!bar) return;
+    const gCount = (window.NORI_GICHUL?.questions || []).length;
+    const vCount = (window.NORI_VARIATION?.questions || []).length;
+    const types = [
+      { key: '기출', label: '기출문제', count: gCount },
+      { key: '변형', label: '변형(AI)', count: vCount },
+      { key: '전체', label: '전체',    count: gCount + vCount },
+    ];
+    bar.innerHTML = types.map(t =>
+      `<button class="mode-button gichul-chapter-btn${state.gichulType === t.key ? ' is-active' : ''}" type="button" data-type="${t.key}">${esc(t.label)} <span class="gichul-chapter-count">${t.count}</span></button>`
+    ).join('');
+    bar.querySelectorAll('[data-type]').forEach(btn => {
+      btn.addEventListener('click', () => setGichulType(btn.dataset.type));
+    });
+  }
+
+  function setGichulType(type) {
+    state.gichulType = type;
+    state.gichulChapter = '전체';
+    buildGichulTypeBar();
+    buildGichulChapterBar();
+    startGichulSession();
+  }
+
+  // 챕터 필터 바 생성 (현재 타입 풀 기준 동적 생성)
+  function buildGichulChapterBar() {
+    const bar = document.getElementById('gichulChapterBar');
+    if (!bar) return;
+    const pool = gichulTypePool();
+    const order = (window.NORI_GICHUL?.chapters || []).filter(c => pool.some(q => q.chapter === c));
+    pool.forEach(q => { if (q.chapter && !order.includes(q.chapter)) order.push(q.chapter); });
+    const count = ch => ch === '전체' ? pool.length : pool.filter(q => q.chapter === ch).length;
+    const chapters = ['전체', ...order];
+    bar.innerHTML = chapters.map(ch =>
+      `<button class="mode-button gichul-chapter-btn${ch === state.gichulChapter ? ' is-active' : ''}" type="button" data-chapter="${esc(ch)}">${esc(ch)} <span class="gichul-chapter-count">${count(ch)}</span></button>`
+    ).join('');
+    bar.querySelectorAll('.gichul-chapter-btn').forEach(btn => {
+      btn.addEventListener('click', () => setGichulChapter(btn.dataset.chapter));
+    });
+  }
+
+  // 챕터 선택 → 필터 적용 + 세션 초기화 + 재렌더
+  function setGichulChapter(ch) {
+    state.gichulChapter = ch;
+    document.querySelectorAll('#gichulChapterBar .gichul-chapter-btn')
+      .forEach(b => b.classList.toggle('is-active', b.dataset.chapter === ch));
+    startGichulSession();
+  }
+
+  // 현재 풀로 새 세션 시작
+  function startGichulSession() {
+    state.gichul = { questions: shuffle([...gichulPool()]), current: 0, answered: false, scores: [] };
+    renderGichulQuestion();
+  }
+
   function enterGichulMode() {
     const qs = window.NORI_GICHUL?.questions || [];
     if (!qs.length) { alert('기출문제 데이터를 불러올 수 없습니다.'); return; }
 
     state.gichulMode = true;
-    state.gichul = { questions: shuffle([...qs]), current: 0, answered: false, scores: [] };
+    buildGichulTypeBar();
+    buildGichulChapterBar();
+    startGichulSession();
 
     document.getElementById('overviewBand').style.display = 'none';
     document.getElementById('contentGrid').style.display  = 'none';
@@ -858,8 +942,6 @@
 
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
-
-    renderGichulQuestion();
   }
 
   function exitGichulMode() {
@@ -889,6 +971,7 @@
       </div>`;
 
     if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
+    if (q.type === 'variation') html += `<span class="variation-badge">변형문제(AI생성)</span>`;
 
     html += `<p class="quiz-question">${esc(q.stem).replace(/\n/g, '<br>')}</p>`;
     html += `<div class="quiz-options">`;
@@ -977,8 +1060,7 @@
     </div>`;
 
     el.querySelector('#gichulRetryBtn').addEventListener('click', () => {
-      state.gichul = { questions: shuffle([...(window.NORI_GICHUL?.questions || [])]), current: 0, answered: false, scores: [] };
-      renderGichulQuestion();
+      startGichulSession();
     });
     if (wrongQs.length > 0) {
       el.querySelector('#gichulRetryWrongBtn').addEventListener('click', () => {

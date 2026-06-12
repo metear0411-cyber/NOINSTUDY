@@ -1214,6 +1214,62 @@ a { color: var(--teal); }
   white-space: nowrap;
 }
 
+/* ─── 기출문제 타입 선택 바 (기출/변형/전체) ─── */
+.gichul-type-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px 0;
+  background: #fff;
+  flex-shrink: 0;
+}
+.gichul-type-bar .gichul-chapter-btn {
+  height: auto;
+  min-height: 32px;
+  padding: 5px 14px;
+  font-weight: 700;
+}
+
+/* ─── 변형문제 배지 ─── */
+.variation-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: #f0e6ff;
+  color: #6b3fa0;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* ─── 기출문제 챕터 필터 바 ─── */
+.gichul-chapter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  flex-shrink: 0;
+}
+.gichul-chapter-bar .gichul-chapter-btn {
+  height: auto;
+  min-height: 32px;
+  padding: 5px 12px;
+}
+.gichul-chapter-count {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 11px;
+  font-weight: 700;
+}
+.gichul-chapter-btn.is-active .gichul-chapter-count {
+  background: rgba(255, 255, 255, 0.28);
+}
+
 /* ─── 기출문제 태그 (과목 분류) ─── */
 .gichul-tag {
   display: inline-block;
