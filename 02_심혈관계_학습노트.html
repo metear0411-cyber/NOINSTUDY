@@ -125,6 +125,14 @@ table.tbl tr:nth-child(even) td{background:#fafbfc}
 footer{margin-top:50px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
 mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 @media(max-width:680px){body{font-size:16px}.row .fig{flex-basis:100%}}
+
+/* ── 정답 가독성 보강 (앱 레이어드 UI 톤 통일) ── */
+.selfcheck .a,#quiz .ans{border-left:4px solid var(--brand);line-height:1.7;color:var(--ink);word-break:keep-all;overflow-wrap:break-word}
+.selfcheck .a::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;margin-right:7px;font-size:11.5px;font-weight:800;vertical-align:1px}
+#quiz .ans{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+#quiz .ans::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:800}
+#quiz summary{padding:4px 0}
+#quiz summary:focus-visible,.selfcheck details summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
 </style></head>
 <body>
 <header class="top"><div class="wrap">
@@ -236,6 +244,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 2. 허혈성 심장질환 ===== -->
 <section class="chap" id="ihd">
   <h2>2. 허혈성 심장질환 (IHD) <span class="pill freq">⭐⭐ 빈출</span></h2>
+  <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:acs" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 ACS MCQ·플래시카드 풀기 ↗</a></p>
   <p class="chap-intro">3개 관상동맥 중 1개 이상이 좁아져 심근 혈류가 부족한 상태. <b>전 세계 사망원인 1위.</b></p>
 
   <div class="card" id="ihd-class">
@@ -309,6 +318,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 3. 심부전 ===== -->
 <section class="chap" id="hf">
   <h2>3. 심부전 (Heart Failure) <span class="pill freq">⭐ 빈출</span></h2>
+  <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:heart-failure" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 심부전 MCQ·플래시카드 풀기 ↗</a></p>
   <p class="chap-intro">심장 기능 저하로 호흡곤란·부종·피로가 나타나는 <b>임상증후군</b>(질환 아님). 가장 흔한 원인은 심근경색.</p>
   <div class="card">
     <dl class="kv">
@@ -335,6 +345,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 4. 부정맥 ===== -->
 <section class="chap" id="arrhythmia">
   <h2>4. 부정맥 (Arrhythmia) <span class="pill freq">⭐ 빈출</span></h2>
+  <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:arrhythmia" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 부정맥 MCQ·플래시카드 풀기 ↗</a></p>
   <p class="chap-intro">정상 동성리듬이 아닌 모든 리듬. 노인에 흔하며 가장 흔한 건 <b>심방세동(AF)</b>. 진단의 기본은 <b>12유도 심전도</b>.</p>
 
   <div class="card" id="af">
@@ -378,6 +389,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 5. 말초동맥질환 ===== -->
 <section class="chap" id="pad">
   <h2>5. 말초동맥질환 (PAD)</h2>
+  <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:pvd" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 말초동맥질환 MCQ·플래시카드 풀기 ↗</a></p>
   <div class="card">
     <dl class="kv">
       <dt>정의</dt><dd>대동맥·관상동맥·뇌혈관을 제외한 혈관의 폐쇄·협착. 기전은 IHD와 동일(<span class="cz">죽종 형성·파열·혈전</span>). 남성↑, <span class="cz">대퇴-슬와동맥</span> 호발.</dd>

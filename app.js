@@ -538,20 +538,28 @@
     return `<div class="study-section"><h4>${title}</h4>${bodyHtml}</div>`;
   }
 
-  // flowStep 텍스트를 '. ' 기준으로 번호 리스트로 분리
+  // 핵심어 강조 — 이미 esc()된 문자열에만 적용(숫자·단위는 esc 영향 없음, 안전)
+  function emph(escaped) {
+    return escaped
+      .replace(/(금기|금지|절대|즉시|응급|반드시|주의|중단|위험|사망|독성)/g, '<b class="kw-warn">$1</b>')
+      .replace(/(\d+(?:\.\d+)?\s?(?:mmHg|mg\/dL|mEq\/L|mg|mcg|mL|%|회|시간|분|일|주|kg|g))/g, '<b class="kw-num">$1</b>');
+  }
+
+  // flowStep 텍스트를 '. ' '; ' '①②③' 기준으로 잘게 분리 + 핵심어 강조
   function formatFlowText(text) {
     if (!text) return '';
-    // '. ' 뒤에 한국어·대문자·숫자·【·원형숫자 로 시작하는 패턴에서 분리
-    const parts = text
-      .split(/\.\s+(?=[가-힣A-Z【①②③④⑤⑥⑦⑧⑨⑩\d])/)
+    // 원형숫자 마커 앞에 분리 토큰(\u0001) 삽입 후, 문장부호 기준으로도 분리
+    const marked = text.replace(/\s*([①②③④⑤⑥⑦⑧⑨⑩])\s*/g, '\u0001$1');
+    const parts = marked
+      .split(/\u0001|(?:\.\s+|;\s+)(?=[가-힣A-Z【\d])/)
       .map(p => p
-        .replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '') // 분리 후 앞에 남은 원형숫자 제거
-        .replace(/\.\s*$/, '')
+        .replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '')
+        .replace(/[.;]\s*$/, '')
         .trim()
       )
       .filter(Boolean);
-    if (parts.length <= 1) return `<span>${esc(text)}</span>`;
-    return `<ol class="flow-text-list">${parts.map(p => `<li>${esc(p)}</li>`).join('')}</ol>`;
+    if (parts.length <= 1) return `<span>${emph(esc(text))}</span>`;
+    return `<ol class="flow-text-list">${parts.map(p => `<li>${emph(esc(p))}</li>`).join('')}</ol>`;
   }
 
   // 간호포인트 중 금기·주의·위험 키워드 포함 여부 감지
