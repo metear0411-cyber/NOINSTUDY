@@ -399,8 +399,7 @@
         html += section('핵심 암기 포인트', memoryList(topic.memory));
       }
       if (topic.traps?.length) {
-        html += section('함정 &amp; 주의사항',
-          `<ul class="trap-list">${topic.traps.map(t => `<li>⚠ ${esc(t)}</li>`).join('')}</ul>`);
+        html += section('함정 &amp; 주의사항', trapList(topic.traps));
       }
     } else {
       // 이해 모드 — 임상 추론 플로우
@@ -428,8 +427,7 @@
         html += section('핵심 암기 포인트', memoryList(topic.memory));
       }
       if (topic.traps?.length) {
-        html += section('함정 &amp; 주의사항',
-          `<ul class="trap-list">${topic.traps.map(t => `<li>⚠ ${esc(t)}</li>`).join('')}</ul>`);
+        html += section('함정 &amp; 주의사항', trapList(topic.traps));
       }
     }
 
@@ -493,8 +491,7 @@
     if (topic.memory?.length)
       deep += section('핵심 암기 포인트', memoryList(topic.memory));
     if (topic.traps?.length)
-      deep += section('함정 &amp; 주의사항',
-        `<ul class="trap-list">${topic.traps.map(t => `<li>⚠ ${esc(t)}</li>`).join('')}</ul>`);
+      deep += section('함정 &amp; 주의사항', trapList(topic.traps));
     if (topic.caseFrame)
       deep += section('2차 사례형 답안 틀 (SOAP)',
         `<div class="why-banner" style="white-space:pre-line;">${esc(topic.caseFrame)}</div>`);
@@ -506,6 +503,22 @@
             + `<div class="l-deep-body">${deep}</div></details>`;
 
     el.innerHTML = html || '<div class="empty-state">학습 내용을 준비 중입니다</div>';
+  }
+
+  // 함정 & 주의사항 — 머리말(:/→/—)만 보이는 접이식 줄. 긴 경고 문장 나열 완화.
+  function trapList(items) {
+    const rows = items.map(t => {
+      const s = String(t);
+      const m = s.match(/[:：]|→|—/);
+      const idx = m ? m.index : -1;
+      if (idx > 0 && idx <= 52) {
+        const head = s.slice(0, idx).trim();
+        const body = s.slice(idx + m[0].length).trim();
+        if (body) return `<details class="trap-item"><summary class="trap-key">⚠ ${esc(head)}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="trap-detail">${esc(body)}</div></details>`;
+      }
+      return `<div class="trap-item trap-plain">⚠ ${esc(s)}</div>`;
+    }).join('');
+    return `<div class="trap-fold">${rows}</div>`;
   }
 
   // 핵심 암기 포인트 — 키워드(머리말)만 보이는 접이식 줄. 키워드가 없으면 일반 줄.
