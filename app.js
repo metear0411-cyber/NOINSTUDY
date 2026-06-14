@@ -396,8 +396,7 @@
     if (state.memoryMode) {
       // 암기 집중 모드
       if (topic.memory?.length) {
-        html += section('핵심 암기 포인트',
-          `<ul class="memory-list">${topic.memory.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`);
+        html += section('핵심 암기 포인트', memoryList(topic.memory));
       }
       if (topic.traps?.length) {
         html += section('함정 &amp; 주의사항',
@@ -426,8 +425,7 @@
       html += medsSection(topic);
 
       if (topic.memory?.length) {
-        html += section('핵심 암기 포인트',
-          `<ul class="memory-list">${topic.memory.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`);
+        html += section('핵심 암기 포인트', memoryList(topic.memory));
       }
       if (topic.traps?.length) {
         html += section('함정 &amp; 주의사항',
@@ -493,8 +491,7 @@
     }
     deep += medsSection(topic);
     if (topic.memory?.length)
-      deep += section('핵심 암기 포인트',
-        `<ul class="memory-list">${topic.memory.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`);
+      deep += section('핵심 암기 포인트', memoryList(topic.memory));
     if (topic.traps?.length)
       deep += section('함정 &amp; 주의사항',
         `<ul class="trap-list">${topic.traps.map(t => `<li>⚠ ${esc(t)}</li>`).join('')}</ul>`);
@@ -509,6 +506,22 @@
             + `<div class="l-deep-body">${deep}</div></details>`;
 
     el.innerHTML = html || '<div class="empty-state">학습 내용을 준비 중입니다</div>';
+  }
+
+  // 핵심 암기 포인트 — 키워드(머리말)만 보이는 접이식 줄. 키워드가 없으면 일반 줄.
+  // 긴 문장 나열로 인한 가독성 저하 완화: 헤드워드 스캔 → 필요한 것만 펼침.
+  function memoryList(items) {
+    const rows = items.map(m => {
+      const s = String(m);
+      const ci = s.search(/[:：]/);
+      if (ci > 0 && ci <= 42) {
+        const head = s.slice(0, ci).trim();
+        const body = s.slice(ci + 1).trim();
+        if (body) return `<details class="mem-item"><summary class="mem-key">${esc(head)}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="mem-detail">${esc(body)}</div></details>`;
+      }
+      return `<div class="mem-item mem-plain">${esc(s)}</div>`;
+    }).join('');
+    return `<div class="mem-list">${rows}</div>`;
   }
 
   // 핵심 정리 — 색상 라벨 칩 + 설명 카드 (체크리스트: 순서 아님 → 번호 X)
