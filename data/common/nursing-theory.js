@@ -7,14 +7,23 @@ window.NORI_DATA['nursing-theory'] = {
       id: 'major-theorists',
       title: '주요 간호이론가 비교',
       priority: 'high',
+      category: '간호이론',
+      analogy: '간호이론가 = 저마다 다른 렌즈를 낀 안경사 — Orem은 "스스로 못 하는 부분"을, Roy는 "변화에 적응하는지"를, Watson은 "마음을 돌보는지"를 본다. 같은 환자라도 어떤 렌즈로 보느냐에 따라 간호 초점이 달라진다.',
+      coreSummary: [
+        { label: '이론가 매칭', detail: 'Orem=자가간호, Roy=적응, Neuman=스트레스/체계, Watson=돌봄, Leininger=문화, Henderson=14욕구, Peplau=대인관계, Abdellah=21문제.' },
+        { label: 'Orem 체계', detail: '자가간호 역량<요구=결핍→개입. 전완(전부 대신)·부분(일부 보조)·지지교육(교육·상담만) 3체계.' },
+        { label: 'Roy 양식', detail: '4적응양식(생리·자아개념·역할기능·상호의존) + 자극 3종(focal·contextual·residual), 조절/인지 대처기전.' },
+        { label: 'Neuman 예방', detail: '3겹 방어선(유연-정상-저항)에 스트레스원. 1차(노출 전 강화)·2차(조기 치료)·3차(재활).' },
+        { label: '이론 추상성', detail: '메타>대형이론(Orem·Roy·Neuman·Watson, 검증 어려움)>중범위(Peplau·Pender, 실무 적용)>실천이론.' }
+      ],
+      redFlags: [
+        { level: 'urgency', sign: 'Watson 돌봄 적용 간호사의 공감 피로(compassion fatigue)·번아웃 징후', action: '돌봄 질 저하 악순환 → 간호사 자기돌봄(self-care)·슈퍼비전 병행 필수.' },
+        { level: 'urgency', sign: 'Orem 전완 간호 노인의 자존감 저하·우울·무기력(자율성 박탈)', action: '잔존 능력(residual function) 사정 후 가능한 범위에서 참여 유도.' },
+        { level: 'urgency', sign: 'Roy 낙상 후 자아개념 부적응(자존감 손상)→낙상 두려움·활동 제한', action: 'GDS 우울 평가 + 자아개념 회복 중재 병행으로 재낙상 악순환 차단.' },
+        { level: 'emergency', sign: 'Neuman 방어선 붕괴 징후(급격한 기능 저하·다기관 기능부전)', action: '유연방어선 이상(스트레스 반응 급증) 시 2차 예방(조기 치료)으로 즉시 전환.' }
+      ],
       beginner: '간호이론은 "간호란 무엇인가?"에 답하는 틀입니다. 시험에서는 이론가 이름과 핵심 개념을 1:1 매칭하는 문제가 자주 나옵니다. Orem = 자가간호, Roy = 적응, Neuman = 스트레스/체계, Watson = 돌봄, Leininger = 문화, Henderson = 14가지 기본 욕구, Peplau = 대인관계, Abdellah = 21가지 간호문제 — 이 8쌍을 먼저 외우세요.',
       whyImportant: '노인전문간호사 시험에서 "다음 중 Roy 적응모델의 적응 양식이 아닌 것은?", "Orem 이론에서 간호사가 개입하는 상황은?", "Abdellah의 21 간호문제 이론에서 환자중심 접근의 근거는?" 유형이 매 시험마다 출제됩니다. 이론 비교표를 통한 변별력 확인이 핵심입니다.',
-      redFlags: [
-        'Watson 인간돌봄이론 — "돌봄 10가지 요소(Carative factors)" 적용 시 간호사 자신의 소진 위험 간과 금지: 공감 피로(compassion fatigue)→번아웃→돌봄 질 저하 악순환 → 간호사 자기돌봄(self-care)·슈퍼비전 병행 필수',
-        'Orem 이론 — 전완 간호(wholly compensatory) 대상 노인에서 자율성 박탈 위험 주의: 모든 결정을 간호사가 대신→자존감 저하·우울·무기력 진행 → 잔존 능력(residual function) 사정 후 가능한 범위에서 참여 유도',
-        'Roy 적응모델 — 노인 낙상 후 자아개념 적응 양식(자존감 손상) 간과 시 우울 진행: 낙상 두려움→활동 제한→근감소→재낙상 위험 악순환 → GDS 우울 평가 + 자아개념 회복 중재 병행',
-        'Neuman 체계모델 — 방어선 붕괴 징후(급격한 기능 저하·다기관 기능부전): 유연방어선→정상방어선→저항선 순차적 붕괴 시 회복 불가능 상태 진입 → 유연방어선 이상 징후(스트레스 반응 급격 증가) 시 2차 예방(조기 치료)으로 즉시 전환'
-      ],
       memory: [
         "Nightingale(환경이론): 건강 회복의 핵심 = 환경(신선한 공기·청결·빛·온도·조용함) / 근대 간호의 창시자 / '간호는 자연이 환자에게 작용하도록 최선의 조건을 만드는 것'",
         "Orem(자가간호 결핍 이론, S-CDNT): 정식 명칭 Self-Care Deficit Nursing Theory(1991 4판) / 자가간호 결핍 시 간호 개입 / 간호 체계 3가지: ① 전완(wholly compensatory) ② 부분(partially compensatory) ③ 지지-교육(supportive-educative) / 노인 낙상·인지 저하 시 전완 체계 적용",
@@ -305,13 +314,20 @@ window.NORI_DATA['nursing-theory'] = {
       id: 'theory-application',
       title: '이론의 임상 적용 — 간호과정',
       priority: 'medium',
-      beginner: '간호과정은 ADPIE(사정→진단→계획→수행→평가)의 5단계 순환 과정입니다. NANDA 진단 체계를 알아야 간호 진단을 올바르게 서술할 수 있습니다. 이론을 임상에 연결하는 핵심 도구가 간호과정입니다.',
+      category: '간호이론',
+      analogy: '간호과정 = 요리 레시피의 한 사이클 — 재료 확인(사정)→무엇을 만들지 정함(진단)→조리 계획(계획)→실제 조리(수행)→맛보기(평가). 맛이 안 맞으면 다시 재료부터 점검하는 순환 과정이다.',
+      coreSummary: [
+        { label: 'ADPIE', detail: '사정→진단→계획→수행→평가의 5단계 순환 과정. 미달성 시 사정부터 재검토.' },
+        { label: 'NANDA 서술', detail: '[진단명(인간 반응)] r/t [원인] AEB [징후·증상]. 의학 진단명을 진단·원인으로 쓰면 안 됨.' },
+        { label: 'SMART 목표', detail: '구체적·측정가능·달성가능·관련성·시간제한. 주어는 환자(간호사 행위는 중재).' },
+        { label: '메타패러다임', detail: '인간·환경·건강·간호 4요소를 이론가마다 다르게 정의 → 비교 기준.' },
+        { label: '중재 3유형', detail: '독자적(간호사 단독)·의존적(의사 처방)·협력적(다학제 팀).' }
+      ],
       whyImportant: '노인전문간호사 2차 시험(논술형)에서 "다음 사례에 간호이론을 적용하여 간호과정을 기술하시오" 유형이 핵심 출제 영역입니다. NANDA 진단 서술 형식(진단명 related to 원인요인 as evidenced by 징후·증상)을 정확히 쓸 수 있어야 합니다.',
       redFlags: [
-        'NANDA 진단 서술 오류: 의학 진단명을 간호 진단 원인으로 쓰는 것 금지 — "당뇨병과 관련된 영양불균형"(X) → "인슐린 저항성 증가와 관련된 혈당 조절 장애"(O): 의학 진단은 간호사 처방 권한 밖이므로 원인으로 쓸 수 없어 법적·윤리적 문제 발생 가능',
-        '목표 설정 오류: 측정 불가능한 목표("환자가 건강해질 것이다") → 평가 불가능→중재 효과 확인 불가→간호 기록 부실 → SMART 목표(Specific·Measurable·Achievable·Relevant·Time-bound) 반드시 적용 (예: "2주 후 TUG 14초→12초 이하로 개선")',
-        '수행 결과를 목표로 쓰는 오류: "간호사가 교육할 것이다"(수행) vs "환자가 인슐린 주사법을 혼자 시범 보일 것이다"(목표): 주어 오류 → 평가 시 환자 변화가 아닌 간호사 행위만 평가되어 실질적 돌봄 효과 측정 불가',
-        'Abdellah 21 문제 사정 시 잠재(covert) 문제 간과: 사회적 고립·우울·자살 사고는 명시적으로 드러나지 않음 → 체계적 탐색 없으면 노인 자살 위험 간과 (노인 자살 시도 대 사망 비율 2:1~4:1로 청년 25:1보다 훨씬 치명적)'
+        { level: 'urgency', sign: 'NANDA 진단에 의학 진단명을 원인으로 사용("당뇨병과 관련된 영양불균형")', action: '간호 처방 권한 밖이라 법적·윤리적 문제 → "인슐린 저항성 증가와 관련된 혈당 조절 장애"처럼 인간 반응으로 서술.' },
+        { level: 'urgency', sign: '측정 불가능한 목표("환자가 건강해질 것이다")로 평가·중재 효과 확인 불가', action: 'SMART 목표 적용("2주 후 TUG 14초→12초 이하로 개선") 후 평가 가능하게 기술.' },
+        { level: 'emergency', sign: 'Abdellah 21문제 사정 시 잠재(covert) 사회적 고립·우울·자살 사고 간과', action: '체계적 탐색 필수 — 노인 자살 시도 대 사망비 2:1~4:1로 치명적, 즉시 우울·자살 위험 평가.' }
       ],
       memory: [
         "간호이론 메타패러다임(Nursing Metaparadigm) 4요소: ① 인간(Human/Person) ② 환경(Environment) ③ 건강(Health) ④ 간호(Nursing) — 모든 간호이론은 이 4가지 개념을 어떻게 정의하는지로 비교 가능",

@@ -7,6 +7,33 @@
   const EXAM_DATE = new Date(2026, 6, 5);  // 2026-07-05 로컬 자정 (월은 0-indexed) — UTC 파싱 시 타임존 오차로 D-Day 하루 밀림 방지
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
+  const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
+  const LS_QMARK   = 'nori_qmark_v1'; // 문항별 마킹 { qid: 'known' | 'review' }
+  const LS_QSTAT   = 'nori_qstat_v1'; // 문항별 통계 { qid: {seen,wrong} }
+
+  const MOCK_SIZE = 100;  // 모의고사 회당 문항 수
+
+  // 공식 출제비중(subjects.js weight 매핑, 합 100) — 회차 챕터 분포 기준
+  const EXAM_WEIGHTS = {
+    '노인질환관리': 55, '노인복지·시설': 6, '건강증진·예방': 5, '생애말기간호': 3,
+    '공통:신체검진': 7, '공통:약리': 5, '공통:병태생리': 4, '공통:이론·연구': 6,
+    '공통:교육상담': 4, '공통:윤리': 2, '전문간호 총론': 3
+  };
+  // 빈출 가중(그림노트 ⭐⭐/⭐ 빈출 계통) — 회차 내 선택 확률↑·회차 간 반복 ↑
+  const FREQ_BOOST = {
+    '순환기계': 1.7, '신경계': 1.7, '호흡기계': 1.5, '내분비계': 1.5,
+    '근골격계': 1.4, '소화기계': 1.3, '피부감각계': 1.2
+  };
+
+  // ── localStorage 헬퍼 ──
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch (e) { return {}; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  // 결정론적 RNG (mulberry32) — 같은 회차는 항상 동일 구성
+  function makeRng(seed) {
+    let a = seed >>> 0;
+    return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 
   // ─── 앱 상태 ──────────────────────────────────────
   const state = {
@@ -23,9 +50,11 @@
     quiz: { questions: [], current: 0, answered: false, scores: [] },
     flash: { cards: [], current: 0, flipped: false },
     gichulMode: false,
+    gichulView: 'mock',      // 'mock' | 'normal' | 'review'
     gichulChapter: '전체',   // 기출 탭 챕터 필터
     gichulType: '기출',      // '기출' | '변형' | '전체'
-    gichul: { questions: [], current: 0, answered: false, scores: [] }
+    gichulSource: '기출',    // 모의고사 출처: '기출' | '변형'
+    gichul: { questions: [], current: 0, answered: false, scores: [], mock: false, batchId: null, batchLabel: '' }
   };
 
   // ─── 초기화 ───────────────────────────────────────
@@ -1057,10 +1086,163 @@
     startGichulSession();
   }
 
-  // 현재 풀로 새 세션 시작
-  function startGichulSession() {
-    state.gichul = { questions: shuffle([...gichulPool()]), current: 0, answered: false, scores: [] };
+  // 현재 풀(또는 전달된 문항 세트)로 새 세션 시작
+  function startGichulSession(questions, info) {
+    const qs = questions ? [...questions] : shuffle([...gichulPool()]);
+    state.gichul = {
+      questions: qs, current: 0, answered: false, scores: [],
+      mock: !!(info && info.mock), batchId: info?.batchId || null, batchLabel: info?.batchLabel || ''
+    };
     renderGichulQuestion();
+  }
+
+  // ── 모의고사: 결정론적 가중 추출 ──
+  function rawSourcePool(sourceKey) {
+    if (sourceKey === '변형') return (window.NORI_VARIATION?.questions || []).map(q => ({ ...q, type: 'variation' }));
+    return (window.NORI_GICHUL?.questions || []);
+  }
+  function weightedSample(items, k, wf, rng) {
+    const pool = items.slice(), w = pool.map(wf), out = [];
+    for (let n = 0; n < k && pool.length; n++) {
+      let tot = 0; for (const x of w) tot += x;
+      let r = rng() * tot, i = 0;
+      while (i < w.length - 1 && r > w[i]) { r -= w[i]; i++; }
+      out.push(pool[i]); pool.splice(i, 1); w.splice(i, 1);
+    }
+    return out;
+  }
+  function seededShuffleArr(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  // 출제비중대로 챕터 stratified + 빈출 가중. 회차마다 결정론적, 빈출은 회차 간 반복 허용.
+  function buildMockExams(sourceKey) {
+    const pool = rawSourcePool(sourceKey);
+    if (!pool.length) return [];
+    const N = Math.max(1, Math.round(pool.length / MOCK_SIZE));
+    const byChap = {};
+    pool.forEach(q => { (byChap[q.chapter] = byChap[q.chapter] || []).push(q); });
+    const chapters = Object.keys(EXAM_WEIGHTS).filter(c => byChap[c] && byChap[c].length);
+    const totalW = chapters.reduce((a, c) => a + EXAM_WEIGHTS[c], 0) || 1;
+    const prefix = sourceKey === '변형' ? 'var-mock' : 'gi-mock';
+    const exams = [];
+    for (let e = 0; e < N; e++) {
+      let qs = [];
+      chapters.forEach(ch => {
+        const target = Math.round(EXAM_WEIGHTS[ch] / totalW * MOCK_SIZE);
+        const rng = makeRng(hashStr(sourceKey + '|' + e + '|' + ch));
+        qs = qs.concat(weightedSample(byChap[ch], Math.min(target, byChap[ch].length), q => FREQ_BOOST[q.tag] || 1, rng));
+      });
+      qs = seededShuffleArr(qs, makeRng(hashStr(sourceKey + '|order|' + e)));
+      exams.push({ id: `${prefix}-${e + 1}`, label: `${sourceKey} 모의고사 ${e + 1}회`, questions: qs });
+    }
+    return exams;
+  }
+
+  // ── 문항 마킹 / 통계 ──
+  function getQMark(id) { return lsGet(LS_QMARK)[id] || null; }
+  function setQMark(id, val) { const m = lsGet(LS_QMARK); if (val) m[id] = val; else delete m[id]; lsSet(LS_QMARK, m); }
+  function bumpQStat(id, wrong) { const s = lsGet(LS_QSTAT); const e = s[id] || { seen: 0, wrong: 0 }; e.seen++; if (wrong) e.wrong++; s[id] = e; lsSet(LS_QSTAT, s); }
+  function allQuestionsById() {
+    const m = {};
+    (window.NORI_GICHUL?.questions || []).forEach(q => { m[q.id] = q; });
+    (window.NORI_VARIATION?.questions || []).forEach(q => { m[q.id] = { ...q, type: 'variation' }; });
+    return m;
+  }
+  // 자주 틀린 문제 + 복습 표시 문제 모음 (안다 표시는 제외, 오답률 높은 순)
+  function buildReviewSet() {
+    const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK), byId = allQuestionsById();
+    const ids = new Set();
+    Object.entries(stat).forEach(([id, s]) => { if (s && s.wrong > 0) ids.add(id); });
+    Object.entries(mark).forEach(([id, m]) => { if (m === 'review') ids.add(id); });
+    const ratio = q => { const s = stat[q.id]; return s ? s.wrong / (s.seen || 1) : 0; };
+    return [...ids].filter(id => mark[id] !== 'known').map(id => byId[id]).filter(Boolean).sort((a, b) => ratio(b) - ratio(a));
+  }
+
+  // ── 기출 패널 뷰 전환 ──
+  function buildGichulModeBar() {
+    const bar = document.getElementById('gichulModeBar');
+    if (!bar) return;
+    const views = [
+      { key: 'mock',   label: '📋 모의고사' },
+      { key: 'review', label: '🔁 복습 모음' },
+      { key: 'normal', label: '📚 자유 풀기' }
+    ];
+    bar.innerHTML = views.map(v =>
+      `<button class="mode-button gichul-view-btn${state.gichulView === v.key ? ' is-active' : ''}" type="button" data-view="${v.key}">${esc(v.label)}</button>`
+    ).join('');
+    bar.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+      state.gichulView = b.dataset.view; buildGichulModeBar(); showGichulView();
+    }));
+  }
+  function buildGichulSourceBar() {
+    const bar = document.getElementById('gichulTypeBar');
+    if (!bar) return;
+    const g = (window.NORI_GICHUL?.questions || []).length, v = (window.NORI_VARIATION?.questions || []).length;
+    const srcs = [{ key: '기출', label: '기출문제', count: g }, { key: '변형', label: '변형(AI)', count: v }];
+    bar.innerHTML = srcs.map(s =>
+      `<button class="mode-button gichul-chapter-btn${state.gichulSource === s.key ? ' is-active' : ''}" type="button" data-src="${s.key}">${esc(s.label)} <span class="gichul-chapter-count">${s.count}</span></button>`
+    ).join('');
+    bar.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click', () => {
+      state.gichulSource = b.dataset.src; buildGichulSourceBar(); renderMockGrid();
+    }));
+  }
+  function renderMockGrid() {
+    const el = document.getElementById('gichulContent');
+    if (!el) return;
+    document.getElementById('gichulProgress').textContent = '';
+    const exams = buildMockExams(state.gichulSource);
+    const results = lsGet(LS_MOCK);
+    let html = `<div class="mock-intro"><p>📋 <b>${esc(state.gichulSource)} 모의고사</b> — 한 회 <b>${MOCK_SIZE}문항</b>, 실제 출제비중에 맞춰 구성됩니다. 빈출 영역(순환·신경·호흡 등)은 더 자주 출제돼요.</p></div>`;
+    html += `<div class="mock-grid">`;
+    exams.forEach((ex, i) => {
+      const r = results[ex.id];
+      const badge = r ? `<span class="mock-badge ${r.pct >= 60 ? 'pass' : 'fail'}">${r.pct}%</span>` : `<span class="mock-badge new">미응시</span>`;
+      html += `<button class="mock-card" type="button" data-batch="${i}"><strong>${i + 1}회</strong><span>${ex.questions.length}문항</span>${badge}</button>`;
+    });
+    html += `</div>`;
+    el.innerHTML = html;
+    el.querySelectorAll('[data-batch]').forEach(b => b.addEventListener('click', () => {
+      const ex = exams[+b.dataset.batch];
+      startGichulSession(ex.questions, { mock: true, batchId: ex.id, batchLabel: ex.label });
+    }));
+  }
+  function renderReviewIntro() {
+    const el = document.getElementById('gichulContent');
+    if (!el) return;
+    document.getElementById('gichulProgress').textContent = '';
+    const set = buildReviewSet();
+    const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK);
+    const wrongN = Object.values(stat).filter(s => s.wrong > 0).length;
+    const reviewN = Object.values(mark).filter(m => m === 'review').length;
+    let html = `<div class="mock-intro">
+      <p>🔁 <b>복습 모음 (오답노트)</b> — 자주 틀린 문제와 "복습 필요"로 표시한 문제를 모았습니다.</p>
+      <p class="mock-sub">자주 틀린 문제 ${wrongN}개 · 복습 표시 ${reviewN}개 · 합계 <b>${set.length}개</b></p></div>`;
+    if (set.length) {
+      html += `<div style="text-align:center;margin-top:16px"><button class="quiz-btn quiz-btn-primary" id="reviewStartBtn" type="button">복습 시작 (${set.length}문제)</button></div>`;
+    } else {
+      html += `<p style="text-align:center;color:var(--muted);margin-top:18px">아직 틀리거나 복습 표시한 문제가 없어요.<br>모의고사를 풀면 자동으로 채워집니다.</p>`;
+    }
+    el.innerHTML = html;
+    el.querySelector('#reviewStartBtn')?.addEventListener('click', () => {
+      startGichulSession(set, { mock: false, batchId: 'review', batchLabel: '복습 모음' });
+    });
+  }
+  function showGichulView() {
+    const typeBar = document.getElementById('gichulTypeBar');
+    const chapBar = document.getElementById('gichulChapterBar');
+    document.getElementById('gichulProgress').textContent = '';
+    if (state.gichulView === 'normal') {
+      typeBar.style.display = ''; chapBar.style.display = '';
+      buildGichulTypeBar(); buildGichulChapterBar(); startGichulSession();
+    } else if (state.gichulView === 'review') {
+      typeBar.style.display = 'none'; chapBar.style.display = 'none';
+      renderReviewIntro();
+    } else { // mock
+      typeBar.style.display = ''; chapBar.style.display = 'none';
+      buildGichulSourceBar(); renderMockGrid();
+    }
   }
 
   function enterGichulMode() {
@@ -1068,16 +1250,14 @@
     if (!qs.length) { alert('기출문제 데이터를 불러올 수 없습니다.'); return; }
 
     state.gichulMode = true;
-    buildGichulTypeBar();
-    buildGichulChapterBar();
-    startGichulSession();
-
     document.getElementById('overviewBand').style.display = 'none';
     document.getElementById('contentGrid').style.display  = 'none';
     document.getElementById('gichulPanel').style.display  = '';
-
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
+
+    buildGichulModeBar();
+    showGichulView();
   }
 
   function exitGichulMode() {
@@ -1098,7 +1278,8 @@
     const pct  = Math.round((current / total) * 100);
     const nums = '①②③④⑤';
 
-    document.getElementById('gichulProgress').textContent = `${current + 1} / ${total}`;
+    document.getElementById('gichulProgress').textContent =
+      (state.gichul.batchLabel ? state.gichul.batchLabel + ' · ' : '') + `${current + 1} / ${total}`;
 
     let html = `<div class="quiz-wrapper">
       <div>
@@ -1108,6 +1289,12 @@
 
     if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
     if (q.type === 'variation') html += `<span class="variation-badge">변형문제(AI생성)</span>`;
+
+    const mk = getQMark(q.id);
+    html += `<div class="qmark-bar">
+      <button class="qmark-btn${mk === 'known' ? ' on-known' : ''}" data-mark="known" type="button">✓ 안다 (패스)</button>
+      <button class="qmark-btn${mk === 'review' ? ' on-review' : ''}" data-mark="review" type="button">! 복습 필요</button>
+    </div>`;
 
     html += `<p class="quiz-question">${esc(q.stem).replace(/\n/g, '<br>')}</p>`;
     html += `<div class="quiz-options">`;
@@ -1135,6 +1322,15 @@
       });
     });
 
+    el.querySelectorAll('.qmark-btn').forEach(b => b.addEventListener('click', () => {
+      const cur = getQMark(q.id), val = b.dataset.mark;
+      setQMark(q.id, cur === val ? null : val);
+      const nv = getQMark(q.id);
+      el.querySelectorAll('.qmark-btn').forEach(x => x.classList.remove('on-known', 'on-review'));
+      if (nv === 'known') el.querySelector('[data-mark="known"]').classList.add('on-known');
+      else if (nv === 'review') el.querySelector('[data-mark="review"]').classList.add('on-review');
+    }));
+
     el.querySelector('#gichulSkipBtn')?.addEventListener('click', () => {
       state.gichul.scores.push(null);
       state.gichul.answered = false;
@@ -1150,6 +1346,7 @@
     const isOk    = chosen === correct;
 
     state.gichul.scores.push(isOk);
+    if (q.id) bumpQStat(q.id, !isOk);  // 문항별 오답 통계 누적(복습 모음용)
 
     el.querySelectorAll('.quiz-option').forEach((b, i) => {
       b.classList.add('disabled');
@@ -1173,38 +1370,60 @@
   }
 
   function renderGichulResult(el, total) {
-    const correct   = state.gichul.scores.filter(s => s === true).length;
-    const pct       = Math.round((correct / total) * 100);
+    const sess      = state.gichul;
+    const correct   = sess.scores.filter(s => s === true).length;
+    const pct       = total ? Math.round((correct / total) * 100) : 0;
     const pass      = pct >= 60;
-    const wrongQs   = state.gichul.questions.filter((q, i) => state.gichul.scores[i] !== true);
+    const wrongQs   = sess.questions.filter((q, i) => sess.scores[i] !== true);
+
+    // 계통별(tag) 정답률
+    const byTag = {};
+    sess.questions.forEach((q, i) => {
+      const t = q.tag || '기타'; const b = byTag[t] = byTag[t] || { c: 0, n: 0 };
+      b.n++; if (sess.scores[i] === true) b.c++;
+    });
+    const tagRows = Object.entries(byTag).sort((a, b) => b[1].n - a[1].n).map(([t, b]) => {
+      const r = Math.round(b.c / b.n * 100);
+      return `<div class="tagrate-row"><span class="tagrate-name">${esc(t)}</span><span class="tagrate-bar"><span style="width:${r}%;background:${r >= 60 ? 'var(--green)' : 'var(--clay)'}"></span></span><span class="tagrate-val">${b.c}/${b.n}</span></div>`;
+    }).join('');
+
+    // 모의고사 결과 저장
+    if (sess.mock && sess.batchId) {
+      const res = lsGet(LS_MOCK); res[sess.batchId] = { pct, correct, total, doneAt: Date.now() }; lsSet(LS_MOCK, res);
+    }
 
     document.getElementById('gichulProgress').textContent = '완료!';
+    const backToList = sess.mock || sess.batchId === 'review';
 
     el.innerHTML = `<div class="quiz-result">
       <p class="quiz-score" style="color:${pass ? 'var(--green)' : 'var(--clay)'}">${pct}%</p>
       <p class="quiz-score-label">${correct} / ${total} 정답</p>
       <p class="quiz-result-msg">${pass ? '합격권 🎉 잘 하셨어요!' : '조금 더 연습해봐요'}</p>
       <p class="quiz-result-sub">60% 이상이 합격 기준입니다</p>
+      <div class="tagrate"><h4>계통별 정답률</h4>${tagRows}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;">
-        <button class="quiz-btn quiz-btn-primary"   id="gichulRetryBtn"      type="button">전체 다시 풀기</button>
+        <button class="quiz-btn quiz-btn-primary"   id="gichulRetryBtn"      type="button">${sess.mock ? '이 회차 다시' : '다시 풀기'}</button>
         ${wrongQs.length > 0
-          ? `<button class="quiz-btn quiz-btn-wrong" id="gichulRetryWrongBtn" type="button">❌ 오답만 다시 풀기 (${wrongQs.length}문제)</button>`
+          ? `<button class="quiz-btn quiz-btn-wrong" id="gichulRetryWrongBtn" type="button">❌ 오답만 다시 (${wrongQs.length}문제)</button>`
           : `<button class="quiz-btn quiz-btn-wrong" disabled style="opacity:0.4;cursor:not-allowed">❌ 오답 없음 🎉</button>`
         }
-        <button class="quiz-btn quiz-btn-secondary" id="gichulBackBtn"       type="button">← 학습으로 돌아가기</button>
+        <button class="quiz-btn quiz-btn-secondary" id="gichulBackBtn"       type="button">${backToList ? '← 목록으로' : '← 학습으로 돌아가기'}</button>
       </div>
     </div>`;
 
     el.querySelector('#gichulRetryBtn').addEventListener('click', () => {
-      startGichulSession();
+      if (sess.mock) startGichulSession(sess.questions, { mock: true, batchId: sess.batchId, batchLabel: sess.batchLabel });
+      else if (sess.batchId === 'review') startGichulSession(sess.questions, { batchId: 'review', batchLabel: '복습 모음' });
+      else startGichulSession();
     });
     if (wrongQs.length > 0) {
       el.querySelector('#gichulRetryWrongBtn').addEventListener('click', () => {
-        state.gichul = { questions: shuffle([...wrongQs]), current: 0, answered: false, scores: [] };
-        renderGichulQuestion();
+        startGichulSession(shuffle([...wrongQs]), { batchLabel: '오답 다시' });
       });
     }
-    el.querySelector('#gichulBackBtn').addEventListener('click', exitGichulMode);
+    el.querySelector('#gichulBackBtn').addEventListener('click', () => {
+      if (backToList) showGichulView(); else exitGichulMode();
+    });
   }
 
   function handleKeyboard(e) {
