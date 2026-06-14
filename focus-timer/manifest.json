@@ -1,0 +1,20 @@
+{
+  "name": "집중 타이머 — 노인전문간호사",
+  "short_name": "집중 타이머",
+  "description": "노인전문간호사 시험 준비용 포모도로 타이머",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F2F2F7",
+  "theme_color": "#1259C3",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
