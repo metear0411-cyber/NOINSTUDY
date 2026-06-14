@@ -40,6 +40,25 @@
     bindEvents();
 
     if (state.subjects.length) selectSubject(state.subjects[0].id);
+
+    // 그림노트 → 앱 딥링크 (#open=과목id:토픽id) 처리
+    window.addEventListener('hashchange', openDeepLink);
+    openDeepLink();
+  }
+
+  // 해시 딥링크로 특정 토픽 열기 (예: index.html#open=gero-disease:htn)
+  function openDeepLink() {
+    const m = (location.hash || '').match(/open=([^:&#]+):([^:&#]+)/);
+    if (!m) return;
+    const sid = decodeURIComponent(m[1]);
+    const tid = decodeURIComponent(m[2]);
+    if (!state.subjects.some(s => s.id === sid)) return;
+    if (sid !== state.currentSubjectId) {
+      selectSubject(sid);
+      setTimeout(() => selectTopic(tid), 50);
+    } else {
+      selectTopic(tid);
+    }
   }
 
   // ─── D-Day ────────────────────────────────────────
@@ -330,6 +349,9 @@
     const el = document.getElementById('modeStudy');
     if (!el) return;
 
+    // coreSummary 를 갖춘 토픽은 레이어드 UI 렌더러 사용 (그 외 토픽은 기존 렌더 유지)
+    if (topic.coreSummary) { renderStudyLayered(topic, el); return; }
+
     let html = '';
 
     // 초보자 배너 + 왜 중요한가
@@ -372,20 +394,7 @@
       }
 
       // 약물치료 섹션 (medications 필드가 있는 토픽에서만 표시)
-      if (topic.medications?.length) {
-        const medsHtml = topic.medications.map(med => {
-          const sideArr = Array.isArray(med.sideEffects) ? med.sideEffects : (med.sideEffects ? [med.sideEffects] : []);
-          const nurseArr = Array.isArray(med.nursingPoints) ? med.nursingPoints : (med.nursingPoints ? [med.nursingPoints] : []);
-          return `<div class="med-card">
-            <div class="med-category">${esc(med.category)}</div>
-            ${med.examples?.length ? `<div class="med-examples">${med.examples.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : ''}
-            ${med.mechanism ? `<div class="med-detail"><strong>기전</strong><p>${esc(med.mechanism)}</p></div>` : ''}
-            ${sideArr.length ? `<div class="med-detail"><strong>⚠️ 부작용</strong><ul>${sideArr.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : ''}
-            ${nurseArr.length ? `<div class="med-detail"><strong>💉 간호 포인트</strong><ul>${nurseArr.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : ''}
-          </div>`;
-        }).join('');
-        html += section('💊 약물치료', `<div class="med-grid">${medsHtml}</div>`);
-      }
+      html += medsSection(topic);
 
       if (topic.memory?.length) {
         html += section('핵심 암기 포인트',
@@ -404,6 +413,125 @@
     }
 
     el.innerHTML = html || '<div class="empty-state">학습 내용을 준비 중입니다</div>';
+  }
+
+  // ─── 학습 모드 (레이어드 UI) ──────────────────────
+  // ① 한눈에(비유·초보·왜 + 그림노트 딥링크) → ② 핵심 한 장 → ③ 자세히(접기)
+  function renderStudyLayered(topic, el) {
+    let html = '';
+
+    // ── ① 한눈에 ──
+    let glance = '';
+    if (topic.analogy)
+      glance += `<div class="l-analogy"><span class="l-analogy-tag">💡 쉽게 이해</span><span>${esc(topic.analogy)}</span></div>`;
+    if (topic.beginner)
+      glance += `<div class="beginner-banner"><strong>초보자 포인트&nbsp;</strong>${esc(topic.beginner)}</div>`;
+    if (topic.whyImportant)
+      glance += `<div class="why-banner"><strong>왜 시험에 나오는가?&nbsp;</strong>${esc(topic.whyImportant)}</div>`;
+    if (topic.noteLink) {
+      const nl = topic.noteLink;
+      glance += `<a class="note-link-btn" href="${nl.file}#${nl.anchor}" target="_blank" rel="noopener">`
+              + `<span class="note-link-ico">📖</span>`
+              + `<span class="note-link-txt"><strong>그림으로 보기</strong><span>${esc(nl.label || '그림노트')}</span></span>`
+              + `<span class="note-link-arrow">↗</span></a>`;
+    }
+    if (glance) html += `<div class="l-glance">${glance}</div>`;
+
+    // ── ② 핵심 한 장 정리 ──
+    if (topic.coreSummary?.length)
+      html += section('⭐ 핵심 한 장 정리', labeledCard(topic.coreSummary));
+
+    // Red Flags — 안전상 항상 노출
+    if (topic.redFlags?.length)
+      html += section('🚨 즉시 대응 신호 (Red Flags)', redFlagCards(topic.redFlags));
+
+    // ── ③ 자세히 보기 (접기) ──
+    let deep = '';
+    const u = topic.understand || {};
+    const lbl = FLOW_LABELS[topic.topicType || 'clinical'];
+    const flowTitle = topic.topicType === 'policy'    ? '제도 구조 개요' :
+                      topic.topicType === 'nursing'   ? '간호 실무 흐름' :
+                      topic.topicType === 'promotion' ? '건강증진 흐름' :
+                                                        '임상 추론 흐름 (PAPIE)';
+    if (u.pathology || u.geriatric_specifics || u.assessment || u.intervention || u.evaluation) {
+      deep += section(flowTitle, stepFlow([
+        { step: lbl[0], text: u.pathology },
+        { step: lbl[1], text: u.geriatric_specifics },
+        { step: lbl[2], text: u.assessment },
+        { step: lbl[3], text: u.intervention },
+        { step: lbl[4], text: u.evaluation }
+      ]));
+    }
+    deep += medsSection(topic);
+    if (topic.memory?.length)
+      deep += section('핵심 암기 포인트',
+        `<ul class="memory-list">${topic.memory.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`);
+    if (topic.traps?.length)
+      deep += section('함정 &amp; 주의사항',
+        `<ul class="trap-list">${topic.traps.map(t => `<li>⚠ ${esc(t)}</li>`).join('')}</ul>`);
+    if (topic.caseFrame)
+      deep += section('2차 사례형 답안 틀 (SOAP)',
+        `<div class="why-banner" style="white-space:pre-line;">${esc(topic.caseFrame)}</div>`);
+
+    if (deep)
+      html += `<details class="l-deep"><summary class="l-deep-summary">`
+            + `<span>📂 자세히 보기 — 임상추론·약물·암기·함정·SOAP</span>`
+            + `<span class="l-deep-chev" aria-hidden="true">▾</span></summary>`
+            + `<div class="l-deep-body">${deep}</div></details>`;
+
+    el.innerHTML = html || '<div class="empty-state">학습 내용을 준비 중입니다</div>';
+  }
+
+  // 핵심 정리 — 색상 라벨 칩 + 설명 카드 (체크리스트: 순서 아님 → 번호 X)
+  function labeledCard(items) {
+    return `<div class="lc-list">${items.map(it => `
+      <div class="lc-row">
+        <span class="lc-chip">${esc(it.label)}</span>
+        <span class="lc-detail">${esc(it.detail)}</span>
+      </div>`).join('')}</div>`;
+  }
+
+  // 진짜 순서가 있는 흐름(PAPIE 등) → 번호 스텝
+  function stepFlow(steps) {
+    const rows = steps.filter(s => s.text).map((s, i) => `
+      <div class="step-row">
+        <span class="step-num">${i + 1}</span>
+        <div class="step-body"><strong class="step-label">${esc(s.step)}</strong>${formatFlowText(s.text)}</div>
+      </div>`).join('');
+    return `<div class="step-flow">${rows}</div>`;
+  }
+
+  // Red Flags — 객체 배열이면 색상 띠 카드, 문자열 배열이면 기존 리스트(하위호환)
+  function redFlagCards(items) {
+    if (typeof items[0] === 'string')
+      return `<ul class="trap-list">${items.map(f => `<li>🚨 ${esc(f)}</li>`).join('')}</ul>`;
+    return `<div class="rf-list">${items.map(it => {
+      const emergency = it.level === 'emergency';
+      return `<div class="rf-card ${emergency ? 'rf-emergency' : 'rf-urgency'}">
+        <span class="rf-badge">${emergency ? '응급' : '긴박·주의'}</span>
+        <div class="rf-body">
+          <p class="rf-sign">${esc(it.sign)}</p>
+          <p class="rf-action">→ ${esc(it.action)}</p>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // 약물치료 섹션 (medications 필드가 있는 토픽에서만) — 기존/레이어드 공용
+  function medsSection(topic) {
+    if (!topic.medications?.length) return '';
+    const medsHtml = topic.medications.map(med => {
+      const sideArr = Array.isArray(med.sideEffects) ? med.sideEffects : (med.sideEffects ? [med.sideEffects] : []);
+      const nurseArr = Array.isArray(med.nursingPoints) ? med.nursingPoints : (med.nursingPoints ? [med.nursingPoints] : []);
+      return `<div class="med-card">
+        <div class="med-category">${esc(med.category)}</div>
+        ${med.examples?.length ? `<div class="med-examples">${med.examples.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : ''}
+        ${med.mechanism ? `<div class="med-detail"><strong>기전</strong><p>${esc(med.mechanism)}</p></div>` : ''}
+        ${sideArr.length ? `<div class="med-detail"><strong>⚠️ 부작용</strong><ul>${sideArr.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : ''}
+        ${nurseArr.length ? `<div class="med-detail"><strong>💉 간호 포인트</strong><ul>${nurseArr.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : ''}
+      </div>`;
+    }).join('');
+    return section('💊 약물치료', `<div class="med-grid">${medsHtml}</div>`);
   }
 
   function section(title, bodyHtml) {

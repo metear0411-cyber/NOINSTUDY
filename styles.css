@@ -728,6 +728,196 @@ a { color: var(--teal); }
 }
 
 /* ─────────────────────────────────────────
+   레이어드 학습 UI (coreSummary 토픽)
+───────────────────────────────────────── */
+.l-glance { display: grid; gap: 9px; margin-bottom: 16px; }
+
+/* ① 쉽게 이해 — 토픽의 시그니처 비유 박스 */
+.l-analogy {
+  display: grid;
+  gap: 7px;
+  padding: 14px 16px;
+  background: var(--purple-soft);
+  border: 1px solid #d9cdf2;
+  border-left: 5px solid var(--purple);
+  border-radius: 0 12px 12px 0;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: #2e1f47;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.l-analogy-tag {
+  justify-self: start;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--purple);
+  letter-spacing: -0.2px;
+}
+
+/* 그림노트 딥링크 버튼 */
+.note-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 14px;
+  background: #fff;
+  border: 1px solid #d9cdf2;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--purple);
+  transition: border-color .14s, box-shadow .14s, transform .14s;
+}
+.note-link-btn:hover {
+  border-color: var(--purple);
+  box-shadow: 0 6px 18px rgba(107, 63, 160, .16);
+  transform: translateY(-1px);
+}
+.note-link-ico { font-size: 20px; line-height: 1; }
+.note-link-txt { display: grid; line-height: 1.3; }
+.note-link-txt strong { font-size: 13.5px; color: var(--purple); }
+.note-link-txt span { font-size: 12px; color: var(--muted); }
+.note-link-arrow { margin-left: auto; font-size: 15px; color: var(--purple); opacity: .7; }
+
+/* ② 핵심 한 장 정리 — 라벨 칩 카드 (체크리스트, 번호 X) */
+.lc-list { display: grid; gap: 8px; }
+.lc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.lc-chip {
+  flex-shrink: 0;
+  min-width: 76px;
+  text-align: center;
+  padding: 4px 9px;
+  background: var(--teal-soft);
+  color: var(--teal-dark);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.lc-detail {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #2f3b42;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* Red Flags — 색상 띠 카드 */
+.rf-list { display: grid; gap: 8px; }
+.rf-card {
+  display: flex;
+  align-items: stretch;
+  gap: 11px;
+  padding: 11px 13px 11px 11px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+.rf-card.rf-emergency { background: var(--clay-soft); border-color: #eecabd; border-left: 5px solid var(--clay); }
+.rf-card.rf-urgency   { background: var(--gold-soft); border-color: #ecd9a8; border-left: 5px solid var(--gold); }
+.rf-badge {
+  flex-shrink: 0;
+  align-self: flex-start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+}
+.rf-emergency .rf-badge { background: var(--clay); }
+.rf-urgency .rf-badge   { background: var(--gold); }
+.rf-body { display: grid; gap: 3px; }
+.rf-sign   { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.55; color: #3a2b25; word-break: keep-all; overflow-wrap: break-word; }
+.rf-action { margin: 0; font-size: 12.5px; line-height: 1.55; color: #5c4a42; word-break: keep-all; overflow-wrap: break-word; }
+.rf-urgency .rf-sign   { color: #4a3a18; }
+.rf-urgency .rf-action { color: #6a552a; }
+
+/* PAPIE 등 진짜 순서 — 번호 스텝 */
+.step-flow { display: grid; gap: 0; }
+.step-row {
+  display: flex;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+.step-row:last-child { border-bottom: none; }
+.step-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+.step-body { flex: 1; min-width: 0; }
+.step-label { display: block; margin-bottom: 4px; color: var(--teal-dark); font-size: 13px; font-weight: 800; }
+.step-body .flow-text-list { padding-left: 17px; }
+.step-body .flow-text-list li { font-size: 13.5px; line-height: 1.6; }
+.step-body > span { font-size: 13.5px; line-height: 1.6; color: #2f3b42; word-break: keep-all; overflow-wrap: break-word; }
+
+/* ③ 자세히 보기 (접기) */
+.l-deep {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.l-deep-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 15px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink);
+  list-style: none;
+  user-select: none;
+}
+.l-deep-summary::-webkit-details-marker { display: none; }
+.l-deep-chev {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--teal);
+  transition: transform .18s ease;
+}
+.l-deep[open] .l-deep-chev { transform: rotate(180deg); }
+.l-deep-body {
+  display: grid;
+  gap: 18px;
+  padding: 4px 15px 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* 접근성 — 키보드 포커스 */
+.note-link-btn:focus-visible,
+.l-deep-summary:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+
+/* 모션 감소 선호 */
+@media (prefers-reduced-motion: reduce) {
+  .note-link-btn { transition: none; }
+  .note-link-btn:hover { transform: none; }
+  .l-deep-chev { transition: none; }
+}
+
+/* ─────────────────────────────────────────
    약물치료 섹션
 ───────────────────────────────────────── */
 .med-grid {
