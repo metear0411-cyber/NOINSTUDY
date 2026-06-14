@@ -127,6 +127,14 @@ table.tbl tr:nth-child(even) td{background:#fafbfc}
 footer{margin-top:50px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
 mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 @media(max-width:680px){body{font-size:16px}.row .fig{flex-basis:100%}}
+
+/* ── 정답 가독성 보강 (앱 레이어드 UI 톤 통일) ── */
+.selfcheck .a,#quiz .ans{border-left:4px solid var(--brand);line-height:1.7;color:var(--ink);word-break:keep-all;overflow-wrap:break-word}
+.selfcheck .a::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;margin-right:7px;font-size:11.5px;font-weight:800;vertical-align:1px}
+#quiz .ans{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+#quiz .ans::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:800}
+#quiz summary{padding:4px 0}
+#quiz summary:focus-visible,.selfcheck details summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
 </style>
 </head>
 <body>

@@ -840,32 +840,69 @@ a { color: var(--teal); }
 .rf-urgency .rf-sign   { color: #4a3a18; }
 .rf-urgency .rf-action { color: #6a552a; }
 
-/* PAPIE 등 진짜 순서 — 번호 스텝 */
-.step-flow { display: grid; gap: 0; }
+/* PAPIE 등 진짜 순서 — 번호 스텝 (카드 분리) */
+.step-flow { display: grid; gap: 8px; }
 .step-row {
   display: flex;
-  gap: 12px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--line);
+  gap: 11px;
+  padding: 11px 13px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
 }
-.step-row:last-child { border-bottom: none; }
 .step-num {
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--teal);
   color: #fff;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
 }
 .step-body { flex: 1; min-width: 0; }
-.step-label { display: block; margin-bottom: 4px; color: var(--teal-dark); font-size: 13px; font-weight: 800; }
-.step-body .flow-text-list { padding-left: 17px; }
-.step-body .flow-text-list li { font-size: 13.5px; line-height: 1.6; }
+.step-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--teal-dark);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.step-body .flow-text-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 5px;
+}
+.step-body .flow-text-list li {
+  position: relative;
+  padding-left: 15px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #2f3b42;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.step-body .flow-text-list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal-soft);
+  box-shadow: inset 0 0 0 1px var(--teal);
+}
 .step-body > span { font-size: 13.5px; line-height: 1.6; color: #2f3b42; word-break: keep-all; overflow-wrap: break-word; }
+
+/* 핵심어 강조 (flow 텍스트 내) */
+.kw-warn { color: var(--clay); font-weight: 700; }
+.kw-num  { font-weight: 700; color: var(--ink); }
 
 /* ③ 자세히 보기 (접기) */
 .l-deep {
