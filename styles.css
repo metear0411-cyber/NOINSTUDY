@@ -671,6 +671,45 @@ a { color: var(--teal); }
   overflow-wrap: break-word;
 }
 
+/* 함정 & 주의사항 — 접이식 (clay/red) */
+.trap-fold { display: flex; flex-direction: column; gap: 6px; }
+.trap-item {
+  border-left: 4px solid var(--clay);
+  background: var(--clay-soft);
+  border-radius: 0 6px 6px 0;
+}
+.trap-item > .trap-key {
+  list-style: none;
+  cursor: pointer;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5c2012;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  word-break: keep-all;
+}
+.trap-key::-webkit-details-marker { display: none; }
+.trap-item[open] > .trap-key .mem-chev { transform: rotate(180deg); }
+.trap-detail {
+  padding: 2px 11px 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #5c2012;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.trap-plain {
+  padding: 9px 11px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5c2012;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 /* 함정 리스트 */
 .trap-list {
   display: grid;
