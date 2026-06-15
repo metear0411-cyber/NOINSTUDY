@@ -514,9 +514,9 @@
       if (idx > 0 && idx <= 52) {
         const head = s.slice(0, idx).trim();
         const body = s.slice(idx + m[0].length).trim();
-        if (body) return `<details class="trap-item"><summary class="trap-key">⚠ ${esc(head)}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="trap-detail">${esc(body)}</div></details>`;
+        if (body) return `<details class="trap-item"><summary class="trap-key">⚠ ${emph(esc(head))}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="trap-detail">${emph(esc(body))}</div></details>`;
       }
-      return `<div class="trap-item trap-plain">⚠ ${esc(s)}</div>`;
+      return `<div class="trap-item trap-plain">⚠ ${emph(esc(s))}</div>`;
     }).join('');
     return `<div class="trap-fold">${rows}</div>`;
   }
@@ -530,9 +530,9 @@
       if (ci > 0 && ci <= 42) {
         const head = s.slice(0, ci).trim();
         const body = s.slice(ci + 1).trim();
-        if (body) return `<details class="mem-item"><summary class="mem-key">${esc(head)}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="mem-detail">${esc(body)}</div></details>`;
+        if (body) return `<details class="mem-item"><summary class="mem-key">${emph(esc(head))}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="mem-detail">${emph(esc(body))}</div></details>`;
       }
-      return `<div class="mem-item mem-plain">${esc(s)}</div>`;
+      return `<div class="mem-item mem-plain">${emph(esc(s))}</div>`;
     }).join('');
     return `<div class="mem-list">${rows}</div>`;
   }
@@ -593,11 +593,18 @@
     return `<div class="study-section"><h4>${title}</h4>${bodyHtml}</div>`;
   }
 
-  // 핵심어 강조 — 이미 esc()된 문자열에만 적용(숫자·단위는 esc 영향 없음, 안전)
+  // 핵심어 강조 — 이미 esc()된 문자열에만 적용(숫자·단위·별표는 esc 영향 없음, 안전)
+  // 색 체계: **외울 핵심**(보라 형광) · 경고어(점토) · 수치+단위(청록)
   function emph(escaped) {
-    return escaped
+    // 1) 수동 강조 **...**(빈출 핵심)는 먼저 추출해 보호 → 자동 강조 중첩 방지
+    const keys = [];
+    let s = escaped.replace(/\*\*([^*\n]+?)\*\*/g, (_, g) => `${keys.push(g) - 1}`);
+    // 2) 경고어(점토) · 수치+단위(청록) 자동 강조
+    s = s
       .replace(/(금기|금지|절대|즉시|응급|반드시|주의|중단|위험|사망|독성)/g, '<b class="kw-warn">$1</b>')
       .replace(/(\d+(?:\.\d+)?\s?(?:mmHg|mg\/dL|mEq\/L|mg|mcg|mL|%|회|시간|분|일|주|kg|g))/g, '<b class="kw-num">$1</b>');
+    // 3) 보호한 핵심 복원
+    return s.replace(/(\d+)/g, (_, i) => `<b class="kw-key">${keys[+i]}</b>`);
   }
 
   // flowStep 텍스트를 '. ' '; ' '①②③' 기준으로 잘게 분리 + 핵심어 강조

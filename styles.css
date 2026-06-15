@@ -978,9 +978,17 @@ a { color: var(--teal); }
 }
 .step-body > span { font-size: 13.5px; line-height: 1.6; color: #2f3b42; word-break: keep-all; overflow-wrap: break-word; }
 
-/* 핵심어 강조 (flow 텍스트 내) */
+/* 핵심어 강조 — 암기 포인트·함정·flow 공통
+   경고어=점토(빨강) · 수치+단위=청록 · 외울 핵심(**)=보라 형광 */
 .kw-warn { color: var(--clay); font-weight: 700; }
-.kw-num  { font-weight: 700; color: var(--ink); }
+.kw-num  { color: var(--teal-dark); font-weight: 700; }
+.kw-key  {
+  color: var(--purple);
+  font-weight: 800;
+  background: linear-gradient(transparent 58%, var(--purple-soft) 58%);
+  padding: 0 1px;
+  border-radius: 2px;
+}
 
 /* ③ 자세히 보기 (접기) */
 .l-deep {
