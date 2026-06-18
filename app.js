@@ -61,6 +61,7 @@
   function init() {
     state.subjects    = window.NORI_SUBJECTS || [];
     state.data        = window.NORI_DATA     || {};
+    ensureQuestionIds();   // id 없는 챕터 문항에 안정적 id 부여 → 오답노트 누적 가능
     state.marks       = JSON.parse(localStorage.getItem(LS_KEY)     || '{}');
     state.catCollapsed = JSON.parse(localStorage.getItem(LS_CAT_KEY) || '{}');
 
@@ -774,6 +775,7 @@
     const isOk    = chosen === correct;
 
     state.quiz.scores.push(isOk);
+    if (q.id) bumpQStat(q.id, !isOk);  // 챕터 퀴즈 오답도 복습 모음(오답노트)에 누적
 
     el.querySelectorAll('.quiz-option').forEach((b, i) => {
       b.classList.add('disabled');
@@ -829,6 +831,11 @@
         }
         <button class="quiz-btn quiz-btn-secondary" id="quizStudyBtn"  type="button">학습 모드</button>
       </div>
+      ${wrongCount > 0 ? `<p class="quiz-result-sub" style="margin-top:12px">❌ 오답 ${wrongCount}개가 <b>오답노트(복습 모음)</b>에 저장됐어요</p>` : ''}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px;">
+        <button class="quiz-btn quiz-btn-secondary" id="quizReviewNoteBtn" type="button">📕 오답노트 보기</button>
+        ${!pass ? `<button class="quiz-btn quiz-btn-secondary" id="quizWeakBtn" type="button">! 이 챕터 약점 표시</button>` : ''}
+      </div>
     </div>`;
 
     el.querySelector('#quizRetryBtn').addEventListener('click', () => {
@@ -845,6 +852,27 @@
     }
 
     el.querySelector('#quizStudyBtn').addEventListener('click', () => setMode('study'));
+
+    // 오답노트(복습 모음)로 바로 이동
+    el.querySelector('#quizReviewNoteBtn')?.addEventListener('click', () => {
+      state.gichulView = 'review';
+      enterGichulMode();
+    });
+
+    // 점수 미달 시 이 챕터를 약점(!)으로 표시
+    el.querySelector('#quizWeakBtn')?.addEventListener('click', (e) => {
+      const key = getMarkKey();
+      if (key) {
+        state.marks[key] = state.marks[key] || {};
+        state.marks[key].weak = true;
+        localStorage.setItem(LS_KEY, JSON.stringify(state.marks));
+        updateMarkButtons();
+        buildTopicList();
+      }
+      e.target.textContent = '✓ 약점으로 표시됨';
+      e.target.disabled = true;
+      e.target.style.opacity = '0.6';
+    });
   }
 
   // ─── 플래시카드 모드 ──────────────────────────────
@@ -1177,8 +1205,33 @@
   function getQMark(id) { return lsGet(LS_QMARK)[id] || null; }
   function setQMark(id, val) { const m = lsGet(LS_QMARK); if (val) m[id] = val; else delete m[id]; lsSet(LS_QMARK, m); }
   function bumpQStat(id, wrong) { const s = lsGet(LS_QSTAT); const e = s[id] || { seen: 0, wrong: 0 }; e.seen++; if (wrong) e.wrong++; s[id] = e; lsSet(LS_QSTAT, s); }
+  // id가 없는 챕터 문항에 결정론적 id 부여(배열 순서 기반 → 새로고침해도 동일)
+  // 기존 실제 id(예: htn-q1)는 그대로 두고, 없는 것만 `sid:topicId#idx` 형식으로 채움
+  function ensureQuestionIds() {
+    Object.entries(state.data || {}).forEach(([sid, subj]) => {
+      (subj.topics || []).forEach(t => {
+        (t.questions || []).forEach((q, i) => {
+          if (q && !q.id) q.id = `${sid}:${t.id}#${i}`;
+        });
+      });
+    });
+  }
+
+  // 토픽(챕터) 문제를 기출 렌더러가 이해하는 형태로 정규화
+  // (choices: [{text}] → [string], caseStory를 stem 앞에 붙임, 태그=토픽명)
+  function normalizeTopicQ(q, topicTitle) {
+    const choices = (q.choices || []).map(c => (typeof c === 'string' ? c : (c && c.text) || ''));
+    const stem = q.caseStory ? `${q.caseStory}\n\n${q.stem}` : q.stem;
+    return { ...q, stem, choices, tag: topicTitle || q.tag, type: 'topic' };
+  }
   function allQuestionsById() {
     const m = {};
+    // 챕터(토픽) 문제 먼저 — 기출/변형과 id가 겹치면 아래에서 덮어씀
+    Object.values(state.data || {}).forEach(subj => {
+      (subj.topics || []).forEach(t => (t.questions || []).forEach(q => {
+        if (q.id) m[q.id] = normalizeTopicQ(q, t.title);
+      }));
+    });
     (window.NORI_GICHUL?.questions || []).forEach(q => { m[q.id] = q; });
     (window.NORI_VARIATION?.questions || []).forEach(q => { m[q.id] = { ...q, type: 'variation' }; });
     return m;
@@ -1250,12 +1303,12 @@
     const wrongN = Object.values(stat).filter(s => s.wrong > 0).length;
     const reviewN = Object.values(mark).filter(m => m === 'review').length;
     let html = `<div class="mock-intro">
-      <p>🔁 <b>복습 모음 (오답노트)</b> — 자주 틀린 문제와 "복습 필요"로 표시한 문제를 모았습니다.</p>
+      <p>🔁 <b>복습 모음 (오답노트)</b> — 챕터 퀴즈·모의고사에서 틀린 문제와 "복습 필요"로 표시한 문제를 자동으로 모았습니다.</p>
       <p class="mock-sub">자주 틀린 문제 ${wrongN}개 · 복습 표시 ${reviewN}개 · 합계 <b>${set.length}개</b></p></div>`;
     if (set.length) {
       html += `<div style="text-align:center;margin-top:16px"><button class="quiz-btn quiz-btn-primary" id="reviewStartBtn" type="button">복습 시작 (${set.length}문제)</button></div>`;
     } else {
-      html += `<p style="text-align:center;color:var(--muted);margin-top:18px">아직 틀리거나 복습 표시한 문제가 없어요.<br>모의고사를 풀면 자동으로 채워집니다.</p>`;
+      html += `<p style="text-align:center;color:var(--muted);margin-top:18px">아직 틀리거나 복습 표시한 문제가 없어요.<br>챕터 퀴즈나 모의고사를 풀면 자동으로 채워집니다.</p>`;
     }
     el.innerHTML = html;
     el.querySelector('#reviewStartBtn')?.addEventListener('click', () => {
