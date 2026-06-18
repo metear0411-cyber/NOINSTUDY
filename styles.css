@@ -652,6 +652,8 @@ a { color: var(--teal); }
   gap: 8px;
   word-break: keep-all;
 }
+/* summary 제목을 단일 flex 아이템으로 묶어, 내부 **강조**(<b>)가 space-between에 벌어지지 않게 함 */
+.mem-key > .key-text, .trap-key > .key-text { flex: 1 1 auto; min-width: 0; }
 .mem-key::-webkit-details-marker { display: none; }
 .mem-chev { font-size: 11px; color: var(--muted); transition: transform .15s; flex-shrink: 0; }
 .mem-item[open] > .mem-key .mem-chev { transform: rotate(180deg); }

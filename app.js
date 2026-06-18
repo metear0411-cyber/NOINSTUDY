@@ -514,7 +514,7 @@
       if (idx > 0 && idx <= 52) {
         const head = s.slice(0, idx).trim();
         const body = s.slice(idx + m[0].length).trim();
-        if (body) return `<details class="trap-item"><summary class="trap-key">⚠ ${emph(esc(head))}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="trap-detail">${emph(esc(body))}</div></details>`;
+        if (body) return `<details class="trap-item"><summary class="trap-key"><span class="key-text">⚠ ${emph(esc(head))}</span><span class="mem-chev" aria-hidden="true">▾</span></summary><div class="trap-detail">${emph(esc(body))}</div></details>`;
       }
       return `<div class="trap-item trap-plain">⚠ ${emph(esc(s))}</div>`;
     }).join('');
@@ -530,7 +530,7 @@
       if (ci > 0 && ci <= 42) {
         const head = s.slice(0, ci).trim();
         const body = s.slice(ci + 1).trim();
-        if (body) return `<details class="mem-item"><summary class="mem-key">${emph(esc(head))}<span class="mem-chev" aria-hidden="true">▾</span></summary><div class="mem-detail">${emph(esc(body))}</div></details>`;
+        if (body) return `<details class="mem-item"><summary class="mem-key"><span class="key-text">${emph(esc(head))}</span><span class="mem-chev" aria-hidden="true">▾</span></summary><div class="mem-detail">${emph(esc(body))}</div></details>`;
       }
       return `<div class="mem-item mem-plain">${emph(esc(s))}</div>`;
     }).join('');
