@@ -4779,7 +4779,7 @@ window.NORI_GICHUL = {
     "choices": [
       "가, 나, 다",
       "가, 다",
-      "나, 라",
+      "나, 다",
       "라",
       "가, 나, 다, 라"
     ],
@@ -7222,6 +7222,7 @@ window.NORI_GICHUL = {
     "source_folder": "07_비뇨기계",
     "chapter": "노인질환관리",
     "tag": "비뇨기계",
+    "disabled": true,
     "id": "ds-444"
   },
   {
@@ -11212,6 +11213,7 @@ window.NORI_GICHUL = {
     "source_folder": "10_임종간호",
     "chapter": "생애말기간호",
     "tag": "임종간호",
+    "disabled": true,
     "id": "ds-590"
   },
   {

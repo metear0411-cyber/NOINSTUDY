@@ -62,6 +62,9 @@
     state.subjects    = window.NORI_SUBJECTS || [];
     state.data        = window.NORI_DATA     || {};
     ensureQuestionIds();   // id 없는 챕터 문항에 안정적 id 부여 → 오답노트 누적 가능
+    // 결함으로 숨김 처리된 문항은 출제 풀에서 제외
+    if (window.NORI_GICHUL?.questions)   window.NORI_GICHUL.questions   = window.NORI_GICHUL.questions.filter(q => !q.disabled);
+    if (window.NORI_VARIATION?.questions) window.NORI_VARIATION.questions = window.NORI_VARIATION.questions.filter(q => !q.disabled);
     state.marks       = JSON.parse(localStorage.getItem(LS_KEY)     || '{}');
     state.catCollapsed = JSON.parse(localStorage.getItem(LS_CAT_KEY) || '{}');
 
