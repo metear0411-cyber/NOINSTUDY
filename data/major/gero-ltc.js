@@ -1531,6 +1531,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: '요로감염 항생제',
+          indication: '증상이 있는 **요로감염**(방광염·신우신염) 치료에 씁니다. 원인 세균을 죽여 배뇨통·빈뇨·발열 같은 증상을 가라앉힙니다.',
+          examPattern: '무증상 세균뇨는 치료하지 않는다는 원칙과 배양 결과에 따른 항생제 선택을 묻는다.',
           examples: ['nitrofurantoin(단순 방광염)', 'trimethoprim-sulfamethoxazole', 'ciprofloxacin'],
           mechanism: '세균 세포벽 합성 억제 또는 엽산 합성 억제',
           sideEffects: ['항생제 관련 설사', 'nitrofurantoin: 폐독성(장기 사용)'],
@@ -1538,6 +1540,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '노로바이러스·설사 지지 치료',
+          indication: '노로바이러스 등으로 구토·설사가 심할 때 **탈수**를 막는 지지 치료입니다. 빠져나간 수분과 전해질을 보충해 탈수와 그 합병증을 예방합니다.',
+          examPattern: '바이러스성 장염은 수분·전해질 보충이 우선이고 지사제는 신중히 쓴다는 점을 묻는다.',
           examples: ['경구 수분 보충(전해질)', 'loperamide(이모디움 — 합병증 없는 성인, 바이러스성에서 일반적 사용 주의)'],
           mechanism: '수분·전해질 보충으로 탈수 예방',
           sideEffects: ['loperamide: 장폐색 위험(C.diff 등 독소성 원인 시 금기)'],
@@ -1662,6 +1666,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: '창상 드레싱 제제',
+          indication: '욕창 등 **창상**을 덮어 치료하는 데 씁니다. 상처에 알맞은 습윤 환경을 만들어 새 살이 잘 자라도록 도와 치유를 빠르게 합니다.',
+          examPattern: '삼출액 양·감염 여부에 따라 드레싱 종류(폼·하이드로콜로이드·실버)를 고르는 문제로 출제된다.',
           examples: ['hydrocolloid(하이드로콜로이드, 1~2기)', 'alginate(삼출물 많을 때)', 'foam 드레싱(중등도 삼출)', '은함유 드레싱(감염 창상)'],
           mechanism: '습윤 환경 유지 → 세포 이동 촉진 → 창상 치유',
           sideEffects: ['은함유 드레싱: 은 축적(장기 사용 시)'],
@@ -1669,6 +1675,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '영양 및 전신 치료',
+          indication: '욕창이 잘 낫도록 몸 안에서 돕는 **영양** 지지입니다. 새 살을 만드는 재료인 단백질과 회복을 돕는 영양소를 채워 조직 재생을 촉진합니다.',
+          examPattern: '욕창 치유를 위한 단백질·비타민C·아연 보충 등 영양 중재의 필요성을 묻는 문제로 출제된다.',
           examples: ['단백질 충분 섭취(1.2~1.5g/kg)', '비타민C·아연 보충'],
           mechanism: '영양 지지 → 조직 재생 촉진',
           sideEffects: ['아연 과다 시 구역'],
@@ -1792,6 +1800,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: 'Beers 기준 고위험 약물',
+          indication: '노인에게 **부적절**할 수 있는 약을 가려내는 기준입니다. 처방 전 이익과 위험을 따지고 더 안전한 대안을 찾는 데 활용해 약물 부작용을 예방합니다.',
+          examPattern: 'Beers 기준 대표 약물과 노인에서의 위험(낙상·섬망·항콜린 부작용)을 묻는 문제로 자주 출제된다.',
           examples: ['항콜린제(diphenhydramine·oxybutynin·tricyclic)', 'BZD(diazepam, lorazepam)', '비BZD 수면제(zolpidem)', '1세대 항히스타민제', 'NSAID 장기 사용', '설포닐유레아(glibenclamide 특히)'],
           mechanism: '노인에서 인지장애·낙상·요실금·변비·요폐 위험 증가',
           sideEffects: ['항콜린 증후군: 구강건조·변비·요저류·인지저하', 'BZD: 낙상·섬망·의존성'],
@@ -1799,6 +1809,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '다약제 이상 반응 모니터링',
+          indication: '여러 약을 함께 먹는 **다약제** 노인에서 약물 상호작용을 감시합니다. 위험한 조합을 미리 찾아내 출혈·전해질 이상·약물 독성을 예방합니다.',
+          examPattern: '다약제 정의와 위험한 약물 상호작용 조합을 짝짓는 문제로 출제된다.',
           examples: ['와파린+NSAIDs(출혈)', 'ACE억제제+K+보존이뇨제(고칼륨)', '디곡신+아미오다론(디곡신 독성)'],
           mechanism: '5종 이상 polypharmacy, 10종 이상 hyperpolypharmacy → 상호작용 위험 급증',
           sideEffects: ['복합 약물 부작용'],
