@@ -106,6 +106,12 @@
       btn.title = on ? '기본 보기 (사이드바·토픽목록 펼치기)' : '넓게 보기 (사이드바·토픽목록 접기)';
       btn.textContent = on ? '⤡' : '⤢';
     }
+    const fab = document.getElementById('focusToggleFloat');
+    if (fab) {
+      fab.classList.toggle('is-active', on);
+      fab.setAttribute('aria-pressed', on ? 'true' : 'false');
+      fab.textContent = on ? '⤡ 펼치기' : '⤢ 넓게';
+    }
     localStorage.setItem(LS_FOCUS, on ? '1' : '0');
   }
 
@@ -1037,10 +1043,10 @@
       if (state.currentSubjectId) buildTopicList();
     });
 
-    // 집중(넓게보기) 모드 토글 — 과목 레일·토픽 목록 접기
-    document.getElementById('focusToggle')?.addEventListener('click', () => {
-      applyFocusMode(!document.body.classList.contains('focus-mode'));
-    });
+    // 집중(넓게보기) 모드 토글 — 과목 레일·토픽 목록 접기 (상단 버튼 + 좌하단 플로팅)
+    const toggleFocus = () => applyFocusMode(!document.body.classList.contains('focus-mode'));
+    document.getElementById('focusToggle')?.addEventListener('click', toggleFocus);
+    document.getElementById('focusToggleFloat')?.addEventListener('click', toggleFocus);
 
     // 기출문제 버튼
     document.getElementById('gichulEntryBtn')?.addEventListener('click', enterGichulMode);

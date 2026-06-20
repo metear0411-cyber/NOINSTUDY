@@ -334,6 +334,17 @@ a { color: var(--teal); }
    (가로 분할화면에서 내용 가독성↑)
 ───────────────────────────────────────── */
 .focus-toggle-btn.is-active { background: var(--teal, #2f8f7f); color: #fff; border-color: var(--teal, #2f8f7f); }
+/* 좌하단 플로팅 토글 — 스크롤 위치와 무관하게 항상 노출 */
+.focus-fab {
+  position: fixed; left: 16px; bottom: 18px; z-index: 9000;
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 15px; border: none; border-radius: 999px;
+  background: var(--teal, #2f8f7f); color: #fff; font-weight: 700; font-size: 13px;
+  cursor: pointer; box-shadow: 0 6px 18px rgba(20,60,50,.32); font-family: inherit;
+}
+.focus-fab:hover { filter: brightness(1.07); }
+.focus-fab.is-active { background: #6b3fa0; }
+@media print { .focus-fab { display: none !important; } }
 body.focus-mode .content-grid { grid-template-columns: minmax(0, 1fr); }
 body.focus-mode .part-panel { display: none; }
 @media (min-width: 769px) {
