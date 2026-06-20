@@ -1649,6 +1649,8 @@ window.NORI_DATA['gero-promotion'] = {
         },
         {
           category: '화상 통증·전신 관리',
+          indication: '화상으로 생긴 **통증**을 조절해 환자를 편안하게 하고 드레싱 같은 처치를 견딜 수 있게 할 때 쓴다. 통증 정도에 따라 해열진통제부터 오피오이드까지 단계적으로 선택한다.',
+          examPattern: '화상 통증의 규칙적(ATC) 투여와 드레싱 교환 전 진통제 선행 투여 원칙을 묻는 문제가 나온다.',
           examples: ['Acetaminophen(경도 통증)', 'Ibuprofen(항염증+진통)', 'Morphine(중등도 이상 화상 통증)'],
           mechanism: '중추·말초 통증 경로 차단 → 화상 통증 조절.',
           sideEffects: ['오피오이드: 변비·호흡 억제', 'NSAIDs: 신기능 저하 노인 주의'],
