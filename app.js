@@ -12,6 +12,13 @@
   const LS_QSTAT   = 'nori_qstat_v1'; // 문항별 통계 { qid: {seen,wrong} }
   const LS_MOCKPROG = 'nori_mockprog_v1'; // 모의고사 진행 임시저장 { batchId: {ids,current,scores,label} }
   const LS_FOCUS   = 'nori_focus_v1'; // 집중(넓게보기) 모드 on/off
+  const LS_STREAK  = 'nori_streak_v1'; // 연속 학습일 { last:'YYYY-MM-DD', count:N }
+
+  // ── 간격 반복(Leitner) ──
+  // 박스 단계(1~5)별 다음 복습까지 간격(시간). 시험이 가까우므로 짧게 순환.
+  // 틀리면 box=1로 리셋 → 8시간 뒤(=대개 다음 세션) 다시 등장.
+  const SRS_HOURS = [null, 8, 24, 3 * 24, 6 * 24, 11 * 24]; // index = box (1..5)
+  const DAILY_DEFAULT = 25; // '오늘의 한 판' 기본 문항 수
 
   const MOCK_SIZE = 150;  // 모의고사 회당 문항 수 (공식 1차 = 공통40 + 노인전공110)
 
@@ -1061,6 +1068,7 @@
 
     // 기출문제 버튼
     document.getElementById('gichulEntryBtn')?.addEventListener('click', enterGichulMode);
+    document.getElementById('dailyEntryBtn')?.addEventListener('click', enterDailyMode);
     document.getElementById('gichulExitBtn')?.addEventListener('click', exitGichulMode);
 
     // 약물 총정리
@@ -1291,7 +1299,97 @@
   // ── 문항 마킹 / 통계 ──
   function getQMark(id) { return lsGet(LS_QMARK)[id] || null; }
   function setQMark(id, val) { const m = lsGet(LS_QMARK); if (val) m[id] = val; else delete m[id]; lsSet(LS_QMARK, m); }
-  function bumpQStat(id, wrong) { const s = lsGet(LS_QSTAT); const e = s[id] || { seen: 0, wrong: 0 }; e.seen++; if (wrong) e.wrong++; s[id] = e; lsSet(LS_QSTAT, s); }
+  function bumpQStat(id, wrong) {
+    const s = lsGet(LS_QSTAT);
+    const e = s[id] || { seen: 0, wrong: 0 };
+    e.seen++;
+    if (wrong) e.wrong++;
+    // 간격 반복 스케줄: 맞히면 박스 +1(최대5), 틀리면 1로 리셋
+    const box = wrong ? 1 : Math.min((e.box || 1) + 1, 5);
+    e.box = box;
+    e.last = Date.now();
+    e.due  = Date.now() + SRS_HOURS[box] * 3600000;
+    s[id] = e;
+    lsSet(LS_QSTAT, s);
+  }
+
+  // ── 연속 학습일(streak) ──
+  function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+  function getStreak() { const st = lsGet(LS_STREAK); return { last: st.last || null, count: st.count || 0 }; }
+  function recordStudyDay() {
+    const st = getStreak();
+    const today = ymd(new Date());
+    if (st.last === today) return st;                 // 오늘 이미 기록됨
+    const yest = ymd(new Date(Date.now() - 86400000));
+    const next = { last: today, count: st.last === yest ? st.count + 1 : 1 };
+    lsSet(LS_STREAK, next);
+    return next;
+  }
+
+  // ── '오늘의 한 판' — 간격 반복 + 신규(비중 가중) 혼합 세트 ──
+  // 1) 복습 만기 문항(due<=now, 약한 박스 우선)  2) 모자라면 미학습 신규를 출제비중·빈출 가중으로 채움
+  function dailyDueList() {
+    const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK), byId = allQuestionsById();
+    const now = Date.now();
+    const due = [];
+    Object.entries(stat).forEach(([id, s]) => {
+      if (!s || mark[id] === 'known' || !byId[id]) return;
+      // due가 잡힌 문항은 만기 시, 옛 데이터(due 없이 오답만 있던 문항)는 즉시 만기로 취급
+      const isDue = s.due != null ? s.due <= now : s.wrong > 0;
+      if (isDue) due.push({ id, box: s.box || 1, due: s.due || 0 });
+    });
+    // 약한 박스(많이 틀린) 우선, 그 다음 더 오래 밀린 순
+    due.sort((a, b) => (a.box - b.box) || (a.due - b.due));
+    return due.map(x => byId[x.id]);
+  }
+  function dailyNewPool() {
+    const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK);
+    const all = [
+      ...(window.NORI_GICHUL?.questions || []),
+      ...(window.NORI_VARIATION?.questions || []).map(q => ({ ...q, type: 'variation' }))
+    ];
+    return all.filter(q => q.id && !stat[q.id] && mark[q.id] !== 'known');
+  }
+  function buildDailySet(limit, opts) {
+    limit = limit || DAILY_DEFAULT;
+    const due = dailyDueList();
+    // 복습이 세트의 최대 70%를 넘지 않게 해 신규 학습 진도도 함께 나가도록(복습만 있으면 전부 사용)
+    const reviewCap = Math.max(Math.ceil(limit * 0.7), limit - dailyNewPool().length);
+    const review = due.slice(0, Math.min(due.length, reviewCap));
+    let set = review.slice();
+    const reviewCount = review.length;
+    if (set.length < limit) {
+      const need = limit - set.length;
+      const newPool = dailyNewPool();
+      const picked = weightedSample(newPool, Math.min(need, newPool.length),
+        q => (EXAM_WEIGHTS[q.chapter] || 3) * (FREQ_BOOST[q.tag] || 1), Math.random);
+      set = set.concat(picked);
+    }
+    const newCount = set.length - reviewCount;
+    let crossCount = 0;
+    if (opts && opts.cross) ({ set, crossCount } = applyCrossover(set));
+    return { questions: shuffle(set), reviewCount, newCount, crossCount };
+  }
+  // 교차 모드: 충분히 외운(box≥3) 복습 항목을 같은 개념의 '다른 소스' 문항으로 치환
+  // → 답을 외운 게 아니라 개념을 아는지 확인. 파트너가 없으면 원문 유지.
+  function applyCrossover(set) {
+    const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK);
+    const ids = new Set(set.map(q => q.id));
+    let crossCount = 0;
+    const out = set.map(q => {
+      const s = stat[q.id];
+      if (!s || (s.box || 1) < 3) return q;     // 외운 복습 항목만 대상(신규·약한 항목은 그대로)
+      const partner = crossPartners(q, ids).find(p => mark[p.id] !== 'known' && !ids.has(p.id));
+      if (!partner) return q;
+      ids.delete(q.id); ids.add(partner.id);
+      crossCount++;
+      return { ...partner, _cross: true };
+    });
+    return { set: out, crossCount };
+  }
+  function dailyStats() {
+    return { due: dailyDueList().length, fresh: dailyNewPool().length, streak: getStreak().count };
+  }
   // id가 없는 챕터 문항에 결정론적 id 부여(배열 순서 기반 → 새로고침해도 동일)
   // 기존 실제 id(예: htn-q1)는 그대로 두고, 없는 것만 `sid:topicId#idx` 형식으로 채움
   function ensureQuestionIds() {
@@ -1323,6 +1421,52 @@
     (window.NORI_VARIATION?.questions || []).forEach(q => { m[q.id] = { ...q, type: 'variation' }; });
     return m;
   }
+
+  // ── 교차출제(꼬리물기) — 기출 ↔ 변형 같은 개념 연결 ──
+  // 하이브리드 링크: ① 변형 source_id가 실제 기출 id면 정밀 1:1 연결,
+  //                 ② 아니면 같은 tag(계통), ③ 그래도 없으면 같은 chapter로 근사 매칭.
+  // (기출 변형 양쪽이 tag 19종·chapter 11종을 100% 공유 → 사실상 전 문항 커버)
+  let _crossIndex = null;
+  function buildCrossIndex() {
+    if (_crossIndex) return _crossIndex;
+    const G = window.NORI_GICHUL?.questions || [];
+    const V = window.NORI_VARIATION?.questions || [];
+    const gIds = new Set(G.map(q => q.id));
+    const byId = {}, g2v = {}, v2g = {}, byTag = {}, byChapter = {};
+    const reg = (q, src) => {
+      byId[q.id] = src === 'variation' ? { ...q, type: 'variation' } : q;
+      (byTag[q.tag] = byTag[q.tag] || { gichul: [], variation: [] })[src].push(q.id);
+      (byChapter[q.chapter] = byChapter[q.chapter] || { gichul: [], variation: [] })[src].push(q.id);
+    };
+    G.forEach(q => reg(q, 'gichul'));
+    V.forEach(q => {
+      reg(q, 'variation');
+      if (gIds.has(q.source_id)) {            // 정밀 링크
+        v2g[q.id] = q.source_id;
+        (g2v[q.source_id] = g2v[q.source_id] || []).push(q.id);
+      }
+    });
+    _crossIndex = { byId, g2v, v2g, byTag, byChapter };
+    return _crossIndex;
+  }
+  // q와 같은 개념의 '반대 소스' 문항들을 정밀→tag→chapter 순으로 반환(자기 자신·exclude 제외)
+  function crossPartners(q, exclude) {
+    if (!q || !q.id) return [];
+    const idx = buildCrossIndex();
+    exclude = exclude || new Set();
+    const isVar = q.type === 'variation';
+    const otherKey = isVar ? 'gichul' : 'variation';
+    const out = [];
+    const pushId = id => {
+      if (!id || id === q.id || exclude.has(id) || out.some(o => o.id === id)) return;
+      if (idx.byId[id]) out.push(idx.byId[id]);
+    };
+    if (isVar) pushId(idx.v2g[q.id]);                       // ① 정밀
+    else (idx.g2v[q.id] || []).forEach(pushId);
+    ((idx.byTag[q.tag] || {})[otherKey] || []).forEach(pushId);   // ② 같은 계통
+    if (!out.length) ((idx.byChapter[q.chapter] || {})[otherKey] || []).forEach(pushId); // ③ 같은 챕터
+    return out;
+  }
   // 자주 틀린 문제 + 복습 표시 문제 모음 (안다 표시는 제외, 오답률 높은 순)
   function buildReviewSet() {
     const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK), byId = allQuestionsById();
@@ -1338,6 +1482,7 @@
     const bar = document.getElementById('gichulModeBar');
     if (!bar) return;
     const views = [
+      { key: 'daily',  label: '🎯 오늘의 한 판' },
       { key: 'mock',   label: '📋 모의고사' },
       { key: 'review', label: '🔁 복습 모음' },
       { key: 'normal', label: '📚 자유 풀기' }
@@ -1400,6 +1545,49 @@
       startGichulSession(ex.questions, { mock: true, batchId: ex.id, batchLabel: ex.label });
     }));
   }
+  function renderDailyIntro() {
+    const el = document.getElementById('gichulContent');
+    if (!el) return;
+    document.getElementById('gichulProgress').textContent = '';
+    const d = dailyStats();
+    const today = ymd(new Date());
+    const doneToday = getStreak().last === today;
+    const totalAvail = d.due + d.fresh;
+    const sizes = [15, 25, 40].filter(n => n <= Math.max(15, totalAvail) || n === 15);
+
+    let html = `<div class="daily-hero">
+      <div class="daily-streak">🔥 연속 <b>${d.streak}</b>일${doneToday ? ' <span class="daily-done-chip">오늘 완료 ✓</span>' : ''}</div>
+      <h3 class="daily-title">🎯 오늘의 한 판</h3>
+      <p class="daily-lead">고민 없이 버튼만 누르세요. 알고리즘이 <b>잊을 때가 된 복습 문제</b>와 <b>비중 높은 새 문제</b>를 섞어 냅니다.</p>
+      <div class="daily-stat-row">
+        <div class="daily-stat"><span class="daily-stat-n">${d.due}</span><span class="daily-stat-l">🔁 복습 만기</span></div>
+        <div class="daily-stat"><span class="daily-stat-n">${d.fresh}</span><span class="daily-stat-l">✨ 새 문제</span></div>
+      </div>`;
+
+    if (totalAvail === 0) {
+      html += `<p class="daily-empty">풀 문제가 없어요 🎉 모든 문항을 "안다"로 표시했거나 데이터가 없습니다.</p>`;
+    } else {
+      html += `<label class="daily-cross-toggle"><input type="checkbox" id="dailyCrossToggle" checked>
+        🔀 <b>교차출제</b> — 외운 복습 문제는 <b>같은 개념의 다른 문제</b>(기출↔변형)로 바꿔 출제</label>`;
+      html += `<div class="daily-size-row">` +
+        sizes.map((n, i) => `<button class="quiz-btn ${i === 1 || sizes.length === 1 ? 'quiz-btn-primary' : 'quiz-btn-secondary'} daily-start" type="button" data-n="${n}">${n}문제 시작</button>`).join('') +
+        `</div>
+        <p class="daily-tip">💡 맞히면 다음 복습 간격이 늘어나고, 틀리면 곧 다시 나옵니다. 교차출제를 켜면 답을 외운 문제도 표현을 바꿔 출제해 <b>진짜 개념 이해</b>를 점검해요.</p>`;
+    }
+    html += `</div>`;
+    el.innerHTML = html;
+
+    el.querySelectorAll('.daily-start').forEach(b => b.addEventListener('click', () => {
+      const cross = el.querySelector('#dailyCrossToggle')?.checked;
+      const set = buildDailySet(+b.dataset.n, { cross });
+      if (!set.questions.length) { renderDailyIntro(); return; }
+      startGichulSession(set.questions, {
+        batchId: 'daily',
+        batchLabel: `오늘의 한 판 (복습 ${set.reviewCount}·신규 ${set.newCount}${set.crossCount ? '·🔀' + set.crossCount : ''})`
+      });
+    }));
+  }
+
   function renderReviewIntro() {
     const el = document.getElementById('gichulContent');
     if (!el) return;
@@ -1425,7 +1613,10 @@
     const typeBar = document.getElementById('gichulTypeBar');
     const chapBar = document.getElementById('gichulChapterBar');
     document.getElementById('gichulProgress').textContent = '';
-    if (state.gichulView === 'normal') {
+    if (state.gichulView === 'daily') {
+      typeBar.style.display = 'none'; chapBar.style.display = 'none';
+      renderDailyIntro();
+    } else if (state.gichulView === 'normal') {
       typeBar.style.display = ''; chapBar.style.display = '';
       buildGichulTypeBar(); buildGichulChapterBar(); startGichulSession();
     } else if (state.gichulView === 'review') {
@@ -1450,6 +1641,12 @@
 
     buildGichulModeBar();
     showGichulView();
+  }
+
+  // 사이드바 '🎯 오늘의 한 판' 진입 — 기출 패널을 열고 데일리 뷰로 바로 이동
+  function enterDailyMode() {
+    state.gichulView = 'daily';
+    enterGichulMode();
   }
 
   function exitGichulMode() {
@@ -1607,6 +1804,7 @@
 
     if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
     if (q.type === 'variation') html += `<span class="variation-badge">변형문제(AI생성)</span>`;
+    if (q._cross) html += `<span class="cross-badge">🔀 같은 개념 다른 문제</span>`;
 
     const mk = getQMark(q.id);
     html += `<div class="qmark-bar">
@@ -1677,10 +1875,24 @@
     const nav = el.querySelector('#quizNav');
     if (nav) {
       const more = state.gichul.current + 1 < state.gichul.questions.length;
-      nav.innerHTML = `<button class="quiz-btn quiz-btn-primary" id="gichulNextBtn" type="button">
+      // 같은 개념의 다른 문제(기출↔변형)를 다음 문항으로 끼워넣어 바로 꼬리물기
+      const sessIds = new Set(state.gichul.questions.map(x => x.id));
+      const mark = lsGet(LS_QMARK);
+      const cands = crossPartners(q, sessIds);
+      const partner = cands.find(p => mark[p.id] !== 'known') || cands[0];
+      nav.innerHTML =
+        (partner ? `<button class="quiz-btn quiz-btn-secondary" id="gichulCrossBtn" type="button">🔀 같은 개념 다른 문제</button>` : '') +
+        `<button class="quiz-btn quiz-btn-primary" id="gichulNextBtn" type="button">
         ${more ? '다음 문제 →' : '결과 확인 →'}
       </button>`;
       nav.querySelector('#gichulNextBtn').addEventListener('click', () => {
+        state.gichul.answered = false;
+        state.gichul.current++;
+        saveMockProg();
+        renderGichulQuestion();
+      });
+      nav.querySelector('#gichulCrossBtn')?.addEventListener('click', () => {
+        state.gichul.questions.splice(state.gichul.current + 1, 0, { ...partner, _cross: true });
         state.gichul.answered = false;
         state.gichul.current++;
         saveMockProg();
@@ -1712,15 +1924,18 @@
       const res = lsGet(LS_MOCK); res[sess.batchId] = { pct, correct, total, doneAt: Date.now() }; lsSet(LS_MOCK, res);
       clearMockProg(sess.batchId);
     }
+    // 한 세션이라도 끝내면 오늘을 학습일로 기록(연속일 streak)
+    let streakNote = '';
+    if (total > 0) { const st = recordStudyDay(); streakNote = `🔥 연속 학습 ${st.count}일째`; }
 
     document.getElementById('gichulProgress').textContent = '완료!';
-    const backToList = sess.mock || sess.batchId === 'review';
+    const backToList = sess.mock || sess.batchId === 'review' || sess.batchId === 'daily';
 
     el.innerHTML = `<div class="quiz-result">
       <p class="quiz-score" style="color:${pass ? 'var(--green)' : 'var(--clay)'}">${pct}%</p>
       <p class="quiz-score-label">${correct} / ${total} 정답</p>
       <p class="quiz-result-msg">${pass ? '합격권 🎉 잘 하셨어요!' : '조금 더 연습해봐요'}</p>
-      <p class="quiz-result-sub">60% 이상이 합격 기준입니다</p>
+      <p class="quiz-result-sub">60% 이상이 합격 기준입니다${streakNote ? ` · ${streakNote}` : ''}</p>
       <div class="tagrate"><h4>계통별 정답률</h4>${tagRows}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;">
         <button class="quiz-btn quiz-btn-primary"   id="gichulRetryBtn"      type="button">${sess.mock ? '이 회차 다시' : '다시 풀기'}</button>
@@ -1735,6 +1950,11 @@
     el.querySelector('#gichulRetryBtn').addEventListener('click', () => {
       if (sess.mock) startGichulSession(sess.questions, { mock: true, batchId: sess.batchId, batchLabel: sess.batchLabel });
       else if (sess.batchId === 'review') startGichulSession(sess.questions, { batchId: 'review', batchLabel: '복습 모음' });
+      else if (sess.batchId === 'daily') {  // 새 '오늘의 한 판' 구성으로 한 판 더
+        const set = buildDailySet(total);
+        if (set.questions.length) startGichulSession(set.questions, { batchId: 'daily', batchLabel: `오늘의 한 판 (복습 ${set.reviewCount}·신규 ${set.newCount})` });
+        else { state.gichulView = 'daily'; buildGichulModeBar(); showGichulView(); }
+      }
       else startGichulSession();
     });
     if (wrongQs.length > 0) {
