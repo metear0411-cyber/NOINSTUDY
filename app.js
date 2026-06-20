@@ -10,6 +10,7 @@
   const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
   const LS_QMARK   = 'nori_qmark_v1'; // 문항별 마킹 { qid: 'known' | 'review' }
   const LS_QSTAT   = 'nori_qstat_v1'; // 문항별 통계 { qid: {seen,wrong} }
+  const LS_MOCKPROG = 'nori_mockprog_v1'; // 모의고사 진행 임시저장 { batchId: {ids,current,scores,label} }
   const LS_FOCUS   = 'nori_focus_v1'; // 집중(넓게보기) 모드 on/off
 
   const MOCK_SIZE = 150;  // 모의고사 회당 문항 수 (공식 1차 = 공통40 + 노인전공110)
@@ -187,6 +188,8 @@
 
   // ─── 과목 선택 ────────────────────────────────────
   function selectSubject(subjectId) {
+    if (state.gichulMode) exitGichulMode();
+    if (document.getElementById('medPanel')?.style.display !== 'none') exitMedMode();
     state.currentSubjectId = subjectId;
     state.currentTopicId   = null;
 
@@ -346,6 +349,10 @@
 
   // ─── 토픽 선택 ────────────────────────────────────
   function selectTopic(topicId) {
+    // 약물·기출 패널이 열려 있으면 닫고 학습 화면으로 복귀 (사이드바에서 바로 토픽 이동 가능)
+    if (state.gichulMode) exitGichulMode();
+    if (document.getElementById('medPanel')?.style.display !== 'none') exitMedMode();
+
     state.currentTopicId = topicId;
     state.quiz  = { questions: [], current: 0, answered: false, scores: [] };
     state.flash = { cards: [], current: 0, flipped: false };
@@ -607,10 +614,12 @@
       const nurseArr = Array.isArray(med.nursingPoints) ? med.nursingPoints : (med.nursingPoints ? [med.nursingPoints] : []);
       return `<div class="med-card">
         <div class="med-category">${esc(med.category)}</div>
+        ${med.indication ? `<div class="med-use"><strong>💡 이럴 때 써요 (적응증·효능)</strong><p>${emph(esc(med.indication))}</p></div>` : ''}
         ${med.examples?.length ? `<div class="med-examples">${med.examples.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : ''}
         ${med.mechanism ? `<div class="med-detail"><strong>기전</strong><p>${esc(med.mechanism)}</p></div>` : ''}
         ${sideArr.length ? `<div class="med-detail"><strong>⚠️ 부작용</strong><ul>${sideArr.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : ''}
         ${nurseArr.length ? `<div class="med-detail"><strong>💉 간호 포인트</strong><ul>${nurseArr.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : ''}
+        ${med.examPattern ? `<div class="med-exam"><strong>📝 기출 포인트</strong><p>${emph(esc(med.examPattern))}</p></div>` : ''}
       </div>`;
     }).join('');
     return section('💊 약물치료', `<div class="med-grid">${medsHtml}</div>`);
@@ -1203,6 +1212,38 @@
     renderGichulQuestion();
   }
 
+  // ── 모의고사 임시저장(이어풀기) ──
+  function getMockProg() { return lsGet(LS_MOCKPROG); }
+  function saveMockProg() {
+    const g = state.gichul;
+    if (!g || !g.batchId || !g.mock) return;
+    if (g.current >= g.questions.length) return; // 완료분은 저장 안 함
+    const p = getMockProg();
+    p[g.batchId] = { ids: g.questions.map(q => q.id), current: g.current, scores: g.scores, label: g.batchLabel, at: Date.now() };
+    lsSet(LS_MOCKPROG, p);
+  }
+  function clearMockProg(id) { const p = getMockProg(); if (id && p[id]) { delete p[id]; lsSet(LS_MOCKPROG, p); } }
+  function resumeMock(batchId) {
+    const p = getMockProg()[batchId];
+    if (!p) return false;
+    const byId = allQuestionsById();
+    const qs = p.ids.map(id => byId[id]).filter(Boolean);
+    if (!qs.length) { clearMockProg(batchId); return false; }
+    const cur = Math.min(p.current, qs.length);
+    state.gichul = { questions: qs, current: cur, answered: false, scores: (p.scores || []).slice(0, cur), mock: true, batchId, batchLabel: p.label || '' };
+    renderGichulQuestion();
+    return true;
+  }
+  // 전체 섞기: 해당 소스(기출/변형) 전 문항을 한 세션으로 섞어 풀기(이어풀기 지원)
+  function startShuffleAll() {
+    const id = 'shuffle-' + state.gichulSource;
+    if (getMockProg()[id]) { resumeMock(id); return; }
+    const pool = rawSourcePool(state.gichulSource);
+    const qs = shuffle([...pool]);
+    state.gichul = { questions: qs, current: 0, answered: false, scores: [], mock: true, batchId: id, batchLabel: state.gichulSource + ' 전체 섞기' };
+    renderGichulQuestion();
+  }
+
   // ── 모의고사: 결정론적 가중 추출 ──
   function rawSourcePool(sourceKey) {
     if (sourceKey === '변형') return (window.NORI_VARIATION?.questions || []).map(q => ({ ...q, type: 'variation' }));
@@ -1326,17 +1367,36 @@
     document.getElementById('gichulProgress').textContent = '';
     const exams = buildMockExams(state.gichulSource);
     const results = lsGet(LS_MOCK);
-    let html = `<div class="mock-intro"><p>📋 <b>${esc(state.gichulSource)} 모의고사</b> — 한 회 <b>${MOCK_SIZE}문항</b>, 실제 출제비중에 맞춰 구성됩니다. 빈출 영역(순환·신경·호흡 등)은 더 자주 출제돼요.</p></div>`;
+    const prog = getMockProg();
+    let html = `<div class="mock-intro"><p>📋 <b>${esc(state.gichulSource)} 모의고사</b> — 한 회 <b>${MOCK_SIZE}문항</b>, 실제 출제비중에 맞춰 구성됩니다. 중간에 나가도 <b>이어풀기</b>로 저장돼요.</p></div>`;
+
+    // 전체 섞기 타일 (이어풀기 지원)
+    const shId = 'shuffle-' + state.gichulSource;
+    const shP = prog[shId];
+    const shPool = rawSourcePool(state.gichulSource).length;
+    const shLabel = shP ? `이어풀기 ${shP.current}/${shP.ids.length}` : `전 ${shPool}문항 섞기`;
+    html += `<button class="mock-shuffle-btn" id="mockShuffleBtn" type="button">🔀 전체 섞어 풀기 <span>${shLabel}</span></button>`;
+    if (shP) html += `<button class="mock-restart-link" id="mockShuffleRestart" type="button">↻ 전체 섞기 처음부터</button>`;
+
     html += `<div class="mock-grid">`;
     exams.forEach((ex, i) => {
       const r = results[ex.id];
-      const badge = r ? `<span class="mock-badge ${r.pct >= 60 ? 'pass' : 'fail'}">${r.pct}%</span>` : `<span class="mock-badge new">미응시</span>`;
-      html += `<button class="mock-card" type="button" data-batch="${i}"><strong>${i + 1}회</strong><span>${ex.questions.length}문항</span>${badge}</button>`;
+      const p = prog[ex.id];
+      const badge = p ? `<span class="mock-badge prog">이어풀기 ${p.current}/${p.ids.length}</span>`
+        : r ? `<span class="mock-badge ${r.pct >= 60 ? 'pass' : 'fail'}">${r.pct}%</span>`
+        : `<span class="mock-badge new">미응시</span>`;
+      html += `<button class="mock-card${p ? ' has-prog' : ''}" type="button" data-batch="${i}"><strong>${i + 1}회</strong><span>${ex.questions.length}문항</span>${badge}</button>`;
     });
     html += `</div>`;
     el.innerHTML = html;
+
+    el.querySelector('#mockShuffleBtn')?.addEventListener('click', startShuffleAll);
+    el.querySelector('#mockShuffleRestart')?.addEventListener('click', () => {
+      if (confirm('전체 섞기 진행을 지우고 처음부터 새로 섞을까요?')) { clearMockProg(shId); startShuffleAll(); }
+    });
     el.querySelectorAll('[data-batch]').forEach(b => b.addEventListener('click', () => {
       const ex = exams[+b.dataset.batch];
+      if (prog[ex.id]) { resumeMock(ex.id); return; }  // 이어풀기
       startGichulSession(ex.questions, { mock: true, batchId: ex.id, batchLabel: ex.label });
     }));
   }
@@ -1593,6 +1653,7 @@
       state.gichul.scores.push(null);
       state.gichul.answered = false;
       state.gichul.current++;
+      saveMockProg();
       renderGichulQuestion();
     });
   }
@@ -1622,6 +1683,7 @@
       nav.querySelector('#gichulNextBtn').addEventListener('click', () => {
         state.gichul.answered = false;
         state.gichul.current++;
+        saveMockProg();
         renderGichulQuestion();
       });
     }
@@ -1645,9 +1707,10 @@
       return `<div class="tagrate-row"><span class="tagrate-name">${esc(t)}</span><span class="tagrate-bar"><span style="width:${r}%;background:${r >= 60 ? 'var(--green)' : 'var(--clay)'}"></span></span><span class="tagrate-val">${b.c}/${b.n}</span></div>`;
     }).join('');
 
-    // 모의고사 결과 저장
+    // 모의고사 결과 저장 + 임시저장(이어풀기) 제거
     if (sess.mock && sess.batchId) {
       const res = lsGet(LS_MOCK); res[sess.batchId] = { pct, correct, total, doneAt: Date.now() }; lsSet(LS_MOCK, res);
+      clearMockProg(sess.batchId);
     }
 
     document.getElementById('gichulProgress').textContent = '완료!';
