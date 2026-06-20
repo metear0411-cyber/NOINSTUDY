@@ -313,8 +313,10 @@ a { color: var(--teal); }
 }
 
 .weight-ring {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 96px;
   height: 96px;
   border-radius: 50%;
@@ -323,8 +325,8 @@ a { color: var(--teal); }
     conic-gradient(var(--teal) calc(var(--value) * 1%), var(--teal-soft) 0);
   flex-shrink: 0;
 }
-.weight-ring strong { font-size: 22px; line-height: 1; }
-.weight-ring span { margin-top: -24px; color: var(--muted); font-size: 10px; }
+.weight-ring strong { font-size: 22px; line-height: 1.05; }
+.weight-ring span { margin-top: 3px; color: var(--muted); font-size: 10px; }
 
 .overview-copy { min-width: 0; }
 .subject-meta { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
@@ -1094,14 +1096,14 @@ body.focus-mode .part-panel { display: none; }
   gap: 10px;
 }
 .med-card {
-  border: 1px solid #c8d8e8;
+  border: 1px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
   background: #fff;
 }
 .med-category {
   padding: 8px 12px;
-  background: var(--blue);
+  background: var(--teal);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -1116,11 +1118,11 @@ body.focus-mode .part-panel { display: none; }
 .med-pill {
   display: inline-block;
   padding: 2px 9px;
-  background: var(--blue-soft);
-  border: 1px solid #b8d0e8;
+  background: var(--teal-soft);
+  border: 1px solid #b5d8d2;
   border-radius: 20px;
   font-size: 12px;
-  color: var(--blue);
+  color: var(--teal-dark);
   font-weight: 600;
   word-break: keep-all;
 }
@@ -1199,6 +1201,8 @@ body.focus-mode .part-panel { display: none; }
 .med-exam { margin-top: 8px; padding: 8px 11px; border-radius: 8px; background: #fbf4e6; border-left: 3px solid var(--gold); }
 .med-exam strong { display: block; font-size: 11px; font-weight: 800; color: #8a6418; letter-spacing: 0.02em; margin-bottom: 2px; }
 .med-exam p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #5c4a1e; word-break: keep-all; }
+/* 학습뷰(.lesson-panel) 약물카드는 카드 패딩이 없어 적응증·기출 박스를 좌우 들여쓰기 */
+.lesson-panel .med-card .med-use, .lesson-panel .med-card .med-exam { margin-left: 12px; margin-right: 12px; }
 .med-reveal-btn {
   display: none; margin-top: 8px; padding: 7px 13px; border: 1px dashed #1f7a74; border-radius: 8px;
   background: #eaf4f1; color: #1f7a74; font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit;
@@ -1739,6 +1743,21 @@ body.focus-mode .part-panel { display: none; }
 .mock-badge.new  { background: rgba(0,0,0,.06); color: var(--muted); }
 .mock-badge.pass { background: #e3f3e6; color: var(--green, #2e7d44); }
 .mock-badge.fail { background: #fbe6e0; color: var(--clay, #b5482e); }
+.mock-badge.prog { background: var(--teal-soft); color: var(--teal-dark); }
+.mock-card.has-prog { border-color: var(--teal); }
+/* 전체 섞어 풀기 */
+.mock-shuffle-btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; margin: 4px 0 6px; padding: 13px 16px;
+  border: none; border-radius: 10px; background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: #fff; font-weight: 800; font-size: 14px; cursor: pointer; font-family: var(--font-display);
+}
+.mock-shuffle-btn span { font-weight: 600; font-size: 12px; opacity: .92; background: rgba(255,255,255,.18); padding: 3px 9px; border-radius: 999px; }
+.mock-shuffle-btn:hover { filter: brightness(1.06); }
+.mock-restart-link {
+  display: block; margin: 0 0 10px; padding: 4px 2px; border: none; background: none;
+  color: var(--muted); font-size: 12px; text-decoration: underline; cursor: pointer;
+}
 
 /* ─── 문항별 마킹 (안다 / 복습) ─── */
 .qmark-bar { display: flex; gap: 8px; margin: 2px 0 10px; }
