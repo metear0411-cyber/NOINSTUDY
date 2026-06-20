@@ -1659,6 +1659,34 @@ body.focus-mode .part-panel { display: none; }
   vertical-align: middle;
 }
 
+.cross-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: #fff0e0;
+  color: #b5631a;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.daily-cross-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px auto 0;
+  padding: 10px 14px;
+  max-width: 460px;
+  border: 1px solid var(--border, #e2e8e6);
+  border-radius: 12px;
+  background: #f6faf9;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink, #2a3a37);
+  cursor: pointer;
+}
+.daily-cross-toggle input { flex: 0 0 auto; width: 16px; height: 16px; accent-color: #1f7a74; cursor: pointer; }
+
 /* ─── 기출문제 챕터 필터 바 ─── */
 .gichul-chapter-bar {
   display: flex;

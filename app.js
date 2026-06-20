@@ -1350,13 +1350,14 @@
     ];
     return all.filter(q => q.id && !stat[q.id] && mark[q.id] !== 'known');
   }
-  function buildDailySet(limit) {
+  function buildDailySet(limit, opts) {
     limit = limit || DAILY_DEFAULT;
     const due = dailyDueList();
     // 복습이 세트의 최대 70%를 넘지 않게 해 신규 학습 진도도 함께 나가도록(복습만 있으면 전부 사용)
     const reviewCap = Math.max(Math.ceil(limit * 0.7), limit - dailyNewPool().length);
     const review = due.slice(0, Math.min(due.length, reviewCap));
     let set = review.slice();
+    const reviewCount = review.length;
     if (set.length < limit) {
       const need = limit - set.length;
       const newPool = dailyNewPool();
@@ -1364,7 +1365,27 @@
         q => (EXAM_WEIGHTS[q.chapter] || 3) * (FREQ_BOOST[q.tag] || 1), Math.random);
       set = set.concat(picked);
     }
-    return { questions: shuffle(set), reviewCount: review.length, newCount: set.length - review.length };
+    const newCount = set.length - reviewCount;
+    let crossCount = 0;
+    if (opts && opts.cross) ({ set, crossCount } = applyCrossover(set));
+    return { questions: shuffle(set), reviewCount, newCount, crossCount };
+  }
+  // 교차 모드: 충분히 외운(box≥3) 복습 항목을 같은 개념의 '다른 소스' 문항으로 치환
+  // → 답을 외운 게 아니라 개념을 아는지 확인. 파트너가 없으면 원문 유지.
+  function applyCrossover(set) {
+    const stat = lsGet(LS_QSTAT), mark = lsGet(LS_QMARK);
+    const ids = new Set(set.map(q => q.id));
+    let crossCount = 0;
+    const out = set.map(q => {
+      const s = stat[q.id];
+      if (!s || (s.box || 1) < 3) return q;     // 외운 복습 항목만 대상(신규·약한 항목은 그대로)
+      const partner = crossPartners(q, ids).find(p => mark[p.id] !== 'known' && !ids.has(p.id));
+      if (!partner) return q;
+      ids.delete(q.id); ids.add(partner.id);
+      crossCount++;
+      return { ...partner, _cross: true };
+    });
+    return { set: out, crossCount };
   }
   function dailyStats() {
     return { due: dailyDueList().length, fresh: dailyNewPool().length, streak: getStreak().count };
@@ -1399,6 +1420,52 @@
     (window.NORI_GICHUL?.questions || []).forEach(q => { m[q.id] = q; });
     (window.NORI_VARIATION?.questions || []).forEach(q => { m[q.id] = { ...q, type: 'variation' }; });
     return m;
+  }
+
+  // ── 교차출제(꼬리물기) — 기출 ↔ 변형 같은 개념 연결 ──
+  // 하이브리드 링크: ① 변형 source_id가 실제 기출 id면 정밀 1:1 연결,
+  //                 ② 아니면 같은 tag(계통), ③ 그래도 없으면 같은 chapter로 근사 매칭.
+  // (기출 변형 양쪽이 tag 19종·chapter 11종을 100% 공유 → 사실상 전 문항 커버)
+  let _crossIndex = null;
+  function buildCrossIndex() {
+    if (_crossIndex) return _crossIndex;
+    const G = window.NORI_GICHUL?.questions || [];
+    const V = window.NORI_VARIATION?.questions || [];
+    const gIds = new Set(G.map(q => q.id));
+    const byId = {}, g2v = {}, v2g = {}, byTag = {}, byChapter = {};
+    const reg = (q, src) => {
+      byId[q.id] = src === 'variation' ? { ...q, type: 'variation' } : q;
+      (byTag[q.tag] = byTag[q.tag] || { gichul: [], variation: [] })[src].push(q.id);
+      (byChapter[q.chapter] = byChapter[q.chapter] || { gichul: [], variation: [] })[src].push(q.id);
+    };
+    G.forEach(q => reg(q, 'gichul'));
+    V.forEach(q => {
+      reg(q, 'variation');
+      if (gIds.has(q.source_id)) {            // 정밀 링크
+        v2g[q.id] = q.source_id;
+        (g2v[q.source_id] = g2v[q.source_id] || []).push(q.id);
+      }
+    });
+    _crossIndex = { byId, g2v, v2g, byTag, byChapter };
+    return _crossIndex;
+  }
+  // q와 같은 개념의 '반대 소스' 문항들을 정밀→tag→chapter 순으로 반환(자기 자신·exclude 제외)
+  function crossPartners(q, exclude) {
+    if (!q || !q.id) return [];
+    const idx = buildCrossIndex();
+    exclude = exclude || new Set();
+    const isVar = q.type === 'variation';
+    const otherKey = isVar ? 'gichul' : 'variation';
+    const out = [];
+    const pushId = id => {
+      if (!id || id === q.id || exclude.has(id) || out.some(o => o.id === id)) return;
+      if (idx.byId[id]) out.push(idx.byId[id]);
+    };
+    if (isVar) pushId(idx.v2g[q.id]);                       // ① 정밀
+    else (idx.g2v[q.id] || []).forEach(pushId);
+    ((idx.byTag[q.tag] || {})[otherKey] || []).forEach(pushId);   // ② 같은 계통
+    if (!out.length) ((idx.byChapter[q.chapter] || {})[otherKey] || []).forEach(pushId); // ③ 같은 챕터
+    return out;
   }
   // 자주 틀린 문제 + 복습 표시 문제 모음 (안다 표시는 제외, 오답률 높은 순)
   function buildReviewSet() {
@@ -1500,20 +1567,23 @@
     if (totalAvail === 0) {
       html += `<p class="daily-empty">풀 문제가 없어요 🎉 모든 문항을 "안다"로 표시했거나 데이터가 없습니다.</p>`;
     } else {
+      html += `<label class="daily-cross-toggle"><input type="checkbox" id="dailyCrossToggle" checked>
+        🔀 <b>교차출제</b> — 외운 복습 문제는 <b>같은 개념의 다른 문제</b>(기출↔변형)로 바꿔 출제</label>`;
       html += `<div class="daily-size-row">` +
         sizes.map((n, i) => `<button class="quiz-btn ${i === 1 || sizes.length === 1 ? 'quiz-btn-primary' : 'quiz-btn-secondary'} daily-start" type="button" data-n="${n}">${n}문제 시작</button>`).join('') +
         `</div>
-        <p class="daily-tip">💡 맞히면 다음 복습 간격이 늘어나고, 틀리면 곧 다시 나옵니다. 매일 한 판이면 약점이 저절로 줄어들어요.</p>`;
+        <p class="daily-tip">💡 맞히면 다음 복습 간격이 늘어나고, 틀리면 곧 다시 나옵니다. 교차출제를 켜면 답을 외운 문제도 표현을 바꿔 출제해 <b>진짜 개념 이해</b>를 점검해요.</p>`;
     }
     html += `</div>`;
     el.innerHTML = html;
 
     el.querySelectorAll('.daily-start').forEach(b => b.addEventListener('click', () => {
-      const set = buildDailySet(+b.dataset.n);
+      const cross = el.querySelector('#dailyCrossToggle')?.checked;
+      const set = buildDailySet(+b.dataset.n, { cross });
       if (!set.questions.length) { renderDailyIntro(); return; }
       startGichulSession(set.questions, {
         batchId: 'daily',
-        batchLabel: `오늘의 한 판 (복습 ${set.reviewCount}·신규 ${set.newCount})`
+        batchLabel: `오늘의 한 판 (복습 ${set.reviewCount}·신규 ${set.newCount}${set.crossCount ? '·🔀' + set.crossCount : ''})`
       });
     }));
   }
@@ -1734,6 +1804,7 @@
 
     if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
     if (q.type === 'variation') html += `<span class="variation-badge">변형문제(AI생성)</span>`;
+    if (q._cross) html += `<span class="cross-badge">🔀 같은 개념 다른 문제</span>`;
 
     const mk = getQMark(q.id);
     html += `<div class="qmark-bar">
@@ -1804,10 +1875,24 @@
     const nav = el.querySelector('#quizNav');
     if (nav) {
       const more = state.gichul.current + 1 < state.gichul.questions.length;
-      nav.innerHTML = `<button class="quiz-btn quiz-btn-primary" id="gichulNextBtn" type="button">
+      // 같은 개념의 다른 문제(기출↔변형)를 다음 문항으로 끼워넣어 바로 꼬리물기
+      const sessIds = new Set(state.gichul.questions.map(x => x.id));
+      const mark = lsGet(LS_QMARK);
+      const cands = crossPartners(q, sessIds);
+      const partner = cands.find(p => mark[p.id] !== 'known') || cands[0];
+      nav.innerHTML =
+        (partner ? `<button class="quiz-btn quiz-btn-secondary" id="gichulCrossBtn" type="button">🔀 같은 개념 다른 문제</button>` : '') +
+        `<button class="quiz-btn quiz-btn-primary" id="gichulNextBtn" type="button">
         ${more ? '다음 문제 →' : '결과 확인 →'}
       </button>`;
       nav.querySelector('#gichulNextBtn').addEventListener('click', () => {
+        state.gichul.answered = false;
+        state.gichul.current++;
+        saveMockProg();
+        renderGichulQuestion();
+      });
+      nav.querySelector('#gichulCrossBtn')?.addEventListener('click', () => {
+        state.gichul.questions.splice(state.gichul.current + 1, 0, { ...partner, _cross: true });
         state.gichul.answered = false;
         state.gichul.current++;
         saveMockProg();
