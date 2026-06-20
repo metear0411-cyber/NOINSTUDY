@@ -42,8 +42,28 @@
   --rail-width: 260px;
   --radius: 10px;
 
-  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  /* 타이포 역할 — 본문/제목/수치 분리 */
+  --font-body: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-display: "IBM Plex Sans KR", "Pretendard", "Apple SD Gothic Neo", system-ui, sans-serif;
+  --font-data: "IBM Plex Sans KR", ui-monospace, "Pretendard", monospace;
+
+  font-family: var(--font-body);
   color-scheme: light;
+}
+
+/* 제목은 디스플레이 페이스 + 또렷한 자간/굵기 */
+h1, h2, h3, h4, .kicker, .subject-meta, .priority-label,
+.panel-heading h3, .gichul-title-block h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+h1, h2 { font-weight: 700; }
+/* 수치·계기판은 데이터 페이스 + 고정폭 숫자 */
+#daysLeft, .weight-ring strong, .quiz-score, .gichul-progress,
+.exam-meter span:first-child, .cat-count, .gichul-chapter-count {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 /* ── Reset ── */
@@ -315,8 +335,8 @@ a { color: var(--teal); }
 .chip {
   padding: 4px 9px;
   border-radius: 20px;
-  background: var(--blue-soft);
-  color: var(--blue);
+  background: var(--teal-soft);
+  color: var(--teal-dark);
   font-size: 11px;
   font-weight: 700;
 }
@@ -343,7 +363,7 @@ a { color: var(--teal); }
   cursor: pointer; box-shadow: 0 6px 18px rgba(20,60,50,.32); font-family: inherit;
 }
 .focus-fab:hover { filter: brightness(1.07); }
-.focus-fab.is-active { background: #6b3fa0; }
+.focus-fab.is-active { background: var(--teal-dark); }
 @media print { .focus-fab { display: none !important; } }
 body.focus-mode .content-grid { grid-template-columns: minmax(0, 1fr); }
 body.focus-mode .part-panel { display: none; }
@@ -1140,7 +1160,8 @@ body.focus-mode .part-panel { display: none; }
 .med-critical { color: #c0392b; font-weight: 700; }
 
 /* ── 약물 총정리 탭 ── */
-.med-entry-btn { margin-top: 8px; background: #6b3fa0; }
+.med-entry-btn { margin-top: 6px; background: #fff; color: var(--teal-dark); border: 1px solid var(--teal); }
+.med-entry-btn:hover { background: var(--teal-soft); opacity: 1; }
 .med-toolbar { padding: 10px 14px 4px; }
 #medSearch {
   width: 100%; box-sizing: border-box; padding: 10px 13px; font-size: 14px;
@@ -1151,29 +1172,46 @@ body.focus-mode .part-panel { display: none; }
   padding: 6px 12px; border: 1px solid var(--line, #dfe6e2); border-radius: 999px;
   background: #fff; font-size: 12.5px; font-weight: 600; color: #555; cursor: pointer; font-family: inherit;
 }
-.med-filter-chip.is-active { background: #6b3fa0; color: #fff; border-color: #6b3fa0; }
+.med-filter-chip.is-active { background: #1f7a74; color: #fff; border-color: #1f7a74; }
 .med-sys-group { margin-top: 14px; }
-.med-sys-group > h4 { margin: 0 0 8px; font-size: 14px; color: #6b3fa0; }
+.med-sys-group > h4 { margin: 0 0 8px; font-size: 14px; color: #1f7a74; }
 .med-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .med-badges { display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 .med-badge { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
 .med-badge.hot { background: #ffe3d3; color: #c0392b; }
-.med-badge.geri { background: #ede1fa; color: #6b3fa0; }
-.med-card.med-geri { border-left: 3px solid #6b3fa0; }
-.med-sys-tag { font-size: 11px; color: var(--muted, #8a948f); margin: 2px 0 7px; }
+.med-badge.geri { background: #dcefeb; color: #1f7a74; }
+.med-card.med-geri { border-left: 3px solid #1f7a74; }
+.med-sys-tag { font-size: 11px; color: var(--muted, #8a948f); margin: 2px 0 8px; }
+/* 약물탭 카드: 좌우 패딩 통일(제목·본문 왼쪽 정렬 일치) + 제목 디스플레이 폰트 */
+.med-content .med-card { padding: 13px 15px; overflow: visible; border-color: var(--line); }
+.med-content .med-category { background: none; color: var(--ink); padding: 0; font-family: var(--font-display); font-size: 14.5px; letter-spacing: -0.01em; }
+.med-content .med-examples { padding: 9px 0 2px; }
+.med-content .med-detail { padding: 8px 0 2px; }
+.med-content .med-detail:first-of-type { border-top: none; }
+/* 적응증·효능 (언제/왜 쓰나) — 카드 상단 강조 박스 */
+.med-use {
+  margin: 8px 0 2px; padding: 9px 11px; border-radius: 8px;
+  background: var(--teal-soft); border-left: 3px solid var(--teal);
+}
+.med-use strong { display: block; font-size: 11px; font-weight: 800; color: var(--teal-dark); letter-spacing: 0.02em; margin-bottom: 2px; }
+.med-use p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #214a45; word-break: keep-all; }
+/* 기출 포인트 */
+.med-exam { margin-top: 8px; padding: 8px 11px; border-radius: 8px; background: #fbf4e6; border-left: 3px solid var(--gold); }
+.med-exam strong { display: block; font-size: 11px; font-weight: 800; color: #8a6418; letter-spacing: 0.02em; margin-bottom: 2px; }
+.med-exam p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #5c4a1e; word-break: keep-all; }
 .med-reveal-btn {
-  display: none; margin-top: 8px; padding: 7px 13px; border: 1px dashed #6b3fa0; border-radius: 8px;
-  background: #f6f1fb; color: #6b3fa0; font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit;
+  display: none; margin-top: 8px; padding: 7px 13px; border: 1px dashed #1f7a74; border-radius: 8px;
+  background: #eaf4f1; color: #1f7a74; font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit;
 }
 /* 암기 모드: 부작용·간호포인트 가림 → 탭하면 공개 */
 .med-content.mem-mode .med-card .med-reveal { display: none; }
 .med-content.mem-mode .med-card.revealed .med-reveal { display: block; }
 .med-content.mem-mode .med-card:not(.revealed) .med-reveal-btn { display: inline-block; }
 .med-mem-toggle {
-  margin-left: auto; padding: 7px 13px; border: 1px solid #6b3fa0; border-radius: 8px;
-  background: #fff; color: #6b3fa0; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit;
+  margin-left: auto; padding: 7px 13px; border: 1px solid #1f7a74; border-radius: 8px;
+  background: #fff; color: #1f7a74; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit;
 }
-.med-mem-toggle.is-active { background: #6b3fa0; color: #fff; }
+.med-mem-toggle.is-active { background: #1f7a74; color: #fff; }
 .med-empty { text-align: center; color: var(--muted, #8a948f); padding: 30px 0; }
 
 /* ─────────────────────────────────────────
@@ -1610,8 +1648,8 @@ body.focus-mode .part-panel { display: none; }
   margin-left: 8px;
   padding: 2px 9px;
   border-radius: 10px;
-  background: #f0e6ff;
-  color: #6b3fa0;
+  background: #dcefeb;
+  color: #1f7a74;
   font-size: 11px;
   font-weight: 700;
   vertical-align: middle;

@@ -1485,12 +1485,14 @@
     const nurse = (m.nursingPoints || []).length
       ? `<div class="med-detail"><strong>💉 간호포인트</strong><ul>${m.nursingPoints.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : '';
     const badges = `${m._hot ? '<span class="med-badge hot">🔥 빈출</span>' : ''}${m._geri ? '<span class="med-badge geri">👴 노인주의</span>' : ''}`;
+    const use = m.indication ? `<div class="med-use"><strong>💡 이럴 때 써요 (적응증·효능)</strong><p>${emph(esc(m.indication))}</p></div>` : '';
+    const exam = m.examPattern ? `<div class="med-exam"><strong>📝 기출 포인트</strong><p>${emph(esc(m.examPattern))}</p></div>` : '';
     return `<div class="med-card${m._geri ? ' med-geri' : ''}">
       <div class="med-card-head"><span class="med-category">${esc(m.category)}</span><span class="med-badges">${badges}</span></div>
       <div class="med-sys-tag">${esc(m._system)} · ${esc(m._topic)}</div>
-      ${pills}${mech}
-      <div class="med-reveal">${side}${nurse}</div>
-      <button class="med-reveal-btn" type="button">👁 부작용·간호포인트 보기</button>
+      ${use}${pills}${mech}
+      <div class="med-reveal">${side}${nurse}${exam}</div>
+      <button class="med-reveal-btn" type="button">👁 부작용·간호·기출 보기</button>
     </div>`;
   }
   function renderMedView() {
