@@ -19,24 +19,24 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="노인전문간호사">
   <link rel="apple-touch-icon" href="icon-192.svg">
-  <link rel="stylesheet" href="styles.css?v=20260614y">
+  <link rel="stylesheet" href="styles.css?v=20260614z">
 
   <!-- 데이터 파일 (전역 window 변수 방식 — file:// CORS 우회) -->
   <!-- v=20260428 : 캐시 갱신용 버전 — 데이터 수정 시 숫자 증가 -->
   <script src="data/subjects.js?v=20260611"></script>
-  <script src="data/major/gero-disease.js?v=20260614y"></script>
-  <script src="data/major/gero-ltc.js?v=20260614y"></script>
-  <script src="data/major/gero-promotion.js?v=20260614y"></script>
-  <script src="data/major/gero-eol.js?v=20260614y"></script>
-  <script src="data/major/gero-nursing.js?v=20260614y"></script>
+  <script src="data/major/gero-disease.js?v=20260614z"></script>
+  <script src="data/major/gero-ltc.js?v=20260614z"></script>
+  <script src="data/major/gero-promotion.js?v=20260614z"></script>
+  <script src="data/major/gero-eol.js?v=20260614z"></script>
+  <script src="data/major/gero-nursing.js?v=20260614z"></script>
   <script src="data/common/assessment.js?v=20260614e"></script>
   <script src="data/common/pharmacology.js?v=20260614e"></script>
   <script src="data/common/pathophysiology.js?v=20260614e"></script>
   <script src="data/common/nursing-theory.js?v=20260614e"></script>
   <script src="data/common/nursing-research.js?v=20260614e"></script>
   <script src="data/common/advanced-practice.js?v=20260614e"></script>
-  <script src="data/gichul.js?v=20260614y"></script>
-  <script src="data/variation.js?v=20260614y"></script>
+  <script src="data/gichul.js?v=20260614z"></script>
+  <script src="data/variation.js?v=20260614z"></script>
 </head>
 <body>
 
@@ -80,6 +80,9 @@
       <!-- 기출문제 진입 버튼 -->
       <button class="gichul-entry-btn" id="gichulEntryBtn" type="button">📝 기출문제 풀기</button>
 
+      <!-- 약물 총정리 진입 버튼 -->
+      <button class="gichul-entry-btn med-entry-btn" id="medEntryBtn" type="button">💊 약물 총정리·암기</button>
+
       <!-- 과목 목록 -->
       <div class="subject-list" id="subjectList"></div>
     </aside>
@@ -119,6 +122,22 @@
         <div id="gichulTypeBar" class="gichul-type-bar"></div>
         <div id="gichulChapterBar" class="gichul-chapter-bar"></div>
         <div id="gichulContent" class="lesson-body"></div>
+      </div>
+
+      <!-- 약물 총정리 패널 -->
+      <div id="medPanel" class="gichul-panel" style="display:none;">
+        <div class="gichul-header">
+          <button id="medExitBtn" type="button" class="gichul-exit-btn">← 학습으로</button>
+          <div class="gichul-title-block">
+            <h2>💊 약물 총정리</h2>
+          </div>
+          <button id="medMemToggle" type="button" class="med-mem-toggle">🙈 암기 모드</button>
+        </div>
+        <div class="med-toolbar">
+          <input type="search" id="medSearch" placeholder="약물명·분류·부작용·간호포인트 검색" autocomplete="off">
+          <div id="medFilterBar" class="med-filter-bar"></div>
+        </div>
+        <div id="medContent" class="lesson-body med-content"></div>
       </div>
 
       <!-- 토픽 + 학습 그리드 -->
@@ -173,7 +192,7 @@
   <!-- 집중모드 플로팅 토글 (스크롤 위치 무관 좌하단 상시 노출) -->
   <button class="focus-fab" id="focusToggleFloat" type="button" title="넓게 보기 / 펼치기" aria-pressed="false">⤢ 펼치기</button>
 
-  <script src="app.js?v=20260614y"></script>
+  <script src="app.js?v=20260614z"></script>
   <script src="notes-bridge.js?v=20260531"></script>
   <!-- Service Worker 등록 -->
   <script>

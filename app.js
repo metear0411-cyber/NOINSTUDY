@@ -1054,6 +1054,21 @@
     document.getElementById('gichulEntryBtn')?.addEventListener('click', enterGichulMode);
     document.getElementById('gichulExitBtn')?.addEventListener('click', exitGichulMode);
 
+    // 약물 총정리
+    document.getElementById('medEntryBtn')?.addEventListener('click', enterMedMode);
+    document.getElementById('medExitBtn')?.addEventListener('click', exitMedMode);
+    document.getElementById('medSearch')?.addEventListener('input', e => { _medSearch = e.target.value.trim(); renderMedView(); });
+    document.getElementById('medMemToggle')?.addEventListener('click', function () {
+      _medMemMode = !_medMemMode;
+      this.classList.toggle('is-active', _medMemMode);
+      this.textContent = _medMemMode ? '👁 학습 모드' : '🙈 암기 모드';
+      renderMedView();
+    });
+    document.getElementById('medContent')?.addEventListener('click', e => {
+      const btn = e.target.closest('.med-reveal-btn');
+      if (btn) { btn.closest('.med-card')?.classList.add('revealed'); }
+    });
+
     // 학습 기록 내보내기/불러오기
     document.getElementById('exportMarksBtn')?.addEventListener('click', exportMarks);
     const importInput = document.getElementById('importMarksInput');
@@ -1382,6 +1397,130 @@
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
     document.getElementById('gichulPanel').style.display  = 'none';
+  }
+
+  // ─── 💊 약물 총정리 ────────────────────────────────
+  let _medIndex = null, _medCorpus = null, _medMemMode = false, _medFilter = '전체', _medSearch = '';
+  function medCorpus() {
+    if (_medCorpus != null) return _medCorpus;
+    let c = '';
+    (window.NORI_GICHUL?.questions || []).forEach(q => {
+      if (q.disabled) return;
+      c += (q.stem || '') + ' ' + (q.choices || []).map(x => x.text || x).join(' ') + ' ' + (q.explanation || '') + '\n';
+    });
+    _medCorpus = c.toLowerCase();
+    return _medCorpus;
+  }
+  function medFreqScore(med) {
+    const corp = medCorpus();
+    let score = 0;
+    (med.examples || []).forEach(e => {
+      const base = String(e).replace(/\(.*?\)/g, '').split(/[ ,/·]/)[0].trim().toLowerCase();
+      if (base.length > 2) score += corp.split(base).length - 1;
+    });
+    ['이뇨제', '베타차단제', '항응고제', '항생제', '인슐린', '스테로이드', '항콜린', '벤조디아제핀', 'nsaid', 'ace', 'ppi', 'statin', '항히스타민', '항우울제', '항정신병']
+      .forEach(k => { if ((med.category || '').toLowerCase().includes(k)) score += corp.split(k).length - 1; });
+    return score;
+  }
+  function medIsGeriatric(med) {
+    const cat = (med.category || '');
+    if (/항콜린|벤조디아제핀|1세대 항히스타민|삼환계|TCA|근이완|수면제|Beers|비어스/i.test(cat)) return true;
+    const txt = cat + ' ' + (med.sideEffects || []).join(' ') + ' ' + (med.nursingPoints || []).join(' ');
+    return /노인/.test(txt) && /(금기|주의|피한|피해|위험|Beers|신중)/.test(txt);
+  }
+  function buildMedIndex() {
+    if (_medIndex) return _medIndex;
+    const list = [];
+    Object.values(state.data || {}).forEach(subj => {
+      (subj.topics || []).forEach(t => {
+        (t.medications || []).forEach(m => {
+          if (!m || !m.category) return;
+          list.push(Object.assign({}, m, { _topic: t.title, _system: t.category || subj.title || '기타' }));
+        });
+      });
+    });
+    list.forEach(m => { m._freq = medFreqScore(m); m._geri = medIsGeriatric(m); });
+    // 빈출 배지: 상위 약 30% 또는 freq 12+
+    const sorted = list.slice().sort((a, b) => b._freq - a._freq);
+    const hotCut = Math.max(12, sorted[Math.floor(sorted.length * 0.25)]?._freq || 12);
+    list.forEach(m => { m._hot = m._freq >= hotCut; });
+    list.sort((a, b) => (b._hot - a._hot) || (b._freq - a._freq));
+    _medIndex = list;
+    return _medIndex;
+  }
+
+  function enterMedMode() {
+    document.getElementById('overviewBand').style.display = 'none';
+    document.getElementById('contentGrid').style.display  = 'none';
+    document.getElementById('gichulPanel').style.display  = 'none';
+    document.getElementById('medPanel').style.display     = '';
+    document.getElementById('subjectRail')?.classList.remove('is-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('is-open');
+    buildMedFilterBar();
+    renderMedView();
+  }
+  function exitMedMode() {
+    document.getElementById('medPanel').style.display    = 'none';
+    document.getElementById('overviewBand').style.display = '';
+    document.getElementById('contentGrid').style.display  = '';
+  }
+  function buildMedFilterBar() {
+    const bar = document.getElementById('medFilterBar'); if (!bar) return;
+    const idx = buildMedIndex();
+    const systems = [...new Set(idx.map(m => m._system))];
+    const chips = ['전체', '🔥 빈출', '👴 노인주의', ...systems];
+    bar.innerHTML = chips.map(c =>
+      `<button class="med-filter-chip${_medFilter === c ? ' is-active' : ''}" type="button" data-medf="${esc(c)}">${esc(c)}</button>`
+    ).join('');
+    bar.querySelectorAll('[data-medf]').forEach(b => b.addEventListener('click', () => {
+      _medFilter = b.dataset.medf; buildMedFilterBar(); renderMedView();
+    }));
+  }
+  function medCard(m) {
+    const pills = (m.examples || []).length
+      ? `<div class="med-examples">${m.examples.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : '';
+    const mech = m.mechanism ? `<div class="med-detail"><strong>기전</strong><p>${esc(m.mechanism)}</p></div>` : '';
+    const side = (m.sideEffects || []).length
+      ? `<div class="med-detail"><strong>⚠️ 부작용</strong><ul>${m.sideEffects.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : '';
+    const nurse = (m.nursingPoints || []).length
+      ? `<div class="med-detail"><strong>💉 간호포인트</strong><ul>${m.nursingPoints.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : '';
+    const badges = `${m._hot ? '<span class="med-badge hot">🔥 빈출</span>' : ''}${m._geri ? '<span class="med-badge geri">👴 노인주의</span>' : ''}`;
+    return `<div class="med-card${m._geri ? ' med-geri' : ''}">
+      <div class="med-card-head"><span class="med-category">${esc(m.category)}</span><span class="med-badges">${badges}</span></div>
+      <div class="med-sys-tag">${esc(m._system)} · ${esc(m._topic)}</div>
+      ${pills}${mech}
+      <div class="med-reveal">${side}${nurse}</div>
+      <button class="med-reveal-btn" type="button">👁 부작용·간호포인트 보기</button>
+    </div>`;
+  }
+  function renderMedView() {
+    const el = document.getElementById('medContent'); if (!el) return;
+    const idx = buildMedIndex();
+    const s = _medSearch.toLowerCase();
+    const items = idx.filter(m => {
+      if (_medFilter === '🔥 빈출' && !m._hot) return false;
+      if (_medFilter === '👴 노인주의' && !m._geri) return false;
+      if (_medFilter !== '전체' && _medFilter !== '🔥 빈출' && _medFilter !== '👴 노인주의' && m._system !== _medFilter) return false;
+      if (s) {
+        const blob = (m.category + ' ' + (m.examples || []).join(' ') + ' ' + (m.mechanism || '') + ' ' + (m.sideEffects || []).join(' ') + ' ' + (m.nursingPoints || []).join(' ')).toLowerCase();
+        if (!blob.includes(s)) return false;
+      }
+      return true;
+    });
+    el.classList.toggle('mem-mode', _medMemMode);
+    if (!items.length) { el.innerHTML = '<div class="med-empty">조건에 맞는 약물이 없어요.</div>'; return; }
+    // 계통별 그룹 (빈출 필터일 땐 그룹 없이 빈출순)
+    let html = `<p class="med-empty" style="padding:6px 0;color:#6b3fa0;font-weight:600">총 ${items.length}개 · ${_medMemMode ? '암기 모드(탭하면 부작용·간호 공개)' : '학습 모드'}</p>`;
+    if (_medFilter === '🔥 빈출' || _medFilter === '👴 노인주의' || s) {
+      html += `<div class="med-grid">${items.map(medCard).join('')}</div>`;
+    } else {
+      const groups = {};
+      items.forEach(m => { (groups[m._system] = groups[m._system] || []).push(m); });
+      html += Object.entries(groups).map(([sys, arr]) =>
+        `<div class="med-sys-group"><h4>${esc(sys)} <span style="color:#bbb">(${arr.length})</span></h4><div class="med-grid">${arr.map(medCard).join('')}</div></div>`
+      ).join('');
+    }
+    el.innerHTML = html;
   }
 
   function renderGichulQuestion() {
