@@ -330,6 +330,18 @@ a { color: var(--teal); }
 }
 
 /* ─────────────────────────────────────────
+   집중(넓게보기) 모드 — 과목 레일 + 토픽 목록 접고 학습 내용 최대화
+   (가로 분할화면에서 내용 가독성↑)
+───────────────────────────────────────── */
+.focus-toggle-btn.is-active { background: var(--teal, #2f8f7f); color: #fff; border-color: var(--teal, #2f8f7f); }
+body.focus-mode .content-grid { grid-template-columns: minmax(0, 1fr); }
+body.focus-mode .part-panel { display: none; }
+@media (min-width: 769px) {
+  body.focus-mode .app-shell { grid-template-columns: minmax(0, 1fr); }
+  body.focus-mode .subject-rail { display: none; }
+}
+
+/* ─────────────────────────────────────────
    토픽 패널 (좌)
 ───────────────────────────────────────── */
 .part-panel {
