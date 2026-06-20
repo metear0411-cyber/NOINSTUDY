@@ -20,7 +20,7 @@
     { icon: '🗂️', label: '학습 허브',     desc: '전 과목 + 학습플랜 모아보기',      file: '00_학습허브_시작.html' }
   ];
 
-  var PURPLE = '#6b3fa0';
+  var PURPLE = '#1f7a74';  // 청록 통일(브랜드 악센트)
 
   function injectStyles() {
     var css = ''

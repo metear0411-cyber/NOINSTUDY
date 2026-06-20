@@ -240,6 +240,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '항산화 보충제 (자유기 이론 연계)',
+          indication: '몸속 세포를 망가뜨리는 **자유기**(활성산소)를 줄여 노화와 만성질환 진행을 늦추려 할 때 사용한다. 다만 식품으로 섭취하는 것이 더 안전하고 효과적이다.',
+          examPattern: '자유기(산화기) 이론과 연결해 항산화 비타민의 종류와 식이 우선 원칙을 묻는 문제가 자주 나온다.',
           examples: ['Vitamin C', 'Vitamin E (토코페롤)', 'Co-enzyme Q10', 'Selenium', 'Beta-carotene'],
           mechanism: '자유기(활성산소) 중화 → 세포 산화 손상 억제. 자유기 이론에서 노화·질병 진행을 늦추는 근거.',
           sideEffects: ['고용량 Vitamin E: 출혈 위험, 심혈관 사망 증가 우려', 'Beta-carotene: 흡연자에서 폐암 위험 증가'],
@@ -486,6 +488,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '노화에 따른 약동학 변화 — 노인 약물 관리 핵심',
+          indication: '노인에게 약을 안전하게 쓰기 위해 약이 몸에서 어떻게 흡수·분포·대사·배설되는지 이해할 때 적용한다. 같은 용량도 노인에게는 과량이 되기 쉬워 **저용량**으로 천천히 시작하는 근거가 된다.',
+          examPattern: '노화로 변하는 체지방·체수분·간기능·신기능과 약물 농도의 관계, Start low go slow 원칙을 묻는 문제가 단골이다.',
           examples: ['지용성 약물: Diazepam, Warfarin, Amiodarone', '수용성 약물: Digoxin, Lithium, 아미노글리코시드'],
           mechanism: '노화 → ① 체지방↑(지용성 약물 분포용적↑ → 반감기 연장) ② 체수분·근육량↓(수용성 약물 농도↑) ③ 간 혈류·효소↓(간 대사↓) ④ 신기능↓(신장 배설↓) → 혈중 약물 농도 예측 어려움.',
           sideEffects: ['노인 다약제: 약물 상호작용·부작용 위험 증가', '신기능 저하 시 수용성 약물 독성 축적'],
@@ -733,6 +737,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '노인 권장 예방접종',
+          indication: '면역력이 약해진 노인이 감염병에 걸리거나 중증 합병증으로 가는 것을 막기 위해 미리 접종한다. 항원으로 **능동면역**을 만들어 폐렴·독감·대상포진 같은 질환을 예방한다.',
+          examPattern: '인플루엔자(매년)·폐렴구균(접종 순서)·대상포진(2회) 등 백신 종류별 접종 시기와 횟수를 묻는 문제가 자주 출제된다.',
           examples: ['인플루엔자 백신(매년)', '폐렴구균 백신(PCV13 + PPSV23)', '대상포진 백신(Shingrix, 2회 접종)', 'Tdap(파상풍·디프테리아·백일해 10년마다)', 'B형 간염(미접종자)'],
           mechanism: '항원 자극 → 능동면역 유도. 노인은 면역노화로 백신 반응률이 낮지만 중증 감염·합병증 예방 효과는 유지.',
           sideEffects: ['국소 반응: 주사 부위 통증·발적·부종', '전신: 미열·근육통 (1~2일 이내 소실)', 'Shingrix: 반응성이 높아 발열·오한·피로감이 흔함 (2~3일)'],
@@ -740,6 +746,8 @@ window.NORI_DATA['gero-promotion'] = {
         },
         {
           category: '예방적 약물 — 심혈관 위험 관리',
+          indication: '심근경색·뇌졸중 같은 심혈관 질환을 예방하려고 쓴다. 스타틴은 나쁜 콜레스테롤을 낮춰 **동맥경화**를 억제하고, 저용량 아스피린은 혈소판 응집을 막아 혈전 형성을 줄인다.',
+          examPattern: '아스피린 1차 예방을 고령에서 권장하지 않는 점, 스타틴 근육 부작용 등 노인에서의 이익 대 위험 판단을 묻는 문제가 나온다.',
           examples: ['스타틴(Atorvastatin, Rosuvastatin)', 'Aspirin 저용량(81mg)', '항고혈압제'],
           mechanism: '스타틴: HMG-CoA 환원효소 차단 → LDL 감소 → 동맥경화 억제. 아스피린: COX 불가역 억제 → 혈소판 응집 억제.',
           sideEffects: ['스타틴: 근육통·횡문근융해(드물지만 위험), 간독성', '저용량 아스피린: 위장관 출혈 위험'],
@@ -951,6 +959,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '의사소통 장애 유발 주의 약물',
+          indication: '이 약들은 원래 알레르기·요실금·불면·정신 증상 등을 치료할 목적으로 쓰이지만, 노인에게는 **인지저하**·혼동·과진정을 일으켜 의사소통을 어렵게 만들 수 있어 주의 대상이다.',
+          examPattern: '의사소통이 갑자기 나빠진 노인에서 새로 시작한 항콜린제·진정제를 원인으로 찾도록 하는 문제가 출제된다.',
           examples: ['항콜린제(diphenhydramine, oxybutynin, TCA)', 'Benzodiazepine', '항정신병약(haloperidol, quetiapine)', '강한 진정제'],
           mechanism: '중추신경 억제 또는 항콜린 효과 → 인지저하·혼동·어눌한 말 → 의사소통 능력 저하.',
           sideEffects: ['인지저하·혼동', '구강건조 (항콜린제) → 발음 어려움', '과진정 → 의사소통 자체 불가'],
@@ -958,6 +968,8 @@ window.NORI_DATA['gero-promotion'] = {
         },
         {
           category: '청력 손실 유발 이독성 약물 (의사소통 장애 원인)',
+          indication: '감염·부종·암 등을 치료하는 데 쓰이지만, 귀 안쪽 청각·평형 세포를 손상시켜 **난청**·이명·어지러움을 일으킬 수 있어 청력 보호 차원에서 알아두어야 하는 약물군이다.',
+          examPattern: '아미노글리코시드 등 이독성 약물의 종류와 투여 중 청력·이명 모니터링 필요성을 묻는 문제가 자주 나온다.',
           examples: ['아미노글리코시드계 항생제(gentamicin, tobramycin)', '고용량 이뇨제(furosemide)', 'Cisplatin(항암제)', '고용량 Aspirin', 'Quinine'],
           mechanism: '내이 코르티기관 또는 전정기관의 유모세포 직접 손상 → 감각신경성 난청·이명.',
           sideEffects: ['감각신경성 난청 (비가역적)', '이명', '전정 독성(어지러움·균형 장애)'],
@@ -1170,6 +1182,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '낙상 예방 — 비타민 D + 칼슘',
+          indication: '뼈를 튼튼히 하고 근력·균형을 유지해 노인의 낙상과 골절을 예방하려 할 때 사용한다. 비타민D는 장에서 칼슘 흡수를 돕고, 칼슘은 **골밀도**를 유지한다.',
+          examPattern: '비타민D와 칼슘이 낙상·골절 예방에 기여하는 기전과 칼슘 제제 복용 방법(식사 관계)을 묻는 문제가 출제된다.',
           examples: ['Cholecalciferol(콜레칼시페롤, Vitamin D3)', 'Ergocalciferol(Vitamin D2)', '탄산칼슘(CaCO3)', '구연산칼슘(Calcium Citrate)'],
           mechanism: '비타민D: 소장 칼슘 흡수 촉진, 근신경 기능 유지. 칼슘: 골밀도 유지. 근력 및 균형에 직접 관여 → 낙상 위험 감소.',
           sideEffects: ['비타민D 과용량: 고칼슘혈증(피로·구역·신결석)', '탄산칼슘: 변비, 위장 불편감(공복 복용 시)', '구연산칼슘: 공복 복용 가능, 위산 불필요'],
@@ -1177,6 +1191,8 @@ window.NORI_DATA['gero-promotion'] = {
         },
         {
           category: '낙상 고위험 약물 — Beers 기준 주의',
+          indication: '불면·불안·고혈압·부종 등을 치료하는 약이지만, 노인에게는 졸음·근력 저하·기립성 저혈압을 일으켜 **낙상** 위험을 높이므로 복용 여부를 정기적으로 점검해야 하는 약물군이다.',
+          examPattern: '낙상 위험이 높은 노인에서 Beers 기준에 따라 피해야 할 약물(벤조디아제핀·수면제·이뇨제 등)을 고르는 문제가 단골이다.',
           examples: ['Benzodiazepine (diazepam, lorazepam)', 'Z-drug 수면제 (zolpidem)', '이뇨제 (furosemide)', '항고혈압제 (특히 α차단제)', '항콜린제', '아편유사제'],
           mechanism: '중추신경 억제 → 반응속도↓, 근력↓, 균형↓. 이뇨제·혈압약 → 기립성 저혈압 → 낙상.',
           sideEffects: ['낙상→골절(특히 고관절 골절)', '낙상 후 기립공포증(post-fall syndrome)'],
@@ -1184,6 +1200,8 @@ window.NORI_DATA['gero-promotion'] = {
         },
         {
           category: '영양 결핍 교정 — 낙상·근감소증 예방',
+          indication: '영양이 부족한 노인의 **근육**을 지키고 근감소증과 낙상을 예방하려 할 때 보충한다. 단백질은 근육을 만드는 재료가 되고, 비타민 B12는 신경과 균형 기능을 유지한다.',
+          examPattern: '노인 단백질 필요량 증가와 B12 결핍 위험군(채식·위산 저하·메트포르민 복용)을 묻는 문제가 출제된다.',
           examples: ['단백질 보충(고단백 식이 또는 경구 영양 보충제)', 'Omega-3 지방산(EPA/DHA)', '아연(Zinc)', '비타민 B12'],
           mechanism: '단백질: 근육 합성 기질. Omega-3: 항염증→근감소 억제. B12: 신경 기능 유지(결핍 시 균형 장애).',
           sideEffects: ['과도한 단백질: 신기능 저하 시 부담', 'Omega-3 고용량: 출혈 시간 연장'],
@@ -1394,6 +1412,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '노인 우울증·사회적 고립 관련 약물',
+          indication: '노인의 우울·불안 증상을 치료해 기분과 일상생활을 회복시키려 할 때 쓴다. 뇌의 **세로토닌**을 늘려 증상을 개선하며, 노인 우울증의 1차 선택 약물이다.',
+          examPattern: '노인에게 안전한 SSRI 선택, 효과 판정 기간(4~6주), 저나트륨혈증·낙상 등 부작용을 묻는 문제가 나온다.',
           examples: ['SSRI: Escitalopram(렉사프로), Sertraline(졸로프트)', 'SNRI: Duloxetine(심발타)', 'Mirtazapine(레메론, 식욕 증진 효과)'],
           mechanism: 'SSRI/SNRI: 세로토닌(±NE) 재흡수 차단 → 우울·불안 증상 개선. 노인 1차 선택 항우울제.',
           sideEffects: ['오심·구토 (초기, 1~2주 후 호전)', 'SSRI: 성기능 장애, QT 연장(고용량 Citalopram)', '저나트륨혈증 (SIADH — 노인에서 주의)', '낙상 위험 증가 (어지러움·기립성 저혈압)'],
@@ -1620,6 +1640,8 @@ window.NORI_DATA['gero-promotion'] = {
       medications: [
         {
           category: '화상 초기 국소 처치제',
+          indication: '화상 부위에 발라 세균이 자라는 것을 막고 창상 **감염**을 예방할 때 사용한다. 면역이 약한 노인의 화상이 패혈증으로 번지는 것을 줄이는 데 도움이 된다.',
+          examPattern: '실버설파다이아진 등 국소 항균제의 용도와 화상 초기 올바른 처치(냉각·드레싱) 순서를 묻는 문제가 출제된다.',
           examples: ['Silver Sulfadiazine(슈패덤, 국소 항균 크림)', 'Bacitracin 연고(소면적 얕은 화상)', '식염수 드레싱'],
           mechanism: 'Silver Sulfadiazine: 광범위 항균 → 화상 창상 감염 예방. 수분 유지.',
           sideEffects: ['Silver Sulfadiazine: 백혈구감소증(드물지만 모니터링)', '설폰아미드 알레르기 주의'],
@@ -1627,6 +1649,8 @@ window.NORI_DATA['gero-promotion'] = {
         },
         {
           category: '화상 통증·전신 관리',
+          indication: '화상으로 생긴 **통증**을 조절해 환자를 편안하게 하고 드레싱 같은 처치를 견딜 수 있게 할 때 쓴다. 통증 정도에 따라 해열진통제부터 오피오이드까지 단계적으로 선택한다.',
+          examPattern: '화상 통증의 규칙적(ATC) 투여와 드레싱 교환 전 진통제 선행 투여 원칙을 묻는 문제가 나온다.',
           examples: ['Acetaminophen(경도 통증)', 'Ibuprofen(항염증+진통)', 'Morphine(중등도 이상 화상 통증)'],
           mechanism: '중추·말초 통증 경로 차단 → 화상 통증 조절.',
           sideEffects: ['오피오이드: 변비·호흡 억제', 'NSAIDs: 신기능 저하 노인 주의'],

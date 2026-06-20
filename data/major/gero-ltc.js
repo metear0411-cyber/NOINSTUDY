@@ -1257,6 +1257,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: '요실금 약물',
+          indication: '소변을 참지 못하고 갑자기 마려운 **절박성 요실금**에 씁니다. 방광 근육의 과도한 수축을 억제해 소변을 참는 힘을 키우고 새는 횟수를 줄여 줍니다.',
+          examPattern: '절박성 요실금 약물과 항콜린 부작용(구강건조·변비·인지저하)을 묻는 문제로 출제된다.',
           examples: ['mirabegron(베타미가) 25~50mg (절박성, 항콜린 부작용 적어 노인 선호)', 'oxybutynin IR/ER (절박성, 인지 부작용 주의)'],
           mechanism: '방광 평활근 이완 → 방광 용량 증가 → 절박성 요실금 감소',
           sideEffects: ['oxybutynin: 항콜린(구강건조·변비·인지저하)', 'mirabegron: 혈압 상승(경미)'],
@@ -1264,6 +1266,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '변비 약물',
+          indication: '대변이 잘 나오지 않는 **변비**에 씁니다. 장 속 수분을 늘리거나 장운동을 자극해 굳은 대변을 부드럽게 만들고 배출을 도와줍니다.',
+          examPattern: '완하제 종류(삼투성·자극성) 구분과 노인 변비 우선 선택 약물을 묻는 문제로 출제된다.',
           examples: ['lactulose(삼투성)', 'bisacodyl(자극성, 단기)', 'polyethylene glycol'],
           mechanism: '장내 수분 증가(삼투성) 또는 장 운동 자극 → 대변 배출 촉진',
           sideEffects: ['과다 사용 시 탈수·복통', 'bisacodyl: 의존성(장기 사용 지양)'],
@@ -1384,6 +1388,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: 'WHO 1단계 (경증통증)',
+          indication: '가벼운 통증의 **첫 단계** 약입니다. 마약성이 아니어서 노인에게 비교적 안전하며, 중추에 작용해 통증을 줄여 줍니다.',
+          examPattern: 'WHO 1단계 비마약성 진통제로 아세트아미노펜을 1차 선택하는 이유와 간독성 주의를 묻는다.',
           examples: ['acetaminophen 325~1000mg/회, 최대 3g/일(노인)'],
           mechanism: '중추성 통증 조절',
           sideEffects: ['간독성(과량·알코올 병용)'],
@@ -1391,6 +1397,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: 'WHO 2단계 (중등도 통증)',
+          indication: '1단계 약으로 조절되지 않는 **중등도 통증**에 씁니다. 약한 마약성 진통제로 한 단계 올려 통증을 더 강하게 가라앉힙니다.',
+          examPattern: '1단계로 조절 안 될 때 약한 마약성(트라마돌)으로 올리는 사다리 단계 판단 문제로 출제된다.',
           examples: ['tramadol(트라마돌) 50~100mg', 'codeine'],
           mechanism: '약한 오피오이드 + 세로토닌·노르에피네프린 재흡수 억제',
           sideEffects: ['오심·변비·어지럼증', 'tramadol: 발작 역치 저하'],
@@ -1398,6 +1406,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: 'WHO 3단계 (중증 통증)',
+          indication: '암성 통증 등 **중증 통증**에 쓰는 강한 마약성 진통제입니다. 천장 효과가 없어 통증이 심하면 증량해 강력하게 조절할 수 있습니다.',
+          examPattern: '강한 마약성 진통제의 변비 예방 완하제 병용과 호흡억제 감시를 묻는 문제로 자주 출제된다.',
           examples: ['morphine', 'oxycodone', 'hydromorphone'],
           mechanism: '뮤 오피오이드 수용체 자극 → 강력 진통',
           sideEffects: ['변비(거의 필수 발생)·오심·진정·호흡억제·의존성'],
@@ -1521,6 +1531,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: '요로감염 항생제',
+          indication: '증상이 있는 **요로감염**(방광염·신우신염) 치료에 씁니다. 원인 세균을 죽여 배뇨통·빈뇨·발열 같은 증상을 가라앉힙니다.',
+          examPattern: '무증상 세균뇨는 치료하지 않는다는 원칙과 배양 결과에 따른 항생제 선택을 묻는다.',
           examples: ['nitrofurantoin(단순 방광염)', 'trimethoprim-sulfamethoxazole', 'ciprofloxacin'],
           mechanism: '세균 세포벽 합성 억제 또는 엽산 합성 억제',
           sideEffects: ['항생제 관련 설사', 'nitrofurantoin: 폐독성(장기 사용)'],
@@ -1528,6 +1540,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '노로바이러스·설사 지지 치료',
+          indication: '노로바이러스 등으로 구토·설사가 심할 때 **탈수**를 막는 지지 치료입니다. 빠져나간 수분과 전해질을 보충해 탈수와 그 합병증을 예방합니다.',
+          examPattern: '바이러스성 장염은 수분·전해질 보충이 우선이고 지사제는 신중히 쓴다는 점을 묻는다.',
           examples: ['경구 수분 보충(전해질)', 'loperamide(이모디움 — 합병증 없는 성인, 바이러스성에서 일반적 사용 주의)'],
           mechanism: '수분·전해질 보충으로 탈수 예방',
           sideEffects: ['loperamide: 장폐색 위험(C.diff 등 독소성 원인 시 금기)'],
@@ -1652,6 +1666,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: '창상 드레싱 제제',
+          indication: '욕창 등 **창상**을 덮어 치료하는 데 씁니다. 상처에 알맞은 습윤 환경을 만들어 새 살이 잘 자라도록 도와 치유를 빠르게 합니다.',
+          examPattern: '삼출액 양·감염 여부에 따라 드레싱 종류(폼·하이드로콜로이드·실버)를 고르는 문제로 출제된다.',
           examples: ['hydrocolloid(하이드로콜로이드, 1~2기)', 'alginate(삼출물 많을 때)', 'foam 드레싱(중등도 삼출)', '은함유 드레싱(감염 창상)'],
           mechanism: '습윤 환경 유지 → 세포 이동 촉진 → 창상 치유',
           sideEffects: ['은함유 드레싱: 은 축적(장기 사용 시)'],
@@ -1659,6 +1675,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '영양 및 전신 치료',
+          indication: '욕창이 잘 낫도록 몸 안에서 돕는 **영양** 지지입니다. 새 살을 만드는 재료인 단백질과 회복을 돕는 영양소를 채워 조직 재생을 촉진합니다.',
+          examPattern: '욕창 치유를 위한 단백질·비타민C·아연 보충 등 영양 중재의 필요성을 묻는 문제로 출제된다.',
           examples: ['단백질 충분 섭취(1.2~1.5g/kg)', '비타민C·아연 보충'],
           mechanism: '영양 지지 → 조직 재생 촉진',
           sideEffects: ['아연 과다 시 구역'],
@@ -1782,6 +1800,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: 'Beers 기준 고위험 약물',
+          indication: '노인에게 **부적절**할 수 있는 약을 가려내는 기준입니다. 처방 전 이익과 위험을 따지고 더 안전한 대안을 찾는 데 활용해 약물 부작용을 예방합니다.',
+          examPattern: 'Beers 기준 대표 약물과 노인에서의 위험(낙상·섬망·항콜린 부작용)을 묻는 문제로 자주 출제된다.',
           examples: ['항콜린제(diphenhydramine·oxybutynin·tricyclic)', 'BZD(diazepam, lorazepam)', '비BZD 수면제(zolpidem)', '1세대 항히스타민제', 'NSAID 장기 사용', '설포닐유레아(glibenclamide 특히)'],
           mechanism: '노인에서 인지장애·낙상·요실금·변비·요폐 위험 증가',
           sideEffects: ['항콜린 증후군: 구강건조·변비·요저류·인지저하', 'BZD: 낙상·섬망·의존성'],
@@ -1789,6 +1809,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '다약제 이상 반응 모니터링',
+          indication: '여러 약을 함께 먹는 **다약제** 노인에서 약물 상호작용을 감시합니다. 위험한 조합을 미리 찾아내 출혈·전해질 이상·약물 독성을 예방합니다.',
+          examPattern: '다약제 정의와 위험한 약물 상호작용 조합을 짝짓는 문제로 출제된다.',
           examples: ['와파린+NSAIDs(출혈)', 'ACE억제제+K+보존이뇨제(고칼륨)', '디곡신+아미오다론(디곡신 독성)'],
           mechanism: '5종 이상 polypharmacy, 10종 이상 hyperpolypharmacy → 상호작용 위험 급증',
           sideEffects: ['복합 약물 부작용'],

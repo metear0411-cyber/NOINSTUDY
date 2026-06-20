@@ -235,6 +235,8 @@ window.NORI_DATA['gero-eol'] = {
       medications: [
         {
           category: '통증 조절 (WHO 사다리 + 지속 주입)',
+          indication: '말기 환자의 중등도~중증 통증을 조절하기 위해 사용한다. 강력한 진통으로 통증을 누그러뜨려 남은 시간의 편안함과 삶의 질을 높이는 완화의료의 핵심 약물이다. **모르핀**은 호흡곤란 완화에도 쓰인다.',
+          examPattern: 'WHO 통증 사다리 단계별 약물과 오피오이드의 가장 흔한 부작용(변비) 및 규칙적 투여(ATC) 원칙을 묻는 문제가 출제된다.',
           examples: ['morphine SC/IV 지속 주입', 'hydromorphone', 'fentanyl 패치'],
           mechanism: '뮤 오피오이드 수용체 자극 → 강력 진통',
           sideEffects: ['변비·진정·호흡억제(말기 적절 용량은 수명 단축 안 함 — 이중효과 원칙)'],
@@ -242,6 +244,8 @@ window.NORI_DATA['gero-eol'] = {
         },
         {
           category: '호흡곤란 조절',
+          indication: '말기 환자가 숨이 차서 괴로워할 때 그 고통을 덜어주기 위해 사용한다. **저용량 모르핀**은 호흡 중추의 감수성을 조절해 숨참을 완화하고, 난치성 호흡곤란에는 진정 약물로 편안함을 돕는다.',
+          examPattern: '저용량 오피오이드가 말기 호흡곤란 완화에 쓰인다는 점과 가족에게 호흡 변화가 정상 과정임을 설명하는 간호를 묻는다.',
           examples: ['저용량 morphine(오피오이드 비경험자 2.5~5mg q4h)', 'midazolam(미다졸람 SC — 난치성 호흡곤란 말기 진정)'],
           mechanism: '호흡 중추 감수성 조절 → 호흡곤란 완화',
           sideEffects: ['진정·호흡억제'],
@@ -249,6 +253,8 @@ window.NORI_DATA['gero-eol'] = {
         },
         {
           category: '구역·분비물·불안 조절',
+          indication: '말기 환자의 메스꺼움과 구토, 기도 분비물로 인한 그르렁거림, 불안과 안절부절을 가라앉히기 위해 사용한다. 여러 불편 증상을 함께 다스려 환자가 편안하게 임종을 맞도록 돕는다. **분비물**에는 항콜린제를 쓴다.',
+          examPattern: '임종 분비물(death rattle)은 환자 고통의 표현이 아니며 흡인보다 체위 변경과 가족 교육이 우선임을 묻는 문제가 출제된다.',
           examples: ['haloperidol(구역, 0.5~2mg)', 'hyoscine butylbromide(사후 그르렁거림 분비물)', 'midazolam(불안·근긴장)', 'dexamethasone(뇌압상승·식욕증진)'],
           mechanism: '구역: D2 차단 / 분비물: 항콜린 / 불안: GABA 강화',
           sideEffects: ['haloperidol: 추체외로 증상', 'midazolam: 과도한 진정'],
