@@ -10,6 +10,7 @@
   const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
   const LS_QMARK   = 'nori_qmark_v1'; // 문항별 마킹 { qid: 'known' | 'review' }
   const LS_QSTAT   = 'nori_qstat_v1'; // 문항별 통계 { qid: {seen,wrong} }
+  const LS_FOCUS   = 'nori_focus_v1'; // 집중(넓게보기) 모드 on/off
 
   const MOCK_SIZE = 100;  // 모의고사 회당 문항 수
 
@@ -71,6 +72,7 @@
     updateDDay();
     buildSubjectList();
     bindEvents();
+    applyFocusMode(localStorage.getItem(LS_FOCUS) === '1');
 
     if (state.subjects.length) selectSubject(state.subjects[0].id);
 
@@ -92,6 +94,19 @@
     } else {
       selectTopic(tid);
     }
+  }
+
+  // ─── 집중(넓게보기) 모드 ──────────────────────────
+  function applyFocusMode(on) {
+    document.body.classList.toggle('focus-mode', on);
+    const btn = document.getElementById('focusToggle');
+    if (btn) {
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.title = on ? '기본 보기 (사이드바·토픽목록 펼치기)' : '넓게 보기 (사이드바·토픽목록 접기)';
+      btn.textContent = on ? '⤡' : '⤢';
+    }
+    localStorage.setItem(LS_FOCUS, on ? '1' : '0');
   }
 
   // ─── D-Day ────────────────────────────────────────
@@ -1020,6 +1035,11 @@
       state.search = e.target.value.trim();
       buildSubjectList();
       if (state.currentSubjectId) buildTopicList();
+    });
+
+    // 집중(넓게보기) 모드 토글 — 과목 레일·토픽 목록 접기
+    document.getElementById('focusToggle')?.addEventListener('click', () => {
+      applyFocusMode(!document.body.classList.contains('focus-mode'));
     });
 
     // 기출문제 버튼
