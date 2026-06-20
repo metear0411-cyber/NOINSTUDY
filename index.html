@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=20260614ac">
+  <link rel="stylesheet" href="styles.css?v=20260620a">
 
   <!-- 데이터 파일 (전역 window 변수 방식 — file:// CORS 우회) -->
   <!-- v=20260428 : 캐시 갱신용 버전 — 데이터 수정 시 숫자 증가 -->
@@ -81,6 +81,9 @@
         <button class="mode-button" data-filter="major" type="button">전공</button>
         <button class="mode-button" data-filter="common" type="button">공통</button>
       </div>
+
+      <!-- 오늘의 한 판 (간격 반복 데일리) -->
+      <button class="gichul-entry-btn daily-entry-btn" id="dailyEntryBtn" type="button">🎯 오늘의 한 판</button>
 
       <!-- 기출문제 진입 버튼 -->
       <button class="gichul-entry-btn" id="gichulEntryBtn" type="button">📝 기출문제 풀기</button>
@@ -197,7 +200,7 @@
   <!-- 집중모드 플로팅 토글 (스크롤 위치 무관 좌하단 상시 노출) -->
   <button class="focus-fab" id="focusToggleFloat" type="button" title="넓게 보기 / 펼치기" aria-pressed="false">⤢ 펼치기</button>
 
-  <script src="app.js?v=20260614ac"></script>
+  <script src="app.js?v=20260620a"></script>
   <script src="notes-bridge.js?v=20260614ac"></script>
   <!-- Service Worker 등록 -->
   <script>
