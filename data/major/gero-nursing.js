@@ -183,6 +183,8 @@ window.NORI_DATA['gero-nursing'] = {
       medications: [
         {
           category: '수면제 — 비벤조디아제핀계 (Z-drug)',
+          indication: '잠들기 어렵거나 자주 깨는 불면증에 단기간 **수면 유도** 목적으로 쓴다. 벤조디아제핀보다 작용이 빠르고 짧아 수면 시작을 돕는다.',
+          examPattern: '노인에서 낙상·인지저하·잔류 진정 부작용과 Beers 기준 주의 약물이라는 점, 비약물 중재를 먼저 해야 한다는 점이 출제된다.',
           examples: ['Zolpidem(스틸녹스)', 'Eszopiclone(루네스타)', 'Zaleplon'],
           mechanism: 'GABA-A 수용체 선택적 작용 → 수면 유도. 단기(2~4주) 불면증에 제한적 사용.',
           sideEffects: ['낙상 위험 증가 (특히 야간 기상 시)', '인지저하·기억 장애', '익일 잔류 진정(hangover effect)', '의존성·내성 형성'],
@@ -190,6 +192,8 @@ window.NORI_DATA['gero-nursing'] = {
         },
         {
           category: '수면제 — 멜라토닌 수용체 작용제',
+          indication: '밤낮 리듬이 흐트러져 일찍 잠들고 일찍 깨는 노인의 불면증에 **일주기 리듬**을 맞춰 수면을 유도할 때 쓴다. 의존성과 낙상 위험이 낮은 편이다.',
+          examPattern: '낙상·의존성 위험이 낮아 노인에게 상대적으로 안전한 대안 수면제로 비교 출제되며, 취침 전 복용 시점이 묻힌다.',
           examples: ['Ramelteon(로제렘)', 'Melatonin(보충제)'],
           mechanism: '시상하부 SCN의 MT1/MT2 수용체 자극 → 일주기 리듬 조절 → 수면 유도. 의존성·낙상 위험 낮음.',
           sideEffects: ['어지러움', '두통', '졸음'],
@@ -197,6 +201,8 @@ window.NORI_DATA['gero-nursing'] = {
         },
         {
           category: '진정 항우울제 (저용량 사용)',
+          indication: '불면증에 항우울 용량보다 훨씬 낮은 용량으로 **진정** 효과를 노려 수면을 돕는다. 의존성이 적어 야간 수면 유지가 필요한 노인에게 선택할 수 있다.',
+          examPattern: '저용량 doxepin이 불면증 치료제라는 점과 함께 기립성 저혈압·항콜린 부작용 모니터링, 노인 회피 대상 TCA 감별이 출제된다.',
           examples: ['Doxepin(독세핀) 3~6mg', 'Trazodone(트라조돈)'],
           mechanism: '히스타민 H1 수용체 차단 → 진정 효과. 항우울 용량보다 훨씬 낮게 수면 목적으로 사용.',
           sideEffects: ['기립성 저혈압 — 낙상 위험', 'Doxepin: 항콜린 부작용(변비·구강건조·요저류)', 'Trazodone: 음경지속발기증(드물지만 위험)'],
@@ -390,6 +396,8 @@ window.NORI_DATA['gero-nursing'] = {
       medications: [
         {
           category: '항콜린제 주의 (의사소통 악화 요인)',
+          indication: '알레르기·불면·우울·과민성 방광 등 본래 목적으로 쓰는 약들이지만, 노인 의사소통 단원에서는 **인지**와 언어 기능을 떨어뜨리는 악화 요인으로 다룬다.',
+          examPattern: '의사소통이나 인지가 갑자기 나빠진 노인에서 원인 약물로 항콜린 부하를 확인해야 한다는 점, 노인 회피 약물이라는 점이 출제된다.',
           examples: ['항히스타민제(diphenhydramine)', '항경련제 일부', '삼환계 항우울제(amitriptyline)', '방광 항콜린제(oxybutynin)'],
           mechanism: '무스카린성 수용체 차단 → 중추신경계 부작용 → 인지·언어 기능 저하.',
           sideEffects: ['인지저하·혼동(노인 특히 민감)', '섬망 유발 가능', '어눌한 말(약물 유발 의사소통 장애)'],
@@ -397,6 +405,8 @@ window.NORI_DATA['gero-nursing'] = {
         },
         {
           category: '치매 의사소통 보조 — 인지강화제',
+          indication: '알츠하이머 치매에서 **인지**·언어·일상 기능 저하 속도를 늦추기 위해 쓴다. 병을 낫게 하는 것이 아니라 진행을 더디게 하는 보조 역할이다.',
+          examPattern: '오심·설사 등 콜린성 위장관 부작용과 서맥 주의, 그리고 완치가 아닌 진행 지연 약물이라는 교육 포인트가 출제된다.',
           examples: ['Donepezil(도네페질)', 'Rivastigmine(리바스티그민)', 'Galantamine(갈란타민)'],
           mechanism: '아세틸콜린에스테라제 억제 → 시냅스 내 ACh 증가 → 인지·언어 기능 유지 보조.',
           sideEffects: ['오심·구토·설사 (콜린성 부작용)', '서맥·실신 (드물)'],
@@ -609,6 +619,8 @@ window.NORI_DATA['gero-nursing'] = {
       medications: [
         {
           category: '절박성 요실금 — 항무스카린제(방광 항콜린제)',
+          indication: '갑자기 강한 요의가 들며 새는 **절박성** 요실금에서 방광의 과도한 수축을 눌러 절박감과 빈뇨를 줄일 때 쓴다.',
+          examPattern: '구강건조·변비·요저류와 특히 노인 인지저하 부작용, 전립선비대 남성 주의, 즉시방출형 Beers 주의가 출제된다.',
           examples: ['Oxybutynin(디트로판)', 'Solifenacin(베시케어)', 'Tolterodine(디트루시톨)'],
           mechanism: '방광 배뇨근의 무스카린 M3 수용체 차단 → 불수의적 수축 억제 → 절박감 감소.',
           sideEffects: ['구강건조', '변비', '인지저하·혼동 (노인에서 특히 주의 — 중추 항콜린 부작용)', '요저류', '시야 흐림'],
@@ -616,6 +628,8 @@ window.NORI_DATA['gero-nursing'] = {
         },
         {
           category: '절박성 요실금 — β3 수용체 작용제',
+          indication: '절박성 요실금에서 방광 근육을 이완시켜 방광 용적을 늘려 요의를 줄일 때 쓴다. 항콜린 부작용이 없어 **인지** 위험이 있는 노인의 대안이 된다.',
+          examPattern: '항콜린제를 쓰기 어려운 노인의 대안으로 비교 출제되며, 혈압 상승 모니터링과 조절불량 고혈압 주의가 묻힌다.',
           examples: ['Mirabegron(베타미가)'],
           mechanism: '방광 β3 아드레날린 수용체 자극 → 배뇨근 이완 → 방광 용적 증가. 항콜린 부작용 없음.',
           sideEffects: ['혈압 상승', '두통', '비인두염'],
@@ -623,6 +637,8 @@ window.NORI_DATA['gero-nursing'] = {
         },
         {
           category: '변비 완화제',
+          indication: '비약물 중재로 좋아지지 않는 변비에 **배변**을 돕기 위해 쓴다. 삼투성은 변을 무르게 하고 자극성은 장운동을 직접 자극한다.',
+          examPattern: '오피오이드 복용 시 예방적 병용, 분변매복은 완화제보다 수지관장이 먼저라는 순서, 자극성 장기 사용 의존성이 출제된다.',
           examples: ['Lactulose(락툴로스)', '마그네슘 수산화물(마그밀)', 'Bisacodyl(둘코락스)', 'Senna(센나)'],
           mechanism: '삼투성(lactulose·MgOH): 장내 수분 증가 → 변 연화. 자극성(bisacodyl·senna): 장운동 직접 자극.',
           sideEffects: ['삼투성: 과다 복용 시 전해질 불균형, 고암모니아혈증(lactulose)', '자극성: 장경련, 만성 사용 시 의존성·카타르틱 결장'],
@@ -842,6 +858,8 @@ window.NORI_DATA['gero-nursing'] = {
       medications: [
         {
           category: '기능 저하 유발 주의 약물 (ADL 악화 요인)',
+          indication: '진정·항콜린 작용을 가진 약들이며, ADL 단원에서는 본래 효과보다 노인의 **일상생활** 수행을 떨어뜨리는 악화 요인으로 다룬다.',
+          examPattern: 'ADL이 갑자기 나빠진 노인에서 새로 추가된 약물을 먼저 확인하고 포괄적 약물 검토와 Beers 대안 교체를 한다는 점이 출제된다.',
           examples: ['항콜린제 (diphenhydramine, oxybutynin)', 'Benzodiazepine', '강력 진정제', '항히스타민제'],
           mechanism: '중추신경 억제 또는 항콜린 부작용 → 진정·낙상·근력 저하 → ADL 기능 감소.',
           sideEffects: ['과진정 → 독립적 이동 불가', '근력 약화 → 보행·이동 장애 악화', '인지저하 → 식사·개인위생 수행 능력 저하'],

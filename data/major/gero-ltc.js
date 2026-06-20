@@ -1257,6 +1257,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: '요실금 약물',
+          indication: '소변을 참지 못하고 갑자기 마려운 **절박성 요실금**에 씁니다. 방광 근육의 과도한 수축을 억제해 소변을 참는 힘을 키우고 새는 횟수를 줄여 줍니다.',
+          examPattern: '절박성 요실금 약물과 항콜린 부작용(구강건조·변비·인지저하)을 묻는 문제로 출제된다.',
           examples: ['mirabegron(베타미가) 25~50mg (절박성, 항콜린 부작용 적어 노인 선호)', 'oxybutynin IR/ER (절박성, 인지 부작용 주의)'],
           mechanism: '방광 평활근 이완 → 방광 용량 증가 → 절박성 요실금 감소',
           sideEffects: ['oxybutynin: 항콜린(구강건조·변비·인지저하)', 'mirabegron: 혈압 상승(경미)'],
@@ -1264,6 +1266,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: '변비 약물',
+          indication: '대변이 잘 나오지 않는 **변비**에 씁니다. 장 속 수분을 늘리거나 장운동을 자극해 굳은 대변을 부드럽게 만들고 배출을 도와줍니다.',
+          examPattern: '완하제 종류(삼투성·자극성) 구분과 노인 변비 우선 선택 약물을 묻는 문제로 출제된다.',
           examples: ['lactulose(삼투성)', 'bisacodyl(자극성, 단기)', 'polyethylene glycol'],
           mechanism: '장내 수분 증가(삼투성) 또는 장 운동 자극 → 대변 배출 촉진',
           sideEffects: ['과다 사용 시 탈수·복통', 'bisacodyl: 의존성(장기 사용 지양)'],
@@ -1384,6 +1388,8 @@ window.NORI_DATA['gero-ltc'] = {
       medications: [
         {
           category: 'WHO 1단계 (경증통증)',
+          indication: '가벼운 통증의 **첫 단계** 약입니다. 마약성이 아니어서 노인에게 비교적 안전하며, 중추에 작용해 통증을 줄여 줍니다.',
+          examPattern: 'WHO 1단계 비마약성 진통제로 아세트아미노펜을 1차 선택하는 이유와 간독성 주의를 묻는다.',
           examples: ['acetaminophen 325~1000mg/회, 최대 3g/일(노인)'],
           mechanism: '중추성 통증 조절',
           sideEffects: ['간독성(과량·알코올 병용)'],
@@ -1391,6 +1397,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: 'WHO 2단계 (중등도 통증)',
+          indication: '1단계 약으로 조절되지 않는 **중등도 통증**에 씁니다. 약한 마약성 진통제로 한 단계 올려 통증을 더 강하게 가라앉힙니다.',
+          examPattern: '1단계로 조절 안 될 때 약한 마약성(트라마돌)으로 올리는 사다리 단계 판단 문제로 출제된다.',
           examples: ['tramadol(트라마돌) 50~100mg', 'codeine'],
           mechanism: '약한 오피오이드 + 세로토닌·노르에피네프린 재흡수 억제',
           sideEffects: ['오심·변비·어지럼증', 'tramadol: 발작 역치 저하'],
@@ -1398,6 +1406,8 @@ window.NORI_DATA['gero-ltc'] = {
         },
         {
           category: 'WHO 3단계 (중증 통증)',
+          indication: '암성 통증 등 **중증 통증**에 쓰는 강한 마약성 진통제입니다. 천장 효과가 없어 통증이 심하면 증량해 강력하게 조절할 수 있습니다.',
+          examPattern: '강한 마약성 진통제의 변비 예방 완하제 병용과 호흡억제 감시를 묻는 문제로 자주 출제된다.',
           examples: ['morphine', 'oxycodone', 'hydromorphone'],
           mechanism: '뮤 오피오이드 수용체 자극 → 강력 진통',
           sideEffects: ['변비(거의 필수 발생)·오심·진정·호흡억제·의존성'],
