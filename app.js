@@ -428,6 +428,11 @@
     if (topic.beginner)    html += `<div class="beginner-banner"><strong>초보자 포인트&nbsp;</strong>${esc(topic.beginner)}</div>`;
     if (topic.whyImportant) html += `<div class="why-banner"><strong>왜 시험에 나오는가?&nbsp;</strong>${esc(topic.whyImportant)}</div>`;
 
+    // 비교표(빈출 비교 정리) — 상단 노출
+    (topic.compareTables || (topic.compareTable ? [topic.compareTable] : [])).forEach(ct => {
+      html += section(ct.title || '한눈 비교 정리', compareTableBlock(ct));
+    });
+
     // Red Flags
     if (topic.redFlags?.length) {
       html += section('🚨 즉시 대응 신호 (Red Flags)',
