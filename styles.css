@@ -935,6 +935,52 @@ body.focus-mode .part-panel { display: none; }
   overflow-wrap: break-word;
 }
 
+/* 비교표 — 빈출 비교 한눈 정리 */
+.cmp-intro {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #2f3b42;
+  margin: 0 0 10px;
+  word-break: keep-all;
+}
+.cmp-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.55;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cmp-table th, .cmp-table td {
+  padding: 9px 11px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  vertical-align: top;
+  word-break: keep-all;
+}
+.cmp-table th:last-child, .cmp-table td:last-child { border-right: none; }
+.cmp-table tbody tr:last-child td { border-bottom: none; }
+.cmp-table thead th {
+  background: var(--teal-soft);
+  color: var(--teal-dark);
+  font-weight: 800;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+.cmp-table tbody tr:nth-child(even) { background: #f8fafa; }
+.cmp-table td.cmp-key {
+  font-weight: 800;
+  color: var(--teal-dark);
+  white-space: nowrap;
+}
+.cmp-notes { margin: 10px 0 0; padding-left: 18px; }
+.cmp-notes li { font-size: 13px; line-height: 1.6; color: #2f3b42; margin: 3px 0; word-break: keep-all; }
+
 /* Red Flags — 색상 띠 카드 */
 .rf-list { display: grid; gap: 8px; }
 .rf-card {

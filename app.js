@@ -507,6 +507,11 @@
     if (topic.coreSummary?.length)
       html += section('⭐ 핵심 한 장 정리', labeledCard(topic.coreSummary));
 
+    // 비교표(빈출 비교 정리) — 표 형태로 한눈에. coreSummary 바로 아래 노출.
+    (topic.compareTables || (topic.compareTable ? [topic.compareTable] : [])).forEach(ct => {
+      html += section(ct.title || '한눈 비교 정리', compareTableBlock(ct));
+    });
+
     // Red Flags — 안전상 항상 노출
     if (topic.redFlags?.length)
       html += section('🚨 즉시 대응 신호 (Red Flags)', redFlagCards(topic.redFlags));
@@ -585,6 +590,19 @@
         <span class="lc-chip">${esc(it.label)}</span>
         <span class="lc-detail">${esc(it.detail)}</span>
       </div>`).join('')}</div>`;
+  }
+
+  // 비교표 — 빈출 항목을 행/열로 한눈에. intro(설명 문단)·notes(표 아래 요점) 선택.
+  // 셀 안에서도 **강조**·수치·경고어 하이라이트 적용. 모바일에서 가로 스크롤.
+  function compareTableBlock(ct) {
+    const head = `<tr>${(ct.headers || []).map(h => `<th>${emph(esc(h))}</th>`).join('')}</tr>`;
+    const body = (ct.rows || []).map(r =>
+      `<tr>${r.map((c, i) => `<td${i === 0 ? ' class="cmp-key"' : ''}>${emph(esc(String(c)))}</td>`).join('')}</tr>`
+    ).join('');
+    const intro = ct.intro ? `<p class="cmp-intro">${emph(esc(ct.intro))}</p>` : '';
+    const notes = (ct.notes && ct.notes.length)
+      ? `<ul class="cmp-notes">${ct.notes.map(n => `<li>${emph(esc(n))}</li>`).join('')}</ul>` : '';
+    return `${intro}<div class="cmp-scroll"><table class="cmp-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>${notes}`;
   }
 
   // 진짜 순서가 있는 흐름(PAPIE 등) → 번호 스텝
