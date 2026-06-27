@@ -1816,7 +1816,7 @@
   function buildMedFilterBar() {
     const bar = document.getElementById('medFilterBar'); if (!bar) return;
     const idx = buildMedIndex();
-    const systems = [...new Set(idx.map(m => m._system))];
+    const systems = [...new Set(idx.map(m => m._system))].filter(s => s !== '노인주의');
     const chips = ['전체', '🔥 빈출', '👴 노인주의', ...systems];
     bar.innerHTML = chips.map(c =>
       `<button class="med-filter-chip${_medFilter === c ? ' is-active' : ''}" type="button" data-medf="${esc(c)}">${esc(c)}</button>`
@@ -1831,9 +1831,8 @@
       ? `<div class="med-exam"><strong>📝 기출 포인트 (이렇게 나온다)</strong><ul>${m._examPoints.map(p => `<li>${emph(esc(p))}</li>`).join('')}</ul></div>` : '';
     // 통합 클래스: 서브그룹(약물 → 왜 주의)별로 분절. 서브그룹 많으면 기본 접힘.
     if (m._subgroups && m._subgroups.length) {
-      const multi = m._subgroups.length > 2;
       const subs = m._subgroups.map(sg => {
-        const open = (!_medMemMode && !multi) ? ' open' : '';
+        const open = _medMemMode ? '' : ' open';
         const drugs = (sg.drugs || []).length ? `<div class="med-examples">${sg.drugs.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : '';
         const mech = sg.mechanism ? `<div class="med-detail"><strong>🔬 기전</strong><p>${emph(esc(sg.mechanism))}</p></div>` : '';
         const side = (sg.side || []).length ? `<div class="med-detail"><strong>⚠️ 부작용·주의</strong><ul>${sg.side.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : '';
