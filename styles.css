@@ -1322,6 +1322,18 @@ body.focus-mode .part-panel { display: none; }
 .cram-explain { margin: 0; font-size: 13.5px; line-height: 1.72; color: #2f3b42; word-break: keep-all; }
 .cram-capsule { margin: 0; padding-left: 18px; }
 .cram-capsule li { font-size: 13.5px; line-height: 1.6; color: #2f3b42; margin: 4px 0; word-break: keep-all; }
+/* 핵심 암기 — 항상 펼친 학습지형 그리드(가로 자동 3열 내외) */
+.cram-mem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.cram-mem-cell {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 11px; border: 1px solid var(--line, #e2e8e6); border-radius: 9px;
+  background: #fcfdfd; word-break: keep-all;
+}
+.cmc-head { font-size: 12.5px; font-weight: 800; color: var(--teal-dark, #1f7a74); line-height: 1.4; }
+.cmc-body { font-size: 12.5px; line-height: 1.55; color: #2f3b42; }
+/* 암기 모드: 설명만 가리고 머리말로 자가테스트, 탭하면 공개 */
+.mem-mode .cram-mem-cell .cmc-body { filter: blur(4.5px); cursor: pointer; transition: filter .12s; }
+.mem-mode .cram-mem-cell .cmc-body.revealed { filter: none; }
 .cram-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .cram-jump {
   padding: 7px 13px; border: 1px solid var(--teal, #2a9d8f); border-radius: 8px;
