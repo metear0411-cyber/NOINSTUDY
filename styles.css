@@ -1401,12 +1401,30 @@ body.focus-mode .part-panel { display: none; }
   color: var(--muted);
 }
 /* 자유 풀기 — 번호 이동 바 */
+/* 자유 풀기 유형·계통 필터 토글 버튼 */
+.gichul-filter-toggle {
+  display: block; width: 100%; box-sizing: border-box; margin: 2px 0 8px;
+  padding: 7px 12px; border: 1px dashed var(--line, #dfe6e2); border-radius: 9px;
+  background: #f8fafa; color: var(--teal-dark, #1f7a74);
+  font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: left;
+}
+.gichul-filter-toggle.is-open { background: var(--teal-soft, #dcefeb); border-style: solid; }
+
+/* 번호 이동 — 접이식(기본 닫힘) */
+.free-jump-wrap { margin: 6px 0 10px; }
+.free-jump-sum {
+  list-style: none; cursor: pointer; display: inline-block;
+  padding: 5px 11px; border: 1px solid var(--line, #dfe6e2); border-radius: 999px;
+  background: #f8fafa; color: var(--teal-dark, #1f7a74); font-size: 12px; font-weight: 700;
+}
+.free-jump-sum::-webkit-details-marker { display: none; }
+.free-jump-wrap[open] .free-jump-sum { margin-bottom: 6px; }
 .free-jump {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 8px 0 12px;
+  margin: 0 0 4px;
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
