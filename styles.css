@@ -1264,6 +1264,76 @@ body.focus-mode .part-panel { display: none; }
 .med-mem-toggle.is-active { background: #1f7a74; color: #fff; }
 .med-empty { text-align: center; color: var(--muted, #8a948f); padding: 30px 0; }
 
+/* ── 🔥 막판 암기노트 허브 ── */
+.cram-entry-btn { margin-top: 6px; background: #fff5ec; color: #b5631a; border: 1px solid #f0c89a; }
+.cram-entry-btn:hover { background: #ffe9d4; opacity: 1; }
+#cramSearch {
+  width: 100%; box-sizing: border-box; padding: 10px 13px; font-size: 14px;
+  border: 1px solid var(--line, #dfe6e2); border-radius: 10px; font-family: inherit; margin-bottom: 9px;
+}
+.cram-plan {
+  margin: 4px 0 12px; padding: 10px 13px; border-radius: 10px;
+  background: #fff5ec; border: 1px solid #f0c89a; color: #8a4a12;
+  font-size: 13px; line-height: 1.55;
+}
+.cram-plan b { color: #b5631a; }
+.cram-today-btn {
+  margin-left: 6px; padding: 3px 10px; border: 1px solid #d98a3d; border-radius: 999px;
+  background: #fff; color: #b5631a; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.cram-group { margin-bottom: 18px; }
+.cram-group h4 {
+  margin: 0 0 8px; font-size: 14px; color: var(--teal-dark, #1f7a74);
+  border-bottom: 2px solid var(--teal-soft, #dcefeb); padding-bottom: 5px;
+}
+.cram-gcount { color: #bbb; font-weight: 600; font-size: 12px; }
+.cram-card {
+  border: 1px solid var(--line, #dfe6e2); border-radius: 11px; background: #fff;
+  margin-bottom: 8px; overflow: hidden;
+}
+.cram-card[open] { border-color: #f0c89a; box-shadow: 0 1px 6px rgba(181,99,26,0.08); }
+.cram-sum {
+  list-style: none; cursor: pointer; padding: 11px 13px; display: grid;
+  grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center;
+}
+.cram-sum::-webkit-details-marker { display: none; }
+.cram-sum-top { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; grid-column: 1; }
+.cram-title { font-size: 14.5px; font-weight: 800; color: var(--navy, #243b53); }
+.cram-badges { display: inline-flex; gap: 4px; }
+.cram-badge { padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 800; white-space: nowrap; }
+.cram-badge.hot { background: #fff0e0; color: #b5631a; }
+.cram-badge.hi { background: var(--teal-soft, #dcefeb); color: var(--teal-dark, #1f7a74); }
+.cram-badge.weak { background: #fdecec; color: #c0392b; }
+.cram-one {
+  grid-column: 1; font-size: 12px; color: var(--muted, #8a948f); line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cram-chev { grid-column: 2; grid-row: 1 / span 2; color: #bbb; font-size: 13px; transition: transform .15s; }
+.cram-card[open] .cram-chev { transform: rotate(180deg); }
+.cram-body { padding: 4px 13px 13px; border-top: 1px solid var(--line, #eef2f0); }
+.cram-body .study-section { margin-top: 12px; }
+.cram-capsule { margin: 0; padding-left: 18px; }
+.cram-capsule li { font-size: 13.5px; line-height: 1.6; color: #2f3b42; margin: 4px 0; word-break: keep-all; }
+.cram-why {
+  margin: 12px 0 0; padding: 9px 11px; border-radius: 9px; background: #f8fafa;
+  font-size: 13px; line-height: 1.6; color: #2f3b42; word-break: keep-all;
+}
+.cram-why strong { color: var(--teal-dark, #1f7a74); }
+.cram-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.cram-jump {
+  padding: 7px 13px; border: 1px solid var(--teal, #2a9d8f); border-radius: 8px;
+  background: var(--teal-dark, #1f7a74); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.cram-note-link {
+  padding: 7px 13px; border: 1px solid #f0c89a; border-radius: 8px; background: #fff5ec;
+  color: #b5631a; font-size: 13px; font-weight: 700; text-decoration: none;
+}
+/* 암기 모드 — 핵심 가림, 탭하면 공개 */
+.mem-mode .cram-capsule li, .mem-mode .cram-why {
+  filter: blur(5px); cursor: pointer; transition: filter .12s;
+}
+.mem-mode .cram-capsule li.revealed, .mem-mode .cram-why.revealed { filter: none; }
+
 /* ─────────────────────────────────────────
    퀴즈 모드
 ───────────────────────────────────────── */

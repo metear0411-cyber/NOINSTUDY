@@ -198,6 +198,7 @@
   function selectSubject(subjectId) {
     if (state.gichulMode) exitGichulMode();
     if (document.getElementById('medPanel')?.style.display !== 'none') exitMedMode();
+    if (document.getElementById('cramPanel')?.style.display === '') exitCramMode();
     state.currentSubjectId = subjectId;
     state.currentTopicId   = null;
 
@@ -357,9 +358,10 @@
 
   // ─── 토픽 선택 ────────────────────────────────────
   function selectTopic(topicId) {
-    // 약물·기출 패널이 열려 있으면 닫고 학습 화면으로 복귀 (사이드바에서 바로 토픽 이동 가능)
+    // 약물·기출·암기노트 패널이 열려 있으면 닫고 학습 화면으로 복귀 (사이드바에서 바로 토픽 이동 가능)
     if (state.gichulMode) exitGichulMode();
     if (document.getElementById('medPanel')?.style.display !== 'none') exitMedMode();
+    if (document.getElementById('cramPanel')?.style.display === '') exitCramMode();
 
     state.currentTopicId = topicId;
     state.quiz  = { questions: [], current: 0, answered: false, scores: [] };
@@ -1110,6 +1112,23 @@
       if (btn) { btn.closest('.med-card')?.classList.add('revealed'); }
     });
 
+    // 막판 암기노트 허브
+    document.getElementById('cramEntryBtn')?.addEventListener('click', enterCramMode);
+    document.getElementById('cramExitBtn')?.addEventListener('click', exitCramMode);
+    document.getElementById('cramSearch')?.addEventListener('input', e => { _cramSearch = e.target.value.trim(); renderCramHub(); });
+    document.getElementById('cramMemToggle')?.addEventListener('click', function () {
+      _cramMemMode = !_cramMemMode;
+      this.classList.toggle('is-active', _cramMemMode);
+      this.textContent = _cramMemMode ? '👁 학습 모드' : '🙈 암기 모드';
+      renderCramHub();
+    });
+    // 암기 모드: 가려진 핵심(캡슐·왜빈출) 탭하면 공개
+    document.getElementById('cramContent')?.addEventListener('click', e => {
+      if (!_cramMemMode) return;
+      const hit = e.target.closest('.cram-capsule li, .cram-why');
+      if (hit) hit.classList.toggle('revealed');
+    });
+
     // 학습 기록 내보내기/불러오기
     document.getElementById('exportMarksBtn')?.addEventListener('click', exportMarks);
     const importInput = document.getElementById('importMarksInput');
@@ -1671,6 +1690,8 @@
     state.gichulMode = true;
     document.getElementById('overviewBand').style.display = 'none';
     document.getElementById('contentGrid').style.display  = 'none';
+    const medP = document.getElementById('medPanel'); if (medP) medP.style.display = 'none';
+    const cramP = document.getElementById('cramPanel'); if (cramP) cramP.style.display = 'none';
     document.getElementById('gichulPanel').style.display  = '';
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
@@ -1746,6 +1767,7 @@
     document.getElementById('overviewBand').style.display = 'none';
     document.getElementById('contentGrid').style.display  = 'none';
     document.getElementById('gichulPanel').style.display  = 'none';
+    const cramP = document.getElementById('cramPanel'); if (cramP) cramP.style.display = 'none';
     document.getElementById('medPanel').style.display     = '';
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
@@ -1816,6 +1838,150 @@
       ).join('');
     }
     el.innerHTML = html;
+  }
+
+  // ─── 🔥 막판 암기노트 허브 ─────────────────────────────
+  // 흩어진 고빈출 암기 내용을 한 화면 스크롤+탭 펼침으로. 기존 필드(memory·whyImportant·
+  // compareTable·redFlags·cramCapsule)만 모아 빈출 점수로 랭킹. (새 사실 생성 없음)
+  let _cramIndex = null, _cramFilter = '전체', _cramMemMode = false, _cramSearch = '';
+  const CRAM_TAG_ALIAS = { '피부계': '피부감각계', '감각계': '피부감각계' };
+  function cramTagCounts() {
+    const c = {};
+    [...(window.NORI_GICHUL?.questions || []), ...(window.NORI_VARIATION?.questions || [])]
+      .forEach(q => { if (q && q.tag) c[q.tag] = (c[q.tag] || 0) + 1; });
+    return c;
+  }
+  function cramWrongByTag() {
+    const stat = lsGet(LS_QSTAT), wrong = {}, byId = {};
+    [...(window.NORI_GICHUL?.questions || []), ...(window.NORI_VARIATION?.questions || [])]
+      .forEach(q => { if (q && q.id) byId[q.id] = q.tag; });
+    Object.entries(stat).forEach(([id, s]) => {
+      if (s && s.wrong > 0 && byId[id]) wrong[byId[id]] = (wrong[byId[id]] || 0) + s.wrong;
+    });
+    return wrong;
+  }
+  function buildCramIndex() {
+    if (_cramIndex) return _cramIndex;
+    const counts = cramTagCounts(), wrongByTag = cramWrongByTag();
+    const list = [];
+    Object.entries(state.data || {}).forEach(([sid, subj]) => {
+      (subj.topics || []).forEach(t => {
+        const hasContent = (t.memory && t.memory.length) || t.cramCapsule || t.compareTable || t.whyImportant;
+        if (!hasContent) return;
+        const cat = t.category || subj.title || '기타';
+        const tag = CRAM_TAG_ALIAS[cat] || cat;
+        const cnt = counts[tag] || 0;
+        const pw = t.priority === 'high' ? 1.6 : t.priority === 'low' ? 0.7 : 1.0;
+        const fb = FREQ_BOOST[tag] || (cnt > 0 ? 1.2 : 1.0);
+        list.push({
+          sid, tid: t.id, title: t.title, category: cat, tag, priority: t.priority || 'medium',
+          yieldScore: pw * fb * (1 + cnt / 50), qcount: cnt, weak: wrongByTag[tag] || 0,
+          hot: (FREQ_BOOST[tag] >= 1.5) || cnt >= 120, topic: t
+        });
+      });
+    });
+    list.sort((a, b) => b.yieldScore - a.yieldScore);
+    _cramIndex = list;
+    return _cramIndex;
+  }
+  function cramDaysLeft() {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return Math.max(1, Math.ceil((EXAM_DATE - today) / 86400000));
+  }
+  function cramCard(it) {
+    const t = it.topic;
+    const badges = `${it.hot ? '<span class="cram-badge hot">🔥 빈출</span>' : ''}`
+      + `${it.priority === 'high' ? '<span class="cram-badge hi">중요</span>' : ''}`
+      + `${it.weak ? `<span class="cram-badge weak">⚠ 오답 ${it.weak}</span>` : ''}`;
+    const oneRaw = (t.cramCapsule && t.cramCapsule[0]) || (t.memory && t.memory[0]) || t.whyImportant || '';
+    const oneLine = String(oneRaw).replace(/\*\*/g, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    let body = '';
+    if (t.cramCapsule && t.cramCapsule.length)
+      body += section('🎯 반드시 외울 것', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${emph(esc(String(x)))}</li>`).join('')}</ul>`);
+    if (t.whyImportant)
+      body += `<p class="cram-why"><strong>왜 빈출?</strong> ${emph(esc(t.whyImportant))}</p>`;
+    if (t.compareTable)
+      body += section(t.compareTable.title || '한눈 비교', compareTableBlock(t.compareTable));
+    if (t.memory && t.memory.length)
+      body += section('핵심 암기 (탭하면 펼침)', memoryList(t.memory));
+    const emerg = (t.redFlags || []).filter(f => f && typeof f === 'object' && f.level === 'emergency');
+    if (emerg.length) body += section('🚨 응급 신호', redFlagCards(emerg));
+    body += `<div class="cram-actions">`
+      + `<button class="cram-jump" type="button" data-sid="${esc(it.sid)}" data-tid="${esc(it.tid)}">📘 전체 학습</button>`
+      + (t.noteLink ? `<a class="cram-note-link" href="${esc(t.noteLink.file)}#${esc(t.noteLink.anchor)}" target="_blank" rel="noopener">📖 그림으로 보기</a>` : '')
+      + `</div>`;
+    return `<details class="cram-card"><summary class="cram-sum">
+        <span class="cram-sum-top"><span class="cram-title">${esc(it.title)}</span><span class="cram-badges">${badges}</span></span>
+        <span class="cram-one">${esc(oneLine)}</span>
+        <span class="cram-chev" aria-hidden="true">▾</span>
+      </summary><div class="cram-body">${body}</div></details>`;
+  }
+  function buildCramFilterBar() {
+    const bar = document.getElementById('cramFilterBar'); if (!bar) return;
+    const idx = buildCramIndex();
+    const cats = [...new Set(idx.map(i => i.category))];
+    const chips = ['전체', '🔥 최빈출', '⚠ 내 약점', '📅 오늘 분량', ...cats];
+    bar.innerHTML = chips.map(c =>
+      `<button class="med-filter-chip${_cramFilter === c ? ' is-active' : ''}" type="button" data-cramf="${esc(c)}">${esc(c)}</button>`
+    ).join('');
+    bar.querySelectorAll('[data-cramf]').forEach(b => b.addEventListener('click', () => {
+      _cramFilter = b.dataset.cramf; buildCramFilterBar(); renderCramHub();
+    }));
+  }
+  function renderCramHub() {
+    const el = document.getElementById('cramContent'); if (!el) return;
+    const idx = buildCramIndex();
+    const s = _cramSearch.toLowerCase();
+    const dday = cramDaysLeft();
+    const perDay = Math.max(1, Math.ceil(idx.length / dday));
+    let items = idx.slice();
+    if (_cramFilter === '🔥 최빈출') items = items.filter(i => i.hot);
+    else if (_cramFilter === '⚠ 내 약점') items = items.filter(i => i.weak > 0).sort((a, b) => b.weak - a.weak);
+    else if (_cramFilter === '📅 오늘 분량') items = items.slice(0, perDay);
+    else if (_cramFilter !== '전체') items = items.filter(i => i.category === _cramFilter);
+    if (s) items = items.filter(i =>
+      (i.title + ' ' + i.category + ' ' + (i.topic.memory || []).join(' ') + ' ' + (i.topic.whyImportant || '')).toLowerCase().includes(s));
+    el.classList.toggle('mem-mode', _cramMemMode);
+    let html = `<div class="cram-plan">📅 시험까지 <b>D-${dday}</b> · 핵심 토픽 <b>${idx.length}</b>개 → 하루 <b>${perDay}개</b> 권장`
+      + `${_cramFilter !== '📅 오늘 분량' ? ` <button class="cram-today-btn" type="button">오늘 분량만</button>` : ''}</div>`;
+    if (!items.length) { el.innerHTML = html + '<div class="med-empty">조건에 맞는 항목이 없어요.</div>'; bindCramHub(el); return; }
+    if (_cramFilter === '전체') {
+      const groups = {};
+      items.forEach(i => { (groups[i.category] = groups[i.category] || []).push(i); });
+      html += Object.entries(groups).sort((a, b) => b[1][0].yieldScore - a[1][0].yieldScore)
+        .map(([cat, arr]) => `<div class="cram-group"><h4>${esc(cat)} <span class="cram-gcount">${arr.length}</span></h4>${arr.map(cramCard).join('')}</div>`).join('');
+    } else {
+      html += `<p class="med-empty" style="padding:4px 0;color:var(--teal-dark);font-weight:700">${items.length}개</p>`;
+      html += items.map(cramCard).join('');
+    }
+    el.innerHTML = html;
+    bindCramHub(el);
+  }
+  function bindCramHub(el) {
+    el.querySelector('.cram-today-btn')?.addEventListener('click', () => {
+      _cramFilter = '📅 오늘 분량'; buildCramFilterBar(); renderCramHub();
+    });
+    el.querySelectorAll('.cram-jump').forEach(b => b.addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation();
+      const sid = b.dataset.sid, tid = b.dataset.tid;
+      exitCramMode(); selectSubject(sid); setTimeout(() => selectTopic(tid), 30);
+    }));
+  }
+  function enterCramMode() {
+    document.getElementById('overviewBand').style.display = 'none';
+    document.getElementById('contentGrid').style.display  = 'none';
+    document.getElementById('gichulPanel').style.display  = 'none';
+    document.getElementById('medPanel').style.display     = 'none';
+    document.getElementById('cramPanel').style.display    = '';
+    document.getElementById('subjectRail')?.classList.remove('is-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('is-open');
+    buildCramFilterBar();
+    renderCramHub();
+  }
+  function exitCramMode() {
+    const p = document.getElementById('cramPanel'); if (p) p.style.display = 'none';
+    document.getElementById('overviewBand').style.display = '';
+    document.getElementById('contentGrid').style.display  = '';
   }
 
   function renderGichulQuestion() {
