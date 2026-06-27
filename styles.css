@@ -1138,9 +1138,25 @@ body.focus-mode .part-panel { display: none; }
 ───────────────────────────────────────── */
 .med-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;   /* 한 행에 카드 1개(전체 폭) — 가독성 */
   gap: 10px;
 }
+/* 약물 클래스 서브그룹 — 약물↔주의 단위로 분절, 접이식 */
+.med-subs { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; }
+.med-sub { border: 1px solid var(--line, #e2e8e6); border-radius: 9px; background: #fcfdfd; overflow: hidden; }
+.med-sub[open] { border-color: #cfe0db; }
+.med-sub-sum {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px; font-size: 13.5px; font-weight: 800; color: var(--navy, #243b53);
+}
+.med-sub-sum::-webkit-details-marker { display: none; }
+.med-sub-sum::after { content: '▾'; margin-left: auto; color: #aab; font-size: 12px; transition: transform .15s; }
+.med-sub[open] .med-sub-sum::after { transform: rotate(180deg); }
+.med-sub-name { word-break: keep-all; }
+.med-sub-cnt { font-size: 11px; font-weight: 700; color: var(--teal-dark, #1f7a74); background: var(--teal-soft, #dcefeb); padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.med-sub-body { padding: 2px 11px 11px; border-top: 1px solid var(--line, #eef2f0); }
+.med-sub-body .med-examples { padding: 8px 0 4px; }
+.med-sub-body .med-detail { margin-top: 7px; }
 .med-card {
   border: 1px solid var(--line);
   border-radius: 10px;

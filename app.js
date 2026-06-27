@@ -1770,9 +1770,9 @@
     if (window.NORI_MED_CLASSES && window.NORI_MED_CLASSES.length) {
       // 통합 클래스 기반(중복 제거): 토픽별 medications를 클래스로 합친 데이터 사용
       list = window.NORI_MED_CLASSES.map(c => ({
-        category: c.label, examples: c.examples || [], mechanism: c.mechanism || '',
-        indication: c.indication || '', sideEffects: c.sideEffects || [], nursingPoints: c.nursingPoints || [],
-        examPattern: '', _examPoints: c.examPoints || [],
+        category: c.label, examples: c.examples || [], mechanism: '',
+        indication: '', sideEffects: c.sideEffects || [], nursingPoints: c.nursingPoints || [],
+        examPattern: '', _examPoints: c.examPoints || [], _subgroups: c.subgroups || [],
         _system: c.system || '기타', _topic: (c.sources || []).join(' · '), _key: c.key
       }));
     } else {
@@ -1826,6 +1826,28 @@
     }));
   }
   function medCard(m) {
+    const badges = `${m._hot ? '<span class="med-badge hot">🔥 빈출</span>' : ''}${m._geri ? '<span class="med-badge geri">👴 노인주의</span>' : ''}`;
+    const exam = (m._examPoints && m._examPoints.length)
+      ? `<div class="med-exam"><strong>📝 기출 포인트 (이렇게 나온다)</strong><ul>${m._examPoints.map(p => `<li>${emph(esc(p))}</li>`).join('')}</ul></div>` : '';
+    // 통합 클래스: 서브그룹(약물 → 왜 주의)별로 분절. 서브그룹 많으면 기본 접힘.
+    if (m._subgroups && m._subgroups.length) {
+      const multi = m._subgroups.length > 2;
+      const subs = m._subgroups.map(sg => {
+        const open = (!_medMemMode && !multi) ? ' open' : '';
+        const drugs = (sg.drugs || []).length ? `<div class="med-examples">${sg.drugs.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : '';
+        const mech = sg.mechanism ? `<div class="med-detail"><strong>🔬 기전</strong><p>${emph(esc(sg.mechanism))}</p></div>` : '';
+        const side = (sg.side || []).length ? `<div class="med-detail"><strong>⚠️ 부작용·주의</strong><ul>${sg.side.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : '';
+        const nurse = (sg.nursing || []).length ? `<div class="med-detail"><strong>💉 간호</strong><ul>${sg.nursing.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : '';
+        return `<details class="med-sub"${open}><summary class="med-sub-sum"><span class="med-sub-name">${esc(sg.name)}</span><span class="med-sub-cnt">약 ${(sg.drugs || []).length}</span></summary><div class="med-sub-body">${drugs}${mech}${side}${nurse}</div></details>`;
+      }).join('');
+      return `<div class="med-card${m._geri ? ' med-geri' : ''}">
+        <div class="med-card-head"><span class="med-category">${esc(m.category)}</span><span class="med-badges">${badges}</span></div>
+        ${m._topic ? `<div class="med-sys-tag">${esc(m._system)} · 출처: ${esc(m._topic)}</div>` : ''}
+        ${exam}
+        <div class="med-subs">${subs}</div>
+      </div>`;
+    }
+    // 폴백(토픽 medications 평면): 기존 단순 카드
     const pills = (m.examples || []).length
       ? `<div class="med-examples">${m.examples.map(e => `<span class="med-pill">${esc(e)}</span>`).join('')}</div>` : '';
     const mech = m.mechanism ? `<div class="med-detail"><strong>기전</strong><p>${esc(m.mechanism)}</p></div>` : '';
@@ -1833,11 +1855,7 @@
       ? `<div class="med-detail"><strong>⚠️ 부작용</strong><ul>${m.sideEffects.map(s => `<li class="med-side-effect">${esc(s)}</li>`).join('')}</ul></div>` : '';
     const nurse = (m.nursingPoints || []).length
       ? `<div class="med-detail"><strong>💉 간호포인트</strong><ul>${m.nursingPoints.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : '';
-    const badges = `${m._hot ? '<span class="med-badge hot">🔥 빈출</span>' : ''}${m._geri ? '<span class="med-badge geri">👴 노인주의</span>' : ''}`;
-    const use = m.indication ? `<div class="med-use"><strong>💡 이럴 때 써요 (적응증·효능)</strong><p>${emph(esc(m.indication))}</p></div>` : '';
-    const exam = (m._examPoints && m._examPoints.length)
-      ? `<div class="med-exam"><strong>📝 기출 포인트 (이렇게 나온다)</strong><ul>${m._examPoints.map(p => `<li>${emph(esc(p))}</li>`).join('')}</ul></div>`
-      : (m.examPattern ? `<div class="med-exam"><strong>📝 기출 포인트</strong><p>${emph(esc(m.examPattern))}</p></div>` : '');
+    const use = m.indication ? `<div class="med-use"><strong>💡 이럴 때 써요</strong><p>${emph(esc(m.indication))}</p></div>` : '';
     return `<div class="med-card${m._geri ? ' med-geri' : ''}">
       <div class="med-card-head"><span class="med-category">${esc(m.category)}</span><span class="med-badges">${badges}</span></div>
       <div class="med-sys-tag">${esc(m._system)} · ${esc(m._topic)}</div>
