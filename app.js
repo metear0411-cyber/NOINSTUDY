@@ -1125,7 +1125,7 @@
     // 암기 모드: 가려진 핵심(캡슐·왜빈출) 탭하면 공개
     document.getElementById('cramContent')?.addEventListener('click', e => {
       if (!_cramMemMode) return;
-      const hit = e.target.closest('.cram-capsule li, .cram-why');
+      const hit = e.target.closest('.cram-capsule li');
       if (hit) hit.classList.toggle('revealed');
     });
 
@@ -1893,17 +1893,27 @@
     const badges = `${it.hot ? '<span class="cram-badge hot">🔥 빈출</span>' : ''}`
       + `${it.priority === 'high' ? '<span class="cram-badge hi">중요</span>' : ''}`
       + `${it.weak ? `<span class="cram-badge weak">⚠ 오답 ${it.weak}</span>` : ''}`;
-    const oneRaw = (t.cramCapsule && t.cramCapsule[0]) || (t.memory && t.memory[0]) || t.whyImportant || '';
+    const u = t.understand || {};
+    const oneRaw = t.analogy || t.beginner || (t.cramCapsule && t.cramCapsule[0]) || (t.memory && t.memory[0]) || '';
     const oneLine = String(oneRaw).replace(/\*\*/g, '').replace(/\s+/g, ' ').trim().slice(0, 80);
     let body = '';
-    if (t.cramCapsule && t.cramCapsule.length)
-      body += section('🎯 반드시 외울 것', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${emph(esc(String(x)))}</li>`).join('')}</ul>`);
-    if (t.whyImportant)
-      body += `<p class="cram-why"><strong>왜 빈출?</strong> ${emph(esc(t.whyImportant))}</p>`;
+    // ── 이해 먼저 (주입식 X): 비유 → 원리 → 노인 특이성 ──
+    const easy = t.analogy || t.beginner;
+    if (easy)
+      body += `<div class="cram-analogy"><span class="cram-analogy-tag">💡 쉽게 이해</span><p>${emph(esc(easy))}</p></div>`;
+    if (u.pathology)
+      body += section('🔬 왜 이렇게 되나 (원리)', `<p class="cram-explain">${emph(esc(u.pathology))}</p>`);
+    if (u.geriatric_specifics)
+      body += section('👴 노인은 이렇게 나타나요', `<p class="cram-explain">${emph(esc(u.geriatric_specifics))}</p>`);
+    if (t.cramExplain)
+      body += section('💡 한 번 더 쉽게', `<p class="cram-explain">${emph(esc(t.cramExplain))}</p>`);
+    // ── 이해 후 비교·암기 ──
     if (t.compareTable)
       body += section(t.compareTable.title || '한눈 비교', compareTableBlock(t.compareTable));
+    if (t.cramCapsule && t.cramCapsule.length)
+      body += section('🎯 이해했으면 이건 외우자', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${emph(esc(String(x)))}</li>`).join('')}</ul>`);
     if (t.memory && t.memory.length)
-      body += section('핵심 암기 (탭하면 펼침)', memoryList(t.memory));
+      body += section('📌 핵심 암기 (탭하면 펼침)', memoryList(t.memory));
     const emerg = (t.redFlags || []).filter(f => f && typeof f === 'object' && f.level === 'emergency');
     if (emerg.length) body += section('🚨 응급 신호', redFlagCards(emerg));
     body += `<div class="cram-actions">`
