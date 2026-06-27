@@ -1125,7 +1125,7 @@
     // 암기 모드: 가려진 핵심(캡슐·왜빈출) 탭하면 공개
     document.getElementById('cramContent')?.addEventListener('click', e => {
       if (!_cramMemMode) return;
-      const hit = e.target.closest('.cram-capsule li');
+      const hit = e.target.closest('.cram-capsule li, .cram-mem-cell .cmc-body');
       if (hit) hit.classList.toggle('revealed');
     });
 
@@ -1888,6 +1888,21 @@
     const today = new Date(); today.setHours(0, 0, 0, 0);
     return Math.max(1, Math.ceil((EXAM_DATE - today) / 86400000));
   }
+  // 핵심 암기를 '한 장 학습지'처럼 — 접지 않고 항상 펼친 카드 그리드(가로 3열).
+  // 머리말(:앞)은 굵게, 설명은 아래로. 암기 모드면 설명만 가리고 머리말로 자가테스트.
+  function cramMemoryGrid(items) {
+    const cells = items.map(m => {
+      const s = String(m);
+      const ci = s.search(/[:：]/);
+      if (ci > 0 && ci <= 42) {
+        const head = s.slice(0, ci).trim();
+        const bodyTxt = s.slice(ci + 1).trim();
+        if (bodyTxt) return `<div class="cram-mem-cell"><b class="cmc-head">${emph(esc(head))}</b><span class="cmc-body">${emph(esc(bodyTxt))}</span></div>`;
+      }
+      return `<div class="cram-mem-cell"><span class="cmc-body">${emph(esc(s))}</span></div>`;
+    }).join('');
+    return `<div class="cram-mem-grid">${cells}</div>`;
+  }
   function cramCard(it) {
     const t = it.topic;
     const badges = `${it.hot ? '<span class="cram-badge hot">🔥 빈출</span>' : ''}`
@@ -1913,7 +1928,7 @@
     if (t.cramCapsule && t.cramCapsule.length)
       body += section('🎯 이해했으면 이건 외우자', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${emph(esc(String(x)))}</li>`).join('')}</ul>`);
     if (t.memory && t.memory.length)
-      body += section('📌 핵심 암기 (탭하면 펼침)', memoryList(t.memory));
+      body += section('📌 핵심 암기 한눈에', cramMemoryGrid(t.memory));
     const emerg = (t.redFlags || []).filter(f => f && typeof f === 'object' && f.level === 'emergency');
     if (emerg.length) body += section('🚨 응급 신호', redFlagCards(emerg));
     body += `<div class="cram-actions">`
