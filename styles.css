@@ -1322,6 +1322,12 @@ body.focus-mode .part-panel { display: none; }
 .cram-explain { margin: 0; font-size: 13.5px; line-height: 1.72; color: #2f3b42; word-break: keep-all; }
 .cram-capsule { margin: 0; padding-left: 18px; }
 .cram-capsule li { font-size: 13.5px; line-height: 1.6; color: #2f3b42; margin: 4px 0; word-break: keep-all; }
+/* 카테고리형 핵심정리 — 라벨 + 그리드 */
+.cram-cat { margin-top: 12px; }
+.cram-cat-h {
+  margin: 0 0 7px; font-size: 12.5px; font-weight: 800; color: #455;
+  padding: 4px 9px; background: #eef3f2; border-radius: 7px; display: inline-block;
+}
 /* 핵심 암기 — 항상 펼친 학습지형 그리드(가로 자동 3열 내외) */
 .cram-mem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
 .cram-mem-cell {

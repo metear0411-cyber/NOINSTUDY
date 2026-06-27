@@ -1888,6 +1888,17 @@
     const today = new Date(); today.setHours(0, 0, 0, 0);
     return Math.max(1, Math.ceil((EXAM_DATE - today) / 86400000));
   }
+  // 카테고리형 핵심정리 — 진단·감별·약물(이름)·모니터링·금기·간호 등으로 나눠 라벨 + 그리드.
+  const CRAM_CATS = [
+    ['정의', '📖 정의·원인'], ['진단', '🔍 진단·검사'], ['감별', '🔀 감별진단'],
+    ['특징', '⭐ 핵심 특징'], ['약물', '💊 약물 (이름)'], ['모니터링', '📈 부작용·모니터링'],
+    ['금기', '⛔ 금기·주의'], ['간호', '💉 간호중재'], ['합병증', '⚠ 합병증'], ['응급', '🚨 응급']
+  ];
+  function cramSheetBlock(sheet) {
+    return CRAM_CATS.filter(([k]) => Array.isArray(sheet[k]) && sheet[k].length)
+      .map(([k, label]) => `<div class="cram-cat"><h5 class="cram-cat-h">${label}</h5>${cramMemoryGrid(sheet[k])}</div>`)
+      .join('');
+  }
   // 핵심 암기를 '한 장 학습지'처럼 — 접지 않고 항상 펼친 카드 그리드(가로 3열).
   // 머리말(:앞)은 굵게, 설명은 아래로. 암기 모드면 설명만 가리고 머리말로 자가테스트.
   function cramMemoryGrid(items) {
@@ -1927,7 +1938,11 @@
       body += section(t.compareTable.title || '한눈 비교', compareTableBlock(t.compareTable));
     if (t.cramCapsule && t.cramCapsule.length)
       body += section('🎯 이해했으면 이건 외우자', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${emph(esc(String(x)))}</li>`).join('')}</ul>`);
-    if (t.memory && t.memory.length)
+    // 카테고리형 정리(cram-sheets.js)가 있으면 그걸로, 없으면 평면 그리드로 폴백
+    const sheet = (window.NORI_CRAMSHEETS && window.NORI_CRAMSHEETS[it.tid]) || t.cramSheet;
+    if (sheet)
+      body += section('📌 핵심 정리 (카테고리별)', cramSheetBlock(sheet));
+    else if (t.memory && t.memory.length)
       body += section('📌 핵심 암기 한눈에', cramMemoryGrid(t.memory));
     const emerg = (t.redFlags || []).filter(f => f && typeof f === 'object' && f.level === 'emergency');
     if (emerg.length) body += section('🚨 응급 신호', redFlagCards(emerg));
