@@ -1,11 +1,11 @@
 // 노인전문간호사 2026 — Service Worker
 // 버전을 올리면 캐시 갱신됨
-const CACHE_NAME = 'nori-study-v58';
+const CACHE_NAME = 'nori-study-v59';
 
 // 설치 시 미리 캐시할 핵심 파일
 // app.js·styles.css는 index.html과 동일한 ?v= 버전으로 받아 브라우저 HTTP 캐시를 우회한다
 // (배포 시 CACHE_NAME 숫자와 아래 ?v= 날짜를 함께 올릴 것)
-const ASSET_VER = '20260621n';
+const ASSET_VER = '20260621o';
 const PRECACHE_URLS = [
   './index.html',
   './app.js?v=' + ASSET_VER,
@@ -18,6 +18,21 @@ const PRECACHE_URLS = [
   './notes-bridge.js?v=20260531',
 ];
 
+// 그림노트(학습노트) — best-effort 프리캐시(오프라인 보강). 파일명에 한글·· 포함 →
+// encodeURI로 인코딩, addAll 실패해도 install이 안 깨지게 .catch로 격리.
+const NOTE_URLS = [
+  './00_학습허브_시작.html',
+  './01_피부감각계_학습노트.html',
+  './02_심혈관계_학습노트.html',
+  './03_호흡기계_학습노트.html',
+  './04_간호이론·간호연구_학습노트.html',
+  './05_신경계_학습노트.html',
+  './06_소화기계_학습노트.html',
+  './07_근골격계_학습노트.html',
+  './08_내분비계_학습노트.html',
+  './09_장기요양·생애말기_학습노트.html',
+].map(u => encodeURI(u));
+
 // 데이터 파일 — fetch 시 자동 캐시됨
 const DATA_PATTERNS = [
   /\/data\//,
@@ -27,7 +42,9 @@ const DATA_PATTERNS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(cache => cache.addAll(PRECACHE_URLS)
+        // 그림노트는 실패해도 install을 막지 않도록 개별 best-effort
+        .then(() => Promise.all(NOTE_URLS.map(u => cache.add(u).catch(() => {})))))
       .then(() => self.skipWaiting())
   );
 });

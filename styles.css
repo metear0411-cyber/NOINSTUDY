@@ -1322,8 +1322,30 @@ body.focus-mode .part-panel { display: none; }
 .cram-explain { margin: 0; font-size: 13.5px; line-height: 1.72; color: #2f3b42; word-break: keep-all; }
 .cram-capsule { margin: 0; padding-left: 18px; }
 .cram-capsule li { font-size: 13.5px; line-height: 1.6; color: #2f3b42; margin: 4px 0; word-break: keep-all; }
+/* 그림노트 모음 진입 버튼(앵커) */
+.note-entry-btn {
+  display: block; text-align: center; text-decoration: none; margin-top: 6px;
+  background: #f3f0fb; color: #6b3fa0; border: 1px solid #e3dcf5;
+}
+.note-entry-btn:hover { background: #ece5fa; opacity: 1; }
+
+/* 검색+필터바를 패널 상단에 고정 — 긴 목록 스크롤 중에도 필터 유지 */
+.med-toolbar {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--bg, #fff);
+  padding-top: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--line, #eef2f0);
+}
+
 /* 카테고리형 핵심정리 — 라벨 + 그리드 */
 .cram-cat { margin-top: 12px; }
+/* 📝 기출 포인트 — '출제 연결' 섹션 시각 강조 */
+.cram-cat-gichul {
+  margin-top: 16px; padding: 10px 11px 4px;
+  background: #fffdf5; border: 1px solid #f0e6bf; border-radius: 10px;
+}
+.cram-cat-gichul .cram-cat-h { background: #fdf3d0; color: #8a6d1a; }
+.cram-cat-gichul .cram-mem-cell { background: #fffef9; border-color: #f0e6bf; }
 .cram-cat-h {
   margin: 0 0 7px; font-size: 12.5px; font-weight: 800; color: #455;
   padding: 4px 9px; background: #eef3f2; border-radius: 7px; display: inline-block;
