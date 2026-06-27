@@ -666,14 +666,15 @@
   // 색 체계: **외울 핵심**(보라 형광) · 경고어(점토) · 수치+단위(청록)
   function emph(escaped) {
     // 1) 수동 강조 **...**(빈출 핵심)는 먼저 추출해 보호 → 자동 강조 중첩 방지
+    //    플레이스홀더는 실제 숫자(1차·60회·2.0 등)와 충돌하지 않도록 제어문자로 감싼다
     const keys = [];
-    let s = escaped.replace(/\*\*([^*\n]+?)\*\*/g, (_, g) => `${keys.push(g) - 1}`);
+    let s = escaped.replace(/\*\*([^*\n]+?)\*\*/g, (_, g) => `\u0001${keys.push(g) - 1}\u0001`);
     // 2) 경고어(점토) · 수치+단위(청록) 자동 강조
     s = s
       .replace(/(금기|금지|절대|즉시|응급|반드시|주의|중단|위험|사망|독성)/g, '<b class="kw-warn">$1</b>')
       .replace(/(\d+(?:\.\d+)?\s?(?:mmHg|mg\/dL|mEq\/L|mg|mcg|mL|%|회|시간|분|일|주|kg|g))/g, '<b class="kw-num">$1</b>');
-    // 3) 보호한 핵심 복원
-    return s.replace(/(\d+)/g, (_, i) => `<b class="kw-key">${keys[+i]}</b>`);
+    // 3) 보호한 핵심 복원 (제어문자로 감싼 인덱스만 — 실제 숫자는 보존)
+    return s.replace(/\u0001(\d+)\u0001/g, (_, i) => `<b class="kw-key">${keys[+i]}</b>`);
   }
 
   // flowStep 텍스트를 '. ' '; ' '①②③' 기준으로 잘게 분리 + 핵심어 강조
