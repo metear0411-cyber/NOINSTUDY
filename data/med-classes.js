@@ -1,5 +1,5 @@
 // data/med-classes.js — 약물 총정리(통합 클래스 + 서브그룹). 원본 분류를 서브그룹으로 보존해 약물↔기전↔주의 연결 유지.
-// examPoints 미생성 클래스는 세션 한도 리셋 후 채움.
+// examPoints: 기출 해설 기반 출제포인트(38/38).
 window.NORI_MED_CLASSES = [
  {
   "key": "diuretics",
@@ -162,7 +162,7 @@ window.NORI_MED_CLASSES = [
    "저칼륨혈증 증상: 루프이뇨제 복용 노인의 근력 약화·근육 경련·피로감이 저칼륨혈증 때문임을 고르는 문제가 출제",
    "디곡신 독성 악화: 루프이뇨제로 저칼륨혈증이 생기면 디곡신 결합 친화력이 높아져 독성 위험이 커진다는 점이 출제",
    "전해질 모니터링: 이뇨제와 디곡신 병용 노인은 신기능 저하로 독성 위험이 높아 칼륨 등 전해질 검사를 철저히 하라고 출제",
-   "ACE억제제와 병용: 단일 항고혈압제로 조절 안 될 때 같은…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 2,\n      \"label\": \"ep:ace-arb\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a189efea750c4c097\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "ACE억제제와 병용: 단일 항고혈압제로 조절 안 될 때 같은…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='diuretics');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -499,7 +499,7 @@ window.NORI_MED_CLASSES = [
    "디곡신 병용 독성: 베타차단제+디곡신은 심박수 감소가 상승해 서맥·방실차단을 일으키며, verapamil·cimetidine도 혈중농도를 높인다는 상호작용이 출제",
    "서맥 시 투약 보류: propranolol 투약 전 맥박이 분당 60회 미만이면 보류하고 의사에게 보고하는 처치가 정답으로 출제",
    "기관지경련 사정: COPD·천식 환자에서 천명음(wheezing)은 베타차단제의 중증 부작용인 기관지경련 신호이고 오심·불면·피로는 경미라는 점이 출제",
-   "기립성 저혈…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 5,\n      \"label\": \"ep:antiplatelet\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"aabf5f56361ea4e20\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "기립성 저혈…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='beta-blocker');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -597,7 +597,7 @@ window.NORI_MED_CLASSES = [
    "출혈 위험·수술 전 중단: 비가역적 COX 차단으로 수술 7~8일 전 미리 중단하고 잠재적 출혈을 감시한다는 점이 출제",
    "요산배설 촉진제 상호작용: 아스피린이 요산배설을 방해해 통풍 환자에 병용 금기, 대안으로 아세트아미노펜이 안전하다는 점 출제",
    "소화성 궤양 금기: 응고장애 위험으로 궤양성 질환 환자에게 반드시 확인·사용 금지해야 한다는 점 출제",
-   "심방세동 뇌졸중 예…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 6,\n      \"label\": \"ep:anticoagulant\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a52170bc33ed624f7\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "심방세동 뇌졸중 예…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='antiplatelet');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -724,7 +724,7 @@ window.NORI_MED_CLASSES = [
    "헤파린 모니터링: UFH는 aPTT(대조치 1.5~2.5배)로 항응고 효과를 보는 검사가 정답으로 출제",
    "저분자 헤파린 장점: 생체이용률 높고 효과 일정해 aPTT 검사 없이 외래 자가주사 가능한 점이 출제",
    "심방세동 우선치료: 색전성 뇌졸중 예방으로 와파린(INR 2~3) 우선, 불가 시 아스피린 대안이 출제",
-   "혈전용해제: 알테플라제 투여 중 전신·두개내출혈 징후 모니터링이 최우선이고, r-tPA는 STEMI·좌각차…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 7,\n      \"label\": \"ep:statin\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a9df5155f3f17ba88\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "혈전용해제: 알테플라제 투여 중 전신·두개내출혈 징후 모니터링이 최우선이고, r-tPA는 STEMI·좌각차…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='anticoagulant');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -1072,7 +1072,7 @@ window.NORI_MED_CLASSES = [
    "ICS의 역할 구분: 베클로메타손·부데소니드 같은 흡입 스테로이드는 기도염증 억제·장기 유지치료제이며 급성기에는 쓰지 않는다는 점이 출제",
    "MDI 사용법: 2회 흡입 시 1~2분 기다렸다 두 번째를 흡입(상부기도 개방 후 하부기도 전달), 흡입 후 8~10초 숨참기가 올바른 교육 내용으로 출제",
    "테오필린 독성: 구역·구토·두통·빈맥·부정맥이 나타나면 혈중 테오필린 농도 측정이 최우선 검사로 출제(치료농도 8~15μg/mL, 20 이상 독성)",
-   "살부타몰 추가 교육: 운동유발 천식은 운동 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 10,\n      \"label\": \"ep:resp-exacerbation\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a67194f134d332573\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "살부타몰 추가 교육: 운동유발 천식은 운동 …\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='inhaler');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -1184,7 +1184,7 @@ window.NORI_MED_CLASSES = [
    "호스피스 호흡곤란 관리: 산소·모르핀·정서적 지지는 적절하나, 연명 목적의 산소호흡기 부착·동맥혈검사 같은 침습적 처치는 부적절한 처치로 출제",
    "해열진통제 선택: 소화성 궤양 노인에게 COX 억제가 없는 아세트아미노펜이 위장관 출혈 위험이 낮아 안전하고, NSAIDs는 출혈 위험을 높인다는 감별이 출제",
    "NSAIDs 부작용: 위점막 프로스타글란딘 합성 억제로 소화성 궤양이 가장 흔한 부작용이라는 점이 정답 근거로 출제",
-   "고삼투압 상태 지지치료: 등장성 생리식염수 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 11,\n      \"label\": \"ep:antibiotic\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"ad2095da04bf48c17\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "고삼투압 상태 지지치료: 등장성 생리식염수 …\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='resp-exacerbation');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -1438,7 +1438,7 @@ window.NORI_MED_CLASSES = [
    "항결핵제 부작용 짝짓기: INH=말초신경염·간염, Ethambutol=시신경염(적록색맹), Pyrazinamide=간독성·고요산혈증, Streptomycin=제8뇌신경 장애로 감별 출제",
    "간독성 모니터링 약물: INH·Rifampin·Pyrazinamide는 간기능(AST·ALT) 정기검사 필수, Ethambutol은 제외로 출제",
    "Rifampin 체액 착색: 소변·눈물·땀이 오렌지색으로 변하는 것은 무해한 정상 현상이라 안심시키는 반응이 정답으로 출제",
-   "Cephal…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 12,\n      \"label\": \"ep:antiviral\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a46545e0c91fb2bfb\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "Cephal…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='antibiotic');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -1555,7 +1555,7 @@ window.NORI_MED_CLASSES = [
    "포진후 신경통엔 무효: 병변 치유 후 신경통엔 항바이러스제 추가가 효과 없고 삼환계 항우울제·가바펜틴·캡사이신이 권장된다는 감별이 출제",
    "오셀타미비르 적응증: 인플루엔자 치료제로, 만성기침·호흡곤란 환자에겐 적응증이 아니라는 오답 감별로 출제",
    "세균성 폐렴엔 무효: 연쇄상구균 폐렴은 항균제가 핵심이고 항바이러스제는 효과 없다는 점이 정답 근거로 출제",
-   "아만타딘 부작용: 항바이러스제이나 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 13,\n      \"label\": \"ep:oncology-targeted\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a4e51c83efbfbb2d6\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "아만타딘 부작용: 항바이러스제이나 …\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='antiviral');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -1946,7 +1946,7 @@ window.NORI_MED_CLASSES = [
    "감별 함정: 안절부절못함을 agitation(정신행동증상)이나 dyskinesia(불수의 이상운동)로 착각하지 않도록 좌불안석증과 구분 주의",
    "파킨슨+할로페리돌 금기: 도파민 D2 차단으로 levodopa 작용을 길항해 파킨슨 증상이 악화된다는 점이 출제",
    "파킨슨 환자 대안: 항정신병약이 필요하면 도파민 차단이 약한 비정형약(clozapine·quetiapine)을 우선 고려하는 것이 정답으로 출제",
-   "약물 분류 구분: haloperidol은 항정신병약물이며 항우울제가 아…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 16,\n      \"label\": \"ep:antiparkinson\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a5c42c5665c3a7560\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "약물 분류 구분: haloperidol은 항정신병약물이며 항우울제가 아…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='antipsychotic');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -2061,7 +2061,7 @@ window.NORI_MED_CLASSES = [
    "레보도파/카비도파(Sinemet) 1차약: 강직·서동증이 주증상일 때 도파민 보충제 Sinemet이 1차 선택약으로 출제. 카비도파는 말초 탈탄산화를 억제해 뇌로 가는 레보도파를 늘리고 부작용을 줄인다는 점 주의",
    "약물유발성 파킨슨증: 신경이완제·위장관운동개선제(levosulpiride)가 도파민 수용체를 차단해 유발하며, 원인 약물 중단이 가장 확실한 치료로 출제. '항파킨슨제에 효과 없다'는 설명은 틀린 보기로 출제",
    "트리헥시페니딜 항콜린 부작용: 증량 시 구갈·시야흐림·변비·배뇨곤란·혼동·환각이 나타나며, 이를 관찰하고 의사와 상의하도록 보호자 교육하는 것이 정답으로 출제. 구강건조 시 충분한 수분 섭취 교육 주의",
-   "디펜히드라민과…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 17,\n      \"label\": \"ep:antidepressant-hypnotic\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"ac18c25670f9bef9e\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "디펜히드라민과…\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='antiparkinson');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -2201,7 +2201,7 @@ window.NORI_MED_CLASSES = [
    "TCA 감별: amitriptyline·imipramine·nortriptyline은 SSRI가 아니고 항콜린·진정 부작용 커서 노인 부적합 약물로 골라내는 문제 출제",
    "효과 판정 기간: 항우울제는 4~6주 충분히 복용해야 효과 판단 가능, 2주만에 중단·교체하지 않도록 설명하는 것이 정답으로 출제",
    "요실금 유발: 수면제·진정제·항우울제는 진정·방광수축 억제로 요실금을 유발/악화시키며, ACE억제제는 해당 안 된다는 감별 출제",
-   "수면장애 초기 처치: …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 18,\n      \"label\": \"ep:neuropathic-analgesic\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"af5a04c0cc1370dc3\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+   "수면장애 초기 처치: …\",\n      \"promptPreview\": \"너는 노인전문간호사(2026) 시험 대비 '약물 총정리'의 한 약물 클래스에 대한 '📝 기출 포인트'를 실제 기출 해설 기반으로 만든다.  1) 이 클래스 정보+관련 기출(stem·해설)을 읽어라:    node -e const a=require('/tmp/claude-0/-home-user-NOINSTUDY/47d39392-d272-5571-901f-ad7771efc395/scratchpad/medclass-qb.json');const x=a.find(c=>c.key==='antidepressant-hypnotic');process.stdout.write(JSON.stringify(x))    (x.label=클래스명, x.examples=약물명, x.questions=관련 기출[stem,exp"
   ]
  },
  {
@@ -2387,7 +2387,14 @@ window.NORI_MED_CLASSES = [
   "sources": [
    "노인 당뇨병"
   ],
-  "examPoints": []
+  "examPoints": [
+   "설폰요소제 저혈당: 노인은 간·신장 기능 저하로 약물이 축적돼 저혈당이 가장 심각한 부작용으로 출제",
+   "장시간형 SU 회피: 글리벤클라마이드·클로르프로파마이드는 반감기가 길어 노인에 피하고 글리피지드·글리클라지드로 대체가 정답으로 출제",
+   "신기능 저하 주의: 글리벤클라마이드의 활성 대사산물이 신장 축적돼 지속 저혈당을 유발한다는 점이 출제",
+   "메트포르민 기전: 간 당신생 억제와 말초 인슐린 감수성 증가가 작용으로, 저혈당 위험 낮아 비만 2형 당뇨 1차약으로 출제",
+   "노인 무감각성 저혈당: 발한·심계항진·손떨림 등 교감신경 증상이 약하게 나타나 알아채기 어렵다는 점이 주의로 출제",
+   "알파글루코시다아제 억제제: 소장 당 흡수를 지연시켜 식후 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 20,\n      \"label\": \"ep:insulin\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"ab8ea583a10ce3da3\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "insulin",
@@ -2431,12 +2438,12 @@ window.NORI_MED_CLASSES = [
    "노인 당뇨병"
   ],
   "examPoints": [
-   "리스프로 작용시간: 초속효성으로 15분 내 발현·1시간 내 최대효과·2~5시간 지속이며 식사 직전 투여한다는 점이 출제",
-   "리스프로 저혈당: 식사 직전 투여 후 식후 저혈당에 주의해야 한다는 점이 정답 근거로 출제",
-   "속효성(Humulin R) 최대효과: 주사 2~4시간 후 peak라 그 시간대 저혈당을 가장 주의하라는 시간계산 문제로 출제",
-   "주사부위 교체: 약동학의 흡수 원리로, 반복 주사 시 지방위축·흡수저하를 막기 위함이 정답으로 출제",
-   "고혈당성 고삼투압증후군: 인슐린보다 수액·나트륨 교정이 우선이라는 우선순위가 출제",
-   "TPN 고혈당(300 이상): 간호사 임의 인슐린 투여가 아니라 의사 보고가 적절한 중재로 출제"
+   "리스프로(Humalog): 초속효성으로 15분 이내 발현, 1시간 전후 최대효과, 2~5시간 지속이라 식사 직전 투여하고 식후 저혈당 주의로 출제",
+   "속효성 레귤러인슐린: 주사 후 2~4시간에 최대효과가 나와 그 peak 시간대에 저혈당을 가장 주의하라고 출제",
+   "음주와 저혈당: 알코올이 간 포도당신생을 억제해, 인슐린 분비 촉진 설폰요소제 복용 시 심한 저혈당을 유발한다는 점이 금주 이유로 출제",
+   "운동 시 저혈당: 운동 자체가 혈당을 낮추므로 운동 직전 인슐린·혈당강하제 용량을 늘리면 저혈당 위험이 커진다는 오답이 출제",
+   "주사부위 교체: 같은 부위 반복 주사 시 지방위축·흡수 저하를 막기 위함이며 이는 약동학의 흡수 원리라고 출제",
+   "TPN 고혈…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 21,\n      \"label\": \"ep:thyroid-drug\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a21309c07dfaea360\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
   ]
  },
  {
@@ -2498,7 +2505,14 @@ window.NORI_MED_CLASSES = [
   "sources": [
    "갑상선 질환 (노인)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "심장질환 노인 레보티록신: 심부담을 줄이려 0.025mg(12.5~25µg) 저용량으로 시작한다는 점이 정답 근거로 출제",
+   "제산제 상호작용: 칼슘·알루미늄·철·마그네슘 제산제가 흡수를 감소시켜 복용 4시간 후 제산제를 먹도록 교육하는 것이 정답으로 출제",
+   "약효 감소 약물: 리팜핀·페니토인이 레보티록신 대사를 촉진해 약효를 떨어뜨린다는 점이 오답 감별로 출제",
+   "평생 복용 강조: 검사 수치가 정상화돼도 임의 중단하면 재발하므로 계속 복용하라는 대응이 정답으로 출제",
+   "복용법: 레보티록신은 아침 공복에 물과 함께 복용한다는 점이 교육 내용으로 출제",
+   "RAI 치료 후 관리: 효과가 수개월(6~8주) 걸리고 이후 갑상선기능저하증이 흔해 TSH …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 22,\n      \"label\": \"ep:ppi-h2\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"adf1773ec0fc73b19\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "ppi-h2",
@@ -2659,7 +2673,14 @@ window.NORI_MED_CLASSES = [
    "소화성 궤양 (위궤양·십이지장궤양)",
    "위식도역류질환 (GERD)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "H.pylori 제균 3제요법: PPI(omeprazole)+아목시실린+클래리스로마이신(또는 메트로니다졸) 조합이 1차 치료로 출제(완치율 80~90%)",
+   "식도암 감별: 제산제·H2차단제 무반응 + 고형식 연하곤란·체중감소·흡연/음주력일 때 내시경 감별이 정답으로 출제",
+   "ciprofloxacin 상호작용: 마그네슘·알루미늄 제산제가 킬레이트 형성으로 흡수 50~90% 감소, 2시간 전·6시간 후 복용 교육이 출제",
+   "알루미늄 함유 제산제: 노인 변비 유발 약물로 출제(반면 베타차단제는 변비 유발 약물 아님이 정답)",
+   "NSAIDs 위궤양 예방: misoprostol이 적절하고 H2차단제·제산제는 예방보다 치료용이라는 감별이 출제",
+   "레보티록신 흡수 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 23,\n      \"label\": \"ep:laxative\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a0175faa38366aeb2\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "laxative",
@@ -2793,7 +2814,13 @@ window.NORI_MED_CLASSES = [
    "간경변 및 알코올성 간질환",
    "배뇨·배변 장애 관리"
   ],
-  "examPoints": []
+  "examPoints": [
+   "자극성 완하제 내성: 장기 사용 시 장이 둔감해져 더 강한 약·많은 용량이 필요해지므로 노인엔 부드러운 약·비약물 중재 우선이 정답으로 출제",
+   "장기 복용 전해질: 1개월 이상 복용 시 설사로 칼륨·나트륨·마그네슘이 빠져 저칼륨혈증 등 불균형, 혈청 전해질 모니터링이 정답으로 출제",
+   "lactulose 간성뇌증: 장내 산성화로 암모니아 흡수를 막고 하루 2~3회 부드러운 변을 목표로 한다는 교육 이해가 정답으로 출제",
+   "팽창성 완하제 금기: psyllium·차전자피는 충분한 수분이 필수라 수분 제한 노인에게는 분변매복·장폐색 위험으로 부적절하다고 출제",
+   "제산제 배변 영향: 마그네슘 함유 제산제는 삼투작용으로 설사, 알루미늄·칼슘 함유는 변비를 유발…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 24,\n      \"label\": \"ep:liver-renal-adjunct\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a2b14d11e518a2807\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "liver-renal-adjunct",
@@ -2889,7 +2916,10 @@ window.NORI_MED_CLASSES = [
    "간경변 및 알코올성 간질환",
    "만성신장질환 (CKD)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "탄산칼슘(calcium carbonate) 변비: 칼슘 함유 제산제가 변비를 유발하는 대표 성분으로, 노인에서 변비 부작용에 특히 주의해야 한다는 점이 출제",
+   "제산제 성분별 배변 영향: 칼슘·알루미늄 제산제는 변비, 마그네슘 제산제는 삼투성 작용으로 설사를 일으킨다는 감별이 출제"
+  ]
  },
  {
   "key": "overactive-bladder",
@@ -3031,7 +3061,14 @@ window.NORI_MED_CLASSES = [
    "요실금",
    "배뇨·배변 장애 관리"
   ],
-  "examPoints": []
+  "examPoints": [
+   "옥시부티닌 항콜린 부작용: 입마름·변비·시야흐림·요저류·졸림이 가장 흔한 부작용으로, 환자 교육 내용으로 출제",
+   "노인 중추신경 주의: 옥시부티닌이 노인에서 혼란·인지기능 저하를 일으킬 수 있어 특히 주의해야 한다는 점이 출제",
+   "전립선비대증 금기: 항콜린제(옥시부티닌)가 방광 수축력을 떨어뜨려 소변정체를 악화시키는 약물로 정답 출제",
+   "절박성 전용 약물: 옥시부티닌은 절박성 요실금에만 쓰고 복압성(스트레스성) 요실금 중재로는 부적절하다고 출제",
+   "잔뇨 증가 주의: 배뇨 후 잔뇨가 많은 환자에게 항콜린제가 잔뇨를 더 늘려 부적합하다는 점이 출제",
+   "가역적 요실금 유발 약물: 항콜린제가 안정제·이뇨제·칼슘차단제와 함께 일시적 요실금의…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 26,\n      \"label\": \"ep:prostate-estrogen\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a6f3c6f871b3d9974\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "prostate-estrogen",
@@ -3143,7 +3180,13 @@ window.NORI_MED_CLASSES = [
    "요실금",
    "노인 여성생식기계 질환"
   ],
-  "examPoints": []
+  "examPoints": [
+   "알파차단제 기립성저혈압: doxazosin/tamsulosin 복용자가 기상·자세변경 시 어지럼증을 호소하면 먼저 기립성 저혈압(앉고 선 자세 혈압 측정)을 확인하는 처치가 정답으로 출제",
+   "첫 복용 주의: doxazosin 첫 투여는 수 시간 내 저혈압이 와 취침 전 복용·천천히 일어나기 교육이 출제",
+   "알파차단제 성기능 부작용: doxazosin이 발기부전·사정량 감소·성욕감소를 일으키나 설사는 부작용 아님으로 감별 출제",
+   "finasteride 임부 접촉금기: 피부흡수로 남성 태아 생식기 기형 유발, 임부·가임여성이 약·부서진 정제에 닿지 않게 교육이 최우선 정답으로 출제",
+   "finasteride 작용·효과: 5알파환원효소 억제…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 27,\n      \"label\": \"ep:bone-drug\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a44f59f27bfa7f531\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "bone-drug",
@@ -3212,7 +3255,14 @@ window.NORI_MED_CLASSES = [
   "sources": [
    "골다공증과 낙상"
   ],
-  "examPoints": []
+  "examPoints": [
+   "알렌드로네이트(포사맥스) 복용법: 아침 공복에 200mL 이상 맹물로 복용하는 것이 정답으로 출제",
+   "복용 후 자세: 식도염·식도 자극 예방을 위해 30분간 눕지 말고 앉거나 서 있어야 한다는 점이 출제",
+   "흡수 방해: 칼슘·철분·우유·오렌지주스 등과 함께 먹으면 흡수율이 떨어지므로 시간 간격을 두라는 점이 출제",
+   "골다공증 약물 분류: 칼슘·비타민D, 에스트로겐·SERM, 비스포스포네이트, 칼시토닌, 데노수맙이 치료제로 출제",
+   "골다공증 약물 감별: 통풍약 알로퓨리놀은 골다공증 치료제가 아니라는 점이 함정으로 출제",
+   "HRT 금기: 원인 불명 질 출혈·에스트로겐 의존성 종양·혈전색전증이 호르몬요법 절대 금기로 출제"
+  ]
  },
  {
   "key": "acetaminophen",
@@ -3324,7 +3374,14 @@ window.NORI_MED_CLASSES = [
    "노인 통증 관리",
    "욕창 (압력손상)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "소화성 궤양 환자 진통제 선택: 아세트아미노펜이 COX 억제가 없어 위장관 출혈 위험이 가장 낮아 안전한 약으로 정답 출제",
+   "아세트아미노펜 간독성: 장기 복용 시 용량 의존적 간손상으로, 복수·황달 노인에서 복용 여부를 우선 확인하는 것이 정답으로 출제",
+   "NSAIDs 최다 부작용: 위점막 프로스타글란딘 억제로 소화성 궤양이 가장 흔한 부작용이라는 점이 출제",
+   "NSAIDs 복용 시간 교육: 식후 즉시 음식과 함께 복용해 위점막 자극을 줄이고, 공복 복용은 피하라는 교육이 정답으로 출제",
+   "Celecoxib(COX-2) 주의 대상: 수분·나트륨 저류와 혈전 위험으로 고혈압·울혈성 심부전·관상동맥질환·신부전 환자에서 신중 투여로 출제",
+   "N…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 29,\n      \"label\": \"ep:nsaids\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"ace90ab6c6671fd21\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "nsaids",
@@ -3394,7 +3451,14 @@ window.NORI_MED_CLASSES = [
    "골관절염 (Osteoarthritis)",
    "담석증·담낭염"
   ],
-  "examPoints": []
+  "examPoints": [
+   "위장관 부작용 예방: 식사와 함께 또는 식후 즉시 복용해 위점막 자극을 줄이라는 복용법 교육이 정답으로 출제",
+   "소화성 궤양: NSAIDs가 위점막 프로스타글란딘 합성을 억제해 생기는 가장 흔한 부작용으로 출제",
+   "위궤양 예방약: 프로스타글란딘 유사체 misoprostol이 NSAIDs 유발 궤양 예방약으로 출제(H2차단제·제산제는 치료용)",
+   "celecoxib(COX-2 선택적) 신중 투여: 수분·나트륨 저류와 혈전 위험으로 고혈압·심부전·관상동맥·신장질환자 주의로 출제",
+   "노인 위장관 출혈: 식욕부진·어지럼증(빈혈)·무증상 출혈로 나타나 가장 먼저 의심할 약물로 출제",
+   "약물 반응 평가·상호작용: 간독성·신독성·출혈을 확인(소변량은 덜 민감)하고, …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 30,\n      \"label\": \"ep:opioid\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a3f9a8e044a004075\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "opioid",
@@ -3621,7 +3685,12 @@ window.NORI_MED_CLASSES = [
    "노인 통증 관리",
    "완화간호 및 호스피스 (생애말기 돌봄)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "오피오이드 호흡억제 해독제: 모르핀 지속주입 중 호흡수 6회/분·의식저하 시 즉시 날록손(Naloxone) 투여가 정답으로 출제",
+   "옥시코돈 호흡저하 처치: 옥시코돈 주사 후 호흡저하의 해독제로 날록손을 골라야 하는 문제 출제",
+   "날록손 작용기전: 오피오이드 수용체에 경쟁적으로 결합해 중추 억제를 신속히 역전시킨다는 점이 근거로 출제",
+   "해독제 감별: 플루마제닐은 벤조디아제핀 길항제, 아트로핀은 무스카린 차단제로 호흡억제와 무관하다는 점이 오답 근거로 출제"
+  ]
  },
  {
   "key": "dmards",
@@ -3714,7 +3783,14 @@ window.NORI_MED_CLASSES = [
   "sources": [
    "류마티스관절염 (Rheumatoid Arthritis)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "MTX 모니터링: 간독성(ALT·AST)과 골수억제(CBC) 정기 검사가 가장 중요한 모니터링 항목으로 출제",
+   "NSAIDs 최다 부작용: 위점막 프로스타글란딘 억제로 소화성 궤양이 가장 흔한 부작용으로 출제",
+   "NSAIDs 복용 시점: 위점막 자극을 줄이려 식후 즉시 음식과 함께 복용하는 것이 정답으로 출제",
+   "NSAIDs 궤양 예방: 프로스타글란딘 유사체 misoprostol로 궤양을 예방한다는 점이 출제",
+   "노인 NSAIDs 위험: 위장관 출혈이 식욕부진·어지럼증·무증상 출혈로 나타나 먼저 의심하도록 출제",
+   "Celecoxib 신중 투여: 수분·나트륨 저류와 혈전 위험으로 고혈압·심부전·관상동맥질환에서 주의로 출제"
+  ]
  },
  {
   "key": "gout-drug",
@@ -3798,7 +3874,14 @@ window.NORI_MED_CLASSES = [
   "sources": [
    "통풍 (Gout)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "NSAIDs 위장관 부작용: 노인 골관절염 환자 장기 복용 시 가장 먼저 모니터링할 부작용으로 소화성 궤양·위장관 출혈이 정답으로 출제",
+   "NSAIDs 궤양 예방: 프로스타글란딘 유사체인 misoprostol이 NSAIDs로 인한 위궤양 예방약으로 정답으로 출제(다른 약은 치료제)",
+   "NSAIDs 위험 가중 요인: 고령, 스테로이드 병용, H.pylori 감염, 이전 궤양 병력이 GI 위험을 높이는 요인으로 출제",
+   "NSAIDs 복용법: 위점막 자극을 줄이려 식후 즉시 음식과 함께 복용하는 것이 정답으로 출제 주의",
+   "NSAIDs 약물 상호작용: 설폰요소제의 혈당 강하 작용을 강화시키는 약물로 NSAIDs가 출제",
+   "NSAIDs 평가 지표: 부작용…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 33,\n      \"label\": \"ep:topical-wound\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"aed8394b86492700a\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "topical-wound",
@@ -3977,7 +4060,14 @@ window.NORI_MED_CLASSES = [
    "노인 화상 — 특성·예방·간호",
    "피부염 (접촉성·지루성·노인성 소양증)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "알지네이트 드레싱 적응증: 삼출물 많은 욕창 2~4기, 깊거나 굴이 있고 감염된 상처에 사용한다는 점이 정답으로 출제",
+   "하이드로콜로이드(듀오덤) 드레싱: 욕창 2기 폐쇄 드레싱으로 습윤 환경 유지·상처 보호에 가장 적합한 재료로 출제",
+   "리도카인 패치: 포진 후 신경통 치료제로 캡사이신 크림·삼환계 항우울제·가바펜틴과 함께 권장되며 항바이러스제는 효과 없음이 출제",
+   "대상포진 발진기 통증: 냉찜질과 소량 삼환계 항우울제(elavil)가 적절하고 고용량 스테로이드·마약성 진통제 일차 사용은 오답으로 출제",
+   "국소 에스트로겐 크림: 위축성 질염·자궁탈출증에서 전신 부작용 최소화하며 위축 개선하는 비수술적 치료로 출제",
+   "관절강내 스테로이드 주…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 34,\n      \"label\": \"ep:eye-drug\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a5865528297de59a0\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "eye-drug",
@@ -4062,7 +4152,12 @@ window.NORI_MED_CLASSES = [
   "sources": [
    "노인 시각 장애 (백내장·녹내장·황반변성)"
   ],
-  "examPoints": []
+  "examPoints": [
+   "timolol 호흡기 금기: 천식 환자 개방각 녹내장에서 베타차단제 timolol이 사용금기 약물로 출제(기관지 경련 유발)",
+   "COPD와 베타차단제 안약: 점안해도 전신 흡수로 기관지 경련 가능, 다른 계열 안압하강제로 바꾸는 선택이 정답으로 출제",
+   "녹내장 약물 기전 감별: latanoprost는 포도막공막 경로 방수 배출 증대로 작용한다는 점이 보기로 출제",
+   "안압하강제 기전 비교: acetazolamide는 방수 생성 감소, pilocarpine은 섬모체근 수축으로 배출 촉진하는 점이 함께 출제"
+  ]
  },
  {
   "key": "hearing-ototoxic",
@@ -4159,7 +4254,14 @@ window.NORI_MED_CLASSES = [
    "노인성 난청 (Presbycusis)",
    "노인과의 치료적 의사소통"
   ],
-  "examPoints": []
+  "examPoints": [
+   "아미노글리코시드 이독성: gentamicin 등 투여 시 청력 저하를 조기 발견하려 잘 듣지 못하는 정도를 관찰하는 것이 정답으로 출제",
+   "아미노글리코시드 신독성: 신세뇨관 손상으로 혈청 크레아티닌 상승과 소변량 감소를 정기 측정하는 것이 모니터링 정답으로 출제",
+   "반코마이신 부작용: 신독성과 이독성을 함께 유발해 creatinine·BUN과 청력 변화를 모두 모니터링해야 한다고 출제",
+   "푸로세미드 저칼륨혈증: 루프이뇨제가 칼륨을 배출시켜 근력 약화·근육 경련·피로감을 일으킨다는 점이 출제",
+   "Lasix 전해질 이상: 저칼륨·저나트륨·저마그네슘혈증과 탈수가 부작용이며 칼륨은 상승이 아닌 저하라는 함정이 출제",
+   "시스플라틴 구토: 강한 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 36,\n      \"label\": \"ep:vaccine\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"acf5717734e22e176\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "vaccine",
@@ -4294,7 +4396,14 @@ window.NORI_MED_CLASSES = [
    "바이러스성 간염 (A·B·C·D형)",
    "건강증진 및 선별검사"
   ],
-  "examPoints": []
+  "examPoints": [
+   "인플루엔자 접종 시기: 유행 직전인 10~11월에 접종해 항체가 유행기까지 유지되게 한다는 점이 정답 근거로 출제",
+   "시설 접종 대상: 입소 노인뿐 아니라 시설 직원 전원도 함께 접종해야 집단 감염을 막는다는 처치가 출제",
+   "폐렴구균 재접종: 65세 이전 접종자는 65세 이후 5년 뒤 재접종, 65세 이후 첫 접종자는 1회면 충분하다는 점이 출제",
+   "인플루엔자 vs 폐렴구균: 폐렴 예방 우선중재로 '매년' 접종하는 인플루엔자가 정답이고 폐렴구균은 매년이 아님이 출제",
+   "발열 시 접종: 37.5℃ 이상 발열이 있으면 백신 이상반응 감별이 어려워 회복 후로 연기하는 응대가 정답으로 출제",
+   "대상포진 담당 제한: 수포의 수두-대상포진 바이러스 때문에 수두 …\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 37,\n      \"label\": \"ep:nutrition\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"a74ead7ac76e2a76e\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "nutrition",
@@ -4549,7 +4658,14 @@ window.NORI_MED_CLASSES = [
    "ADL·IADL 장애 관리",
    "노인 화상 — 특성·예방·간호"
   ],
-  "examPoints": []
+  "examPoints": [
+   "고혈압 DASH 식이: 과일·채소 충분, 포화지방 제한이 정답이고 비타민·칼슘 보충제는 혈압조절 요소가 아니라고 출제",
+   "간성혼수 단백질 제한: 간이 암모니아를 처리 못해 닭가슴살 같은 고단백 식품을 피하도록 교육하는 것이 정답으로 출제",
+   "골다공증 예방: 칼슘·비타민D 풍부 식품 권장, 수영은 체중부하가 없어 부적절하다는 점이 함정으로 출제",
+   "비타민D 역할: 장에서 칼슘 흡수를 촉진하며 카페인·알코올은 칼슘 배설을 늘려 골밀도를 낮춘다고 출제",
+   "수술 전 영양교정: 경구·위관 섭취 불가한 위암 환자는 TPN으로 칼로리·단백질·비타민을 정맥 공급하는 것이 가장 효과적이라 출제",
+   "간경변 출혈: 만성 음주로 인한 영양불균형과 비타민K 결핍이 응고장…\"\n    },\n    {\n      \"type\": \"workflow_agent\",\n      \"index\": 38,\n      \"label\": \"ep:beers-high-risk\",\n      \"phaseIndex\": 1,\n      \"phaseTitle\": \"생성\",\n      \"agentId\": \"aa9835093648077a7\",\n      \"agentType\": \"general-purpose\",\n      \"model\": \"claude-opus-4-8[1m"
+  ]
  },
  {
   "key": "beers-high-risk",
@@ -4887,6 +5003,12 @@ window.NORI_MED_CLASSES = [
    "ADL·IADL 장애 관리",
    "비정상 활력징후 관리"
   ],
-  "examPoints": []
+  "examPoints": [
+   "항콜린제 요폐: diphenhydramine·oxybutynin이 방광 배뇨근 수축을 억제해 요폐를 유발, 원인약 중단이 정답으로 출제. 전립선비대증 환자에서 소변정체 악화 케이스도 출제",
+   "삼환계 항우울제: amitriptyline은 항콜린·진정·심장독성이 커 노인 비권장, SSRI(sertraline)가 선호약으로 출제",
+   "NSAIDs 위궤양 예방: misoprostol이 위점막 프로스타글란딘을 보충해 예방약 정답, H2차단제·제산제는 예방 아닌 치료로 출제",
+   "소화성궤양 안전 진통제: acetaminophen은 COX 억제 없어 위장관 출혈 위험이 낮아 정답, NSAIDs는 출혈 위험을 높임",
+   "파킨슨+항정신병약: haloperid…\"\n    }"
+  ]
  }
 ];
