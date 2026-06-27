@@ -1901,6 +1901,18 @@
   }
   // 핵심 암기를 '한 장 학습지'처럼 — 접지 않고 항상 펼친 카드 그리드(가로 3열).
   // 머리말(:앞)은 굵게, 설명은 아래로. 암기 모드면 설명만 가리고 머리말로 자가테스트.
+  // 가독성: 줄바꿈(\n)·구분자(|)·번호(①②③·1)·▸) 자리에서 줄바꿈 처리.
+  function cramBreaks(str) {
+    let s = esc(String(str));
+    s = s.replace(/\n+/g, '<br>')
+         .replace(/\s*\|\s*/g, '<br>')
+         .replace(/\s*▸\s*/g, '<br>▸ ')
+         .replace(/\s*(?=[①②③④⑤⑥⑦⑧⑨⑩])/g, '<br>')
+         .replace(/\s+(?=\d[).]\s)/g, '<br>')
+         .replace(/^(?:<br>\s*)+/, '')
+         .replace(/(?:<br>\s*){2,}/g, '<br>');
+    return emph(s);
+  }
   function cramMemoryGrid(items) {
     const cells = items.map(m => {
       const s = String(m);
@@ -1908,9 +1920,9 @@
       if (ci > 0 && ci <= 42) {
         const head = s.slice(0, ci).trim();
         const bodyTxt = s.slice(ci + 1).trim();
-        if (bodyTxt) return `<div class="cram-mem-cell"><b class="cmc-head">${emph(esc(head))}</b><span class="cmc-body">${emph(esc(bodyTxt))}</span></div>`;
+        if (bodyTxt) return `<div class="cram-mem-cell"><b class="cmc-head">${emph(esc(head))}</b><span class="cmc-body">${cramBreaks(bodyTxt)}</span></div>`;
       }
-      return `<div class="cram-mem-cell"><span class="cmc-body">${emph(esc(s))}</span></div>`;
+      return `<div class="cram-mem-cell"><span class="cmc-body">${cramBreaks(s)}</span></div>`;
     }).join('');
     return `<div class="cram-mem-grid">${cells}</div>`;
   }
@@ -1928,16 +1940,16 @@
     if (easy)
       body += `<div class="cram-analogy"><span class="cram-analogy-tag">💡 쉽게 이해</span><p>${emph(esc(easy))}</p></div>`;
     if (u.pathology)
-      body += section('🔬 왜 이렇게 되나 (원리)', `<p class="cram-explain">${emph(esc(u.pathology))}</p>`);
+      body += section('🔬 왜 이렇게 되나 (원리)', `<p class="cram-explain">${cramBreaks(u.pathology)}</p>`);
     if (u.geriatric_specifics)
-      body += section('👴 노인은 이렇게 나타나요', `<p class="cram-explain">${emph(esc(u.geriatric_specifics))}</p>`);
+      body += section('👴 노인은 이렇게 나타나요', `<p class="cram-explain">${cramBreaks(u.geriatric_specifics)}</p>`);
     if (t.cramExplain)
-      body += section('💡 한 번 더 쉽게', `<p class="cram-explain">${emph(esc(t.cramExplain))}</p>`);
+      body += section('💡 한 번 더 쉽게', `<p class="cram-explain">${cramBreaks(t.cramExplain)}</p>`);
     // ── 이해 후 비교·암기 ──
     if (t.compareTable)
       body += section(t.compareTable.title || '한눈 비교', compareTableBlock(t.compareTable));
     if (t.cramCapsule && t.cramCapsule.length)
-      body += section('🎯 이해했으면 이건 외우자', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${emph(esc(String(x)))}</li>`).join('')}</ul>`);
+      body += section('🎯 이해했으면 이건 외우자', `<ul class="cram-capsule">${t.cramCapsule.map(x => `<li>${cramBreaks(x)}</li>`).join('')}</ul>`);
     // 카테고리형 정리(cram-sheets.js)가 있으면 그걸로, 없으면 평면 그리드로 폴백
     const sheet = (window.NORI_CRAMSHEETS && window.NORI_CRAMSHEETS[it.tid]) || t.cramSheet;
     if (sheet)
