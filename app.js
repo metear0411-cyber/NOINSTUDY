@@ -1897,7 +1897,7 @@
   ];
   function cramSheetBlock(sheet) {
     return CRAM_CATS.filter(([k]) => Array.isArray(sheet[k]) && sheet[k].length)
-      .map(([k, label]) => `<div class="cram-cat"><h5 class="cram-cat-h">${label}</h5>${cramMemoryGrid(sheet[k])}</div>`)
+      .map(([k, label]) => `<div class="cram-cat${k === '기출' ? ' cram-cat-gichul' : ''}"><h5 class="cram-cat-h">${label}</h5>${cramMemoryGrid(sheet[k])}</div>`)
       .join('');
   }
   // 핵심 암기를 '한 장 학습지'처럼 — 접지 않고 항상 펼친 카드 그리드(가로 3열).
