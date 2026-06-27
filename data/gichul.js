@@ -1667,8 +1667,8 @@ window.NORI_GICHUL = {
       "혈액배양, 화학적 데브리망, 정맥항생제",
       "혈액배양, 외과적 데브리망, 정맥 항생제"
     ],
-    "answerKey": 2,
-    "explanation": "감염 소견(괴사조직, 화농성 악취 삼출물, 발적·열감)이 있는 욕창의 초기관리는 배양검사로 원인균을 확인하고 괴사조직을 제거하며 전신 항생제를 투여한다. 인쇄된 정답은 2번이다.",
+    "answerKey": 5,
+    "explanation": "감염 소견(괴사조직·화농성 악취 삼출물·발적·열감=진행성 봉와직염)이 있는 대형 욕창의 초기관리. ① 배양: 표면 swab 배양은 정착균(콜로니화)을 반영해 신뢰도가 낮아 권장되지 않고(조직 생검이 표준), 전신 침범이 우려되면 혈액배양을 시행한다. ② 데브리망: 괴사조직이 있고 봉와직염이 진행하므로 외과적(sharp) 변연절제가 필요하다. ③ 항생제: 봉와직염·전신 감염 위험에는 국소·경구가 아닌 정맥(전신) 항생제를 투여한다. 따라서 '혈액배양 + 외과적 데브리망 + 정맥 항생제'(5번)가 가장 적절하다. (데브리망이 빠진 2번, 표면 swab을 포함한 3번은 차선.)",
     "source": "Flaherty E, Flamer T,Mesy M(2003). Geriatric nursing review syllabus: A Core Curriculum in Advanced Practice geriatric Nursing. New York: American Geriatric Society. p436.",
     "hasImage": false,
     "source_folder": "08_피부감각계",
@@ -1819,8 +1819,8 @@ window.NORI_GICHUL = {
       "바이드로폼",
       "1% 실버 설파다이진"
     ],
-    "answerKey": 2,
-    "explanation": "욕창의 클렌징을 위해 생리식염수 클렌징 또는 상처세척을 한다. 인쇄된 정답은 2번(상처 클렌저)이다.",
+    "answerKey": 3,
+    "explanation": "욕창 세척(클렌징)의 표준 용액은 생리식염수다(AHCPR 가이드라인·전문가 의견). 피부 클렌저나 소독제(과산화수소·포비돈 등)는 세포독성이 있어 정상 조직·육아조직을 손상시키므로 욕창 세척에는 피한다. 괴사조직이 있더라도 '세척 용액을 바꾸는' 것이 아니라, 세척은 생리식염수로 하고 괴사조직은 데브리망(별도 단계)으로 제거한다. 보기 중 바이드로폼은 드레싱, 1% 실버 설파다이진은 국소 항균제로 클렌징제가 아니다. 따라서 생리식염수(3번)가 가장 적절하다.",
     "source": "Flaherty E, Flamer T,Mesy M(2003). Geriatric nursing review syllabus: A Core Curriculum in Advanced Practice geriatric Nursing. New York: American Geriatric Society. p438.",
     "hasImage": false,
     "source_folder": "08_피부감각계",
