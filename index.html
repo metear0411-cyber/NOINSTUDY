@@ -24,23 +24,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=20260621f">
+  <link rel="stylesheet" href="styles.css?v=20260621g">
 
   <!-- 데이터 파일 (전역 window 변수 방식 — file:// CORS 우회) -->
   <!-- v=20260428 : 캐시 갱신용 버전 — 데이터 수정 시 숫자 증가 -->
   <script src="data/subjects.js?v=20260611"></script>
-  <script src="data/major/gero-disease.js?v=20260621f"></script>
+  <script src="data/major/gero-disease.js?v=20260621g"></script>
   <script src="data/major/gero-ltc.js?v=20260614ac"></script>
   <script src="data/major/gero-promotion.js?v=20260614ac"></script>
   <script src="data/major/gero-eol.js?v=20260614ac"></script>
   <script src="data/major/gero-nursing.js?v=20260614ac"></script>
-  <script src="data/common/assessment.js?v=20260621f"></script>
+  <script src="data/common/assessment.js?v=20260621g"></script>
   <script src="data/common/pharmacology.js?v=20260614e"></script>
   <script src="data/common/pathophysiology.js?v=20260614e"></script>
   <script src="data/common/nursing-theory.js?v=20260614e"></script>
   <script src="data/common/nursing-research.js?v=20260614e"></script>
   <script src="data/common/advanced-practice.js?v=20260614e"></script>
-  <script src="data/gichul.js?v=20260621f"></script>
+  <script src="data/gichul.js?v=20260621g"></script>
   <script src="data/variation.js?v=20260614ac"></script>
 </head>
 <body>
@@ -90,6 +90,9 @@
 
       <!-- 약물 총정리 진입 버튼 -->
       <button class="gichul-entry-btn med-entry-btn" id="medEntryBtn" type="button">💊 약물 총정리·암기</button>
+
+      <!-- 막판 암기노트 허브 진입 버튼 -->
+      <button class="gichul-entry-btn cram-entry-btn" id="cramEntryBtn" type="button">🔥 막판 암기노트</button>
 
       <!-- 과목 목록 -->
       <div class="subject-list" id="subjectList"></div>
@@ -148,6 +151,22 @@
         <div id="medContent" class="lesson-body med-content"></div>
       </div>
 
+      <!-- 막판 암기노트 허브 패널 -->
+      <div id="cramPanel" class="gichul-panel" style="display:none;">
+        <div class="gichul-header">
+          <button id="cramExitBtn" type="button" class="gichul-exit-btn">← 학습으로</button>
+          <div class="gichul-title-block">
+            <h2>🔥 막판 암기노트</h2>
+          </div>
+          <button id="cramMemToggle" type="button" class="med-mem-toggle">🙈 암기 모드</button>
+        </div>
+        <div class="med-toolbar">
+          <input type="search" id="cramSearch" placeholder="토픽·키워드 검색" autocomplete="off">
+          <div id="cramFilterBar" class="med-filter-bar"></div>
+        </div>
+        <div id="cramContent" class="lesson-body med-content"></div>
+      </div>
+
       <!-- 토픽 + 학습 그리드 -->
       <div class="content-grid" id="contentGrid">
 
@@ -200,7 +219,7 @@
   <!-- 집중모드 플로팅 토글 (스크롤 위치 무관 좌하단 상시 노출) -->
   <button class="focus-fab" id="focusToggleFloat" type="button" title="넓게 보기 / 펼치기" aria-pressed="false">⤢ 펼치기</button>
 
-  <script src="app.js?v=20260621f"></script>
+  <script src="app.js?v=20260621g"></script>
   <script src="notes-bridge.js?v=20260614ac"></script>
   <!-- Service Worker 등록 -->
   <script>
