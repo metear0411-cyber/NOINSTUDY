@@ -1,11 +1,11 @@
 // 노인전문간호사 2026 — Service Worker
 // 버전을 올리면 캐시 갱신됨
-const CACHE_NAME = 'nori-study-v52';
+const CACHE_NAME = 'nori-study-v53';
 
 // 설치 시 미리 캐시할 핵심 파일
 // app.js·styles.css는 index.html과 동일한 ?v= 버전으로 받아 브라우저 HTTP 캐시를 우회한다
 // (배포 시 CACHE_NAME 숫자와 아래 ?v= 날짜를 함께 올릴 것)
-const ASSET_VER = '20260621h';
+const ASSET_VER = '20260621i';
 const PRECACHE_URLS = [
   './index.html',
   './app.js?v=' + ASSET_VER,
@@ -58,6 +58,31 @@ self.addEventListener('fetch', event => {
 
   // 데이터 파일은 network-first — 온라인이면 항상 최신, 오프라인이면 캐시 fallback
   // (?v= 버전을 깜빡 올리지 않아도 콘텐츠 갱신이 즉시 반영되도록)
+  // HTML 앱 껍데기(내비게이션·index.html)는 network-first
+  // — 새 배포가 즉시 반영되도록. 오프라인이면 캐시 fallback.
+  const isHTML = event.request.mode === 'navigate'
+    || url.pathname.endsWith('/')
+    || url.pathname.endsWith('.html');
+  if (isHTML) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response && response.status === 200 && response.type !== 'opaque') {
+            const toCache = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, toCache);
+              if (url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
+                cache.put('./index.html', response.clone());
+              }
+            });
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then(hit => hit || caches.match('./index.html')))
+    );
+    return;
+  }
+
   const isData = DATA_PATTERNS.some(re => re.test(url.pathname));
   if (isData) {
     event.respondWith(
