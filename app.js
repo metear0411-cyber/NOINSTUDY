@@ -1766,15 +1766,27 @@
   }
   function buildMedIndex() {
     if (_medIndex) return _medIndex;
-    const list = [];
-    Object.values(state.data || {}).forEach(subj => {
-      (subj.topics || []).forEach(t => {
-        (t.medications || []).forEach(m => {
-          if (!m || !m.category) return;
-          list.push(Object.assign({}, m, { _topic: t.title, _system: t.category || subj.title || '기타' }));
+    let list;
+    if (window.NORI_MED_CLASSES && window.NORI_MED_CLASSES.length) {
+      // 통합 클래스 기반(중복 제거): 토픽별 medications를 클래스로 합친 데이터 사용
+      list = window.NORI_MED_CLASSES.map(c => ({
+        category: c.label, examples: c.examples || [], mechanism: c.mechanism || '',
+        indication: c.indication || '', sideEffects: c.sideEffects || [], nursingPoints: c.nursingPoints || [],
+        examPattern: '', _examPoints: c.examPoints || [],
+        _system: c.system || '기타', _topic: (c.sources || []).join(' · '), _key: c.key
+      }));
+    } else {
+      // 폴백: 기존 토픽 평면화
+      list = [];
+      Object.values(state.data || {}).forEach(subj => {
+        (subj.topics || []).forEach(t => {
+          (t.medications || []).forEach(m => {
+            if (!m || !m.category) return;
+            list.push(Object.assign({}, m, { _topic: t.title, _system: t.category || subj.title || '기타' }));
+          });
         });
       });
-    });
+    }
     list.forEach(m => { m._freq = medFreqScore(m); m._geri = medIsGeriatric(m); });
     // 빈출 배지: 상위 약 30% 또는 freq 12+
     const sorted = list.slice().sort((a, b) => b._freq - a._freq);
@@ -1823,7 +1835,9 @@
       ? `<div class="med-detail"><strong>💉 간호포인트</strong><ul>${m.nursingPoints.map(n => `<li${isCriticalNurse(n) ? ' class="med-critical"' : ''}>${esc(n)}</li>`).join('')}</ul></div>` : '';
     const badges = `${m._hot ? '<span class="med-badge hot">🔥 빈출</span>' : ''}${m._geri ? '<span class="med-badge geri">👴 노인주의</span>' : ''}`;
     const use = m.indication ? `<div class="med-use"><strong>💡 이럴 때 써요 (적응증·효능)</strong><p>${emph(esc(m.indication))}</p></div>` : '';
-    const exam = m.examPattern ? `<div class="med-exam"><strong>📝 기출 포인트</strong><p>${emph(esc(m.examPattern))}</p></div>` : '';
+    const exam = (m._examPoints && m._examPoints.length)
+      ? `<div class="med-exam"><strong>📝 기출 포인트 (이렇게 나온다)</strong><ul>${m._examPoints.map(p => `<li>${emph(esc(p))}</li>`).join('')}</ul></div>`
+      : (m.examPattern ? `<div class="med-exam"><strong>📝 기출 포인트</strong><p>${emph(esc(m.examPattern))}</p></div>` : '');
     return `<div class="med-card${m._geri ? ' med-geri' : ''}">
       <div class="med-card-head"><span class="med-category">${esc(m.category)}</span><span class="med-badges">${badges}</span></div>
       <div class="med-sys-tag">${esc(m._system)} · ${esc(m._topic)}</div>

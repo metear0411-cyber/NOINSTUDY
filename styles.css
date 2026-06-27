@@ -1247,6 +1247,8 @@ body.focus-mode .part-panel { display: none; }
 .med-exam { margin-top: 8px; padding: 8px 11px; border-radius: 8px; background: #fbf4e6; border-left: 3px solid var(--gold); }
 .med-exam strong { display: block; font-size: 11px; font-weight: 800; color: #8a6418; letter-spacing: 0.02em; margin-bottom: 2px; }
 .med-exam p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #5c4a1e; word-break: keep-all; }
+.med-exam ul { margin: 0; padding-left: 17px; }
+.med-exam li { font-size: 12.5px; line-height: 1.55; color: #5c4a1e; margin: 3px 0; word-break: keep-all; }
 /* 학습뷰(.lesson-panel) 약물카드는 카드 패딩이 없어 적응증·기출 박스를 좌우 들여쓰기 */
 .lesson-panel .med-card .med-use, .lesson-panel .med-card .med-exam { margin-left: 12px; margin-right: 12px; }
 .med-reveal-btn {
