@@ -1096,6 +1096,9 @@
     document.getElementById('gichulEntryBtn')?.addEventListener('click', enterGichulMode);
     document.getElementById('dailyEntryBtn')?.addEventListener('click', enterDailyMode);
     document.getElementById('gichulExitBtn')?.addEventListener('click', exitGichulMode);
+    document.getElementById('gichulFilterToggle')?.addEventListener('click', () => {
+      _gichulFiltersOpen = !_gichulFiltersOpen; applyNormalFilters();
+    });
 
     // 약물 총정리
     document.getElementById('medEntryBtn')?.addEventListener('click', enterMedMode);
@@ -1664,16 +1667,35 @@
       startGichulSession(set, { mock: false, batchId: 'review', batchLabel: '복습 모음' });
     });
   }
+  // 자유 풀기 유형·계통 필터 접힘 상태(기본 접힘 — 문제까지 스크롤 줄이기)
+  let _gichulFiltersOpen = false;
+  function applyNormalFilters() {
+    const typeBar = document.getElementById('gichulTypeBar');
+    const chapBar = document.getElementById('gichulChapterBar');
+    const tog = document.getElementById('gichulFilterToggle');
+    const open = _gichulFiltersOpen;
+    if (typeBar) typeBar.style.display = open ? '' : 'none';
+    if (chapBar) chapBar.style.display = open ? '' : 'none';
+    if (tog) {
+      tog.style.display = '';
+      tog.setAttribute('aria-expanded', open ? 'true' : 'false');
+      tog.classList.toggle('is-open', open);
+      tog.textContent = (open ? '🔧 유형·계통 필터 닫기 ▴' : '🔧 유형·계통 필터 ▾');
+    }
+  }
   function showGichulView() {
     const typeBar = document.getElementById('gichulTypeBar');
     const chapBar = document.getElementById('gichulChapterBar');
+    const tog = document.getElementById('gichulFilterToggle');
     document.getElementById('gichulProgress').textContent = '';
+    if (tog) tog.style.display = 'none';        // 기본 숨김 — normal에서만 노출
     if (state.gichulView === 'daily') {
       typeBar.style.display = 'none'; chapBar.style.display = 'none';
       renderDailyIntro();
     } else if (state.gichulView === 'normal') {
-      typeBar.style.display = ''; chapBar.style.display = '';
-      buildGichulTypeBar(); buildGichulChapterBar(); startGichulSession();
+      buildGichulTypeBar(); buildGichulChapterBar();
+      applyNormalFilters();                      // 토글 노출 + 접힘 상태 반영
+      startGichulSession();
     } else if (state.gichulView === 'review') {
       typeBar.style.display = 'none'; chapBar.style.display = 'none';
       renderReviewIntro();
@@ -2060,15 +2082,15 @@
         <p class="quiz-counter">${current + 1} / ${total}</p>
       </div>`;
 
-    if (isFree) html += `<div class="free-jump">
-        <span class="free-jump-label">📍 이동</span>
+    if (isFree) html += `<details class="free-jump-wrap"><summary class="free-jump-sum">📍 번호 이동 (${current + 1}/${total})</summary>
+      <div class="free-jump">
         <button class="free-jump-btn" data-jump="first" type="button">⏮ 처음</button>
         <button class="free-jump-btn" data-jump="prev" type="button">◀ 이전</button>
         <input class="free-jump-input" id="freeJumpInput" type="number" min="1" max="${total}" placeholder="번호" inputmode="numeric" aria-label="이동할 문제 번호">
         <span class="free-jump-total">/ ${total}</span>
         <button class="free-jump-btn free-jump-go" id="freeJumpGo" type="button">이동</button>
         <button class="free-jump-btn" data-jump="next" type="button">다음 ▶</button>
-      </div>`;
+      </div></details>`;
 
     if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
     if (q.type === 'variation') html += `<span class="variation-badge">변형문제(AI생성)</span>`;
