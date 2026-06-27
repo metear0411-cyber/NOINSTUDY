@@ -1287,6 +1287,41 @@ body.focus-mode .part-panel { display: none; }
   font-size: 12px;
   color: var(--muted);
 }
+/* 자유 풀기 — 번호 이동 바 */
+.free-jump {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fafa;
+}
+.free-jump-label { font-size: 12px; font-weight: 800; color: var(--teal-dark); margin-right: 2px; }
+.free-jump-total { font-size: 12px; color: var(--muted); }
+.free-jump-btn {
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.free-jump-btn:hover { background: var(--teal-soft); }
+.free-jump-go { background: var(--teal-dark); color: #fff; border-color: var(--teal-dark); }
+.free-jump-input {
+  width: 64px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+}
 .quiz-question {
   font-size: 15px;
   font-weight: 700;
