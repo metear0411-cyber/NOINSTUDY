@@ -13,6 +13,7 @@
   const LS_MOCKPROG = 'nori_mockprog_v1'; // 모의고사 진행 임시저장 { batchId: {ids,current,scores,label} }
   const LS_FOCUS   = 'nori_focus_v1'; // 집중(넓게보기) 모드 on/off
   const LS_STREAK  = 'nori_streak_v1'; // 연속 학습일 { last:'YYYY-MM-DD', count:N }
+  const LS_FREEPOS = 'nori_freepos_v1'; // 자유 풀기 필터별 마지막 위치 { 'type|chapter': index }
 
   // ── 간격 반복(Leitner) ──
   // 박스 단계(1~5)별 다음 복습까지 간격(시간). 시험이 가까우므로 짧게 순환.
@@ -1234,10 +1235,22 @@
   }
 
   // 현재 풀(또는 전달된 문항 세트)로 새 세션 시작
+  // ── 자유 풀기 위치 기억(필터별) ──
+  function freeKey() { return `${state.gichulType}|${state.gichulChapter}`; }
+  function getFreePos() { return lsGet(LS_FREEPOS)[freeKey()] || 0; }
+  function setFreePos(idx) { const m = lsGet(LS_FREEPOS); m[freeKey()] = idx; lsSet(LS_FREEPOS, m); }
+
   function startGichulSession(questions, info) {
-    const qs = questions ? [...questions] : shuffle([...gichulPool()]);
+    // 인자 없이 호출 = 자유 풀기: 고정 순서(번호 일치) + 필터별 마지막 위치 이어풀기
+    let qs, start = 0;
+    if (questions) {
+      qs = [...questions];
+    } else {
+      qs = [...gichulPool()];
+      start = Math.min(getFreePos(), Math.max(0, qs.length - 1));
+    }
     state.gichul = {
-      questions: qs, current: 0, answered: false, scores: [],
+      questions: qs, current: start, answered: false, scores: [],
       mock: !!(info && info.mock), batchId: info?.batchId || null, batchLabel: info?.batchLabel || ''
     };
     renderGichulQuestion();
@@ -1815,6 +1828,9 @@
     const q    = questions[current];
     const pct  = Math.round((current / total) * 100);
     const nums = '①②③④⑤';
+    // 자유 풀기(모의/데일리/복습 아님) — 위치 기억 + 번호 이동 메뉴 노출
+    const isFree = !state.gichul.mock && !state.gichul.batchId;
+    if (isFree) setFreePos(current);
 
     document.getElementById('gichulProgress').textContent =
       (state.gichul.batchLabel ? state.gichul.batchLabel + ' · ' : '') + `${current + 1} / ${total}`;
@@ -1823,6 +1839,16 @@
       <div>
         <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
         <p class="quiz-counter">${current + 1} / ${total}</p>
+      </div>`;
+
+    if (isFree) html += `<div class="free-jump">
+        <span class="free-jump-label">📍 이동</span>
+        <button class="free-jump-btn" data-jump="first" type="button">⏮ 처음</button>
+        <button class="free-jump-btn" data-jump="prev" type="button">◀ 이전</button>
+        <input class="free-jump-input" id="freeJumpInput" type="number" min="1" max="${total}" placeholder="번호" inputmode="numeric" aria-label="이동할 문제 번호">
+        <span class="free-jump-total">/ ${total}</span>
+        <button class="free-jump-btn free-jump-go" id="freeJumpGo" type="button">이동</button>
+        <button class="free-jump-btn" data-jump="next" type="button">다음 ▶</button>
       </div>`;
 
     if (q.tag) html += `<span class="gichul-tag">${esc(q.tag)}</span>`;
@@ -1877,6 +1903,27 @@
       saveMockProg();
       renderGichulQuestion();
     });
+
+    // 자유 풀기 번호 이동
+    if (isFree) {
+      const jumpTo = n => {
+        const idx = Math.max(0, Math.min(total - 1, n));
+        state.gichul.current = idx;
+        state.gichul.answered = false;
+        setFreePos(idx);
+        renderGichulQuestion();
+      };
+      el.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => {
+        const j = b.dataset.jump;
+        if (j === 'first') jumpTo(0);
+        else if (j === 'prev') jumpTo(current - 1);
+        else if (j === 'next') jumpTo(current + 1);
+      }));
+      const input = el.querySelector('#freeJumpInput');
+      const go = () => { const v = parseInt(input.value, 10); if (!isNaN(v)) jumpTo(v - 1); };
+      el.querySelector('#freeJumpGo')?.addEventListener('click', go);
+      input?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+    }
   }
 
   function handleGichulAnswer(btn, q, el) {
