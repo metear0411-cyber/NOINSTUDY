@@ -1951,7 +1951,7 @@
   ];
   function cramSheetBlock(sheet) {
     return CRAM_CATS.filter(([k]) => Array.isArray(sheet[k]) && sheet[k].length)
-      .map(([k, label]) => `<details class="cram-cat${k === '기출' ? ' cram-cat-gichul' : ''}" open><summary class="cram-cat-h">${label}</summary>${cramMemoryGrid(sheet[k])}</details>`)
+      .map(([k, label]) => `<details class="cram-cat${k === '기출' ? ' cram-cat-gichul' : ''}"><summary class="cram-cat-h">${label}</summary>${cramMemoryGrid(sheet[k])}</details>`)
       .join('');
   }
   function cramBreaks(str) {
@@ -2034,7 +2034,7 @@
         if (sec.tip) body += `<p class="cram-explain">${cramBreaks(sec.tip)}</p>`;
       } else if (sec.type === 'exam') { body = cramMemoryGrid(sec.items || []); label = '📝 기출 포인트 (이렇게 나온다)'; gichul = ' cram-cat-gichul'; }
       else return '';
-      return `<details class="cram-cat${gichul}" open><summary class="cram-cat-h">${label}</summary>${body}</details>`;
+      return `<details class="cram-cat${gichul}"><summary class="cram-cat-h">${label}</summary>${body}</details>`;
     }).join('');
   }
   function refCard(card, open) {
