@@ -1314,6 +1314,19 @@ body.focus-mode .part-panel { display: none; }
 .cram-hs { border-color: #f2c2c8; background: #fffafa; }
 .cram-hs[open] { border-color: #e88a96; box-shadow: 0 1px 8px rgba(192,57,75,0.10); }
 .cram-hs .cram-title { color: #b23a4c; }
+/* 비교·총정리 카드 액센트 (refcards) */
+.cram-ref.ref-heart, .cram-ref.ref-hf { border-color:#f2c2c8; background:#fffafa; }
+.cram-ref.ref-heart .cram-title, .cram-ref.ref-hf .cram-title { color:#b23a4c; }
+.cram-ref.ref-brain { border-color:#d9c9f0; background:#fdfbff; }
+.cram-ref.ref-brain .cram-title { color:#6b4ea6; }
+.cram-ref.ref-acid { border-color:#bfe3d8; background:#fafffd; }
+.cram-ref.ref-acid .cram-title { color:#1f7a6b; }
+.cram-ref.ref-uro { border-color:#bcd6ef; background:#fbfdff; }
+.cram-ref.ref-uro .cram-title { color:#2c6ba0; }
+.cram-ref.ref-wound { border-color:#f0d6bf; background:#fffdf9; }
+.cram-ref.ref-wound .cram-title { color:#9a6a2a; }
+.cram-ref.ref-tb { border-color:#cfe0c2; background:#fcfff9; }
+.cram-ref.ref-tb .cram-title { color:#5a7a36; }
 .cram-sum {
   list-style: none; cursor: pointer; padding: 11px 13px; display: grid;
   grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center;
