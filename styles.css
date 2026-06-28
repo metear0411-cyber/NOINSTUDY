@@ -1310,6 +1310,10 @@ body.focus-mode .part-panel { display: none; }
   margin-bottom: 8px; overflow: hidden;
 }
 .cram-card[open] { border-color: #f0c89a; box-shadow: 0 1px 6px rgba(181,99,26,0.08); }
+/* 심음 총정리 카드 — 심장 톤 강조 */
+.cram-hs { border-color: #f2c2c8; background: #fffafa; }
+.cram-hs[open] { border-color: #e88a96; box-shadow: 0 1px 8px rgba(192,57,75,0.10); }
+.cram-hs .cram-title { color: #b23a4c; }
 .cram-sum {
   list-style: none; cursor: pointer; padding: 11px 13px; display: grid;
   grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center;
