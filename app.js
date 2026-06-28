@@ -2023,11 +2023,36 @@
         <span class="cram-chev" aria-hidden="true">▾</span>
       </summary><div class="cram-body">${body}</div></details>`;
   }
+  // 심음 총정리 — 막판 암기노트 '🫀 심음' 탭/카드. 이해(비유·원리) → S1~S4 → 분열 → 심잡음 → 청진 위치 → 기출.
+  function cramHeartSoundCard(open) {
+    const H = window.NORI_HEARTSOUNDS; if (!H) return '';
+    let b = '';
+    if (H.intro) b += `<div class="cram-analogy"><span class="cram-analogy-tag">💡 먼저 이해</span><p>${emph(esc(H.intro))}</p></div>`;
+    if (H.cycle) b += section('🔬 왜 소리가 나나 (원리)', `<p class="cram-explain">${cramBreaks(H.cycle)}</p>`);
+    if (H.core && H.core.length) b += section('🔊 S1·S2·S3·S4 한눈에', cramMemoryGrid(H.core));
+    if (H.gallop) b += section('🐴 분마음(gallop) — 시험 단골', `<p class="cram-explain">${cramBreaks(H.gallop)}</p>`);
+    if (H.siteTable) b += section(H.siteTable.title || '청진 위치', compareTableBlock(H.siteTable));
+    if (H.splitting && H.splitting.length) b += section('🔀 S2 분열(splitting)', cramMemoryGrid(H.splitting));
+    if (H.murmurSystolic && H.murmurSystolic.length) {
+      let m = H.murmurIntro ? `<p class="cram-explain">${cramBreaks(H.murmurIntro)}</p>` : '';
+      m += `<div class="cram-cat"><h5 class="cram-cat-h">🔴 수축기 잡음 (S1~S2)</h5>${cramMemoryGrid(H.murmurSystolic)}</div>`;
+      m += `<div class="cram-cat"><h5 class="cram-cat-h">🔵 이완기 잡음 (S2~S1)</h5>${cramMemoryGrid(H.murmurDiastolic || [])}</div>`;
+      if (H.murmurTip) m += `<p class="cram-explain">${cramBreaks(H.murmurTip)}</p>`;
+      b += section('🌊 심잡음(murmur) 구분', m);
+    }
+    if (H.exam && H.exam.length)
+      b += `<div class="cram-cat cram-cat-gichul"><h5 class="cram-cat-h">📝 기출 포인트 (이렇게 나온다)</h5>${cramMemoryGrid(H.exam)}</div>`;
+    return `<details class="cram-card cram-hs"${open ? ' open' : ''}><summary class="cram-sum">
+        <span class="cram-sum-top"><span class="cram-title">🫀 심음(심장 소리) 총정리</span><span class="cram-badges"><span class="cram-badge hi">어려움 정복</span></span></span>
+        <span class="cram-one">S1·S2·S3·S4 · 분열 · 심잡음 · 청진 위치를 한 번에</span>
+        <span class="cram-chev" aria-hidden="true">▾</span>
+      </summary><div class="cram-body">${b}</div></details>`;
+  }
   function buildCramFilterBar() {
     const bar = document.getElementById('cramFilterBar'); if (!bar) return;
     const idx = buildCramIndex();
     const cats = [...new Set(idx.map(i => i.category))];
-    const chips = ['전체', '🔥 최빈출', '⚠ 내 약점', '📅 오늘 분량', ...cats];
+    const chips = ['전체', '🔥 최빈출', '⚠ 내 약점', '📅 오늘 분량', '🫀 심음', ...cats];
     bar.innerHTML = chips.map(c =>
       `<button class="med-filter-chip${_cramFilter === c ? ' is-active' : ''}" type="button" data-cramf="${esc(c)}">${esc(c)}</button>`
     ).join('');
@@ -2041,6 +2066,13 @@
     const s = _cramSearch.toLowerCase();
     const dday = cramDaysLeft();
     const perDay = Math.max(1, Math.ceil(idx.length / dday));
+    // 🫀 심음 탭 — 토픽 기반이 아닌 전용 총정리 카드
+    if (_cramFilter === '🫀 심음') {
+      el.classList.toggle('mem-mode', _cramMemMode);
+      let h = `<div class="cram-plan">🫀 심음이 어렵다면 여기부터 — S1·S2·S3·S4부터 청진 위치·심잡음까지 한 번에 정리했어요</div>`;
+      el.innerHTML = h + `<div class="cram-group"><h4>🫀 심음 총정리</h4>${cramHeartSoundCard(true)}</div>`;
+      bindCramHub(el); return;
+    }
     let items = idx.slice();
     if (_cramFilter === '🔥 최빈출') items = items.filter(i => i.hot);
     else if (_cramFilter === '⚠ 내 약점') items = items.filter(i => i.weak > 0).sort((a, b) => b.weak - a.weak);
@@ -2053,6 +2085,7 @@
       + `${_cramFilter !== '📅 오늘 분량' ? ` <button class="cram-today-btn" type="button">오늘 분량만</button>` : ''}</div>`;
     if (!items.length) { el.innerHTML = html + '<div class="med-empty">조건에 맞는 항목이 없어요.</div>'; bindCramHub(el); return; }
     if (_cramFilter === '전체') {
+      if (!s) html += `<div class="cram-group"><h4>🫀 심음 총정리 <span class="cram-gcount">어려우면 여기</span></h4>${cramHeartSoundCard(false)}</div>`;
       const groups = {};
       items.forEach(i => { (groups[i.category] = groups[i.category] || []).push(i); });
       html += Object.entries(groups).sort((a, b) => b[1][0].yieldScore - a[1][0].yieldScore)
