@@ -5008,7 +5008,7 @@ window.NORI_MED_CLASSES = [
    "삼환계 항우울제: amitriptyline은 항콜린·진정·심장독성이 커 노인 비권장, SSRI(sertraline)가 선호약으로 출제",
    "NSAIDs 위궤양 예방: misoprostol이 위점막 프로스타글란딘을 보충해 예방약 정답, H2차단제·제산제는 예방 아닌 치료로 출제",
    "소화성궤양 안전 진통제: acetaminophen은 COX 억제 없어 위장관 출혈 위험이 낮아 정답, NSAIDs는 출혈 위험을 높임",
-   "파킨슨+항정신병약: haloperid…\"\n    }"
+   "파킨슨+항정신병약 금기: haloperidol은 도파민 D2를 차단해 levodopa 작용을 길항하므로 파킨슨 환자에서 증상을 악화시켜 금기이며, 필요시 도파민 차단이 약한 비정형약(clozapine·quetiapine)을 고려한다는 점이 출제"
   ]
  }
 ];
