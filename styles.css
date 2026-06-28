@@ -1385,6 +1385,15 @@ body.focus-mode .part-panel { display: none; }
   margin: 0 0 7px; font-size: 12.5px; font-weight: 800; color: #455;
   padding: 4px 9px; background: #eef3f2; border-radius: 7px; display: inline-block;
 }
+/* 카테고리 접기 — cram-cat을 details로, summary 헤딩에 클릭·셰브론 */
+details.cram-cat > summary.cram-cat-h { cursor: pointer; list-style: none; }
+details.cram-cat > summary.cram-cat-h::-webkit-details-marker { display: none; }
+details.cram-cat > summary.cram-cat-h::after {
+  content: '▾'; font-size: 10px; margin-left: 6px; color: #8aa; display: inline-block; transition: transform .15s;
+}
+details.cram-cat:not([open]) > summary.cram-cat-h::after { transform: rotate(-90deg); }
+.cram-subcat { margin-top: 8px; }
+.cram-subcat-h { margin: 0 0 5px; font-size: 12px; font-weight: 800; color: #556; }
 /* 핵심 암기 — 항상 펼친 학습지형 그리드(가로 자동 3열 내외) */
 .cram-mem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
 .cram-mem-cell {

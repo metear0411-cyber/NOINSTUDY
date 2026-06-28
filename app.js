@@ -1951,12 +1951,9 @@
   ];
   function cramSheetBlock(sheet) {
     return CRAM_CATS.filter(([k]) => Array.isArray(sheet[k]) && sheet[k].length)
-      .map(([k, label]) => `<div class="cram-cat${k === '기출' ? ' cram-cat-gichul' : ''}"><h5 class="cram-cat-h">${label}</h5>${cramMemoryGrid(sheet[k])}</div>`)
+      .map(([k, label]) => `<details class="cram-cat${k === '기출' ? ' cram-cat-gichul' : ''}" open><summary class="cram-cat-h">${label}</summary>${cramMemoryGrid(sheet[k])}</details>`)
       .join('');
   }
-  // 핵심 암기를 '한 장 학습지'처럼 — 접지 않고 항상 펼친 카드 그리드(가로 3열).
-  // 머리말(:앞)은 굵게, 설명은 아래로. 암기 모드면 설명만 가리고 머리말로 자가테스트.
-  // 가독성: 줄바꿈(\n)·구분자(|)·번호(①②③·1)·▸) 자리에서 줄바꿈 처리.
   function cramBreaks(str) {
     let s = esc(String(str));
     s = s.replace(/\n+/g, '<br>')
@@ -2027,17 +2024,17 @@
   function refCardSections(card) {
     return (card.sections || []).map(sec => {
       if (sec.type === 'intro') return `<div class="cram-analogy"><span class="cram-analogy-tag">${esc(sec.label || '💡 먼저 이해')}</span><p>${emph(esc(sec.text))}</p></div>`;
-      if (sec.type === 'explain') return section(esc(sec.label), `<p class="cram-explain">${cramBreaks(sec.text)}</p>`);
-      if (sec.type === 'grid') return section(esc(sec.label), cramMemoryGrid(sec.items || []));
-      if (sec.type === 'table') return section(esc(sec.label || (sec.table && sec.table.title) || '비교'), compareTableBlock(sec.table || {}));
-      if (sec.type === 'cols') {
-        let m = sec.intro ? `<p class="cram-explain">${cramBreaks(sec.intro)}</p>` : '';
-        m += (sec.cols || []).map(c => `<div class="cram-cat"><h5 class="cram-cat-h">${esc(c.label)}</h5>${cramMemoryGrid(c.items || [])}</div>`).join('');
-        if (sec.tip) m += `<p class="cram-explain">${cramBreaks(sec.tip)}</p>`;
-        return section(esc(sec.label), m);
-      }
-      if (sec.type === 'exam') return `<div class="cram-cat cram-cat-gichul"><h5 class="cram-cat-h">📝 기출 포인트 (이렇게 나온다)</h5>${cramMemoryGrid(sec.items || [])}</div>`;
-      return '';
+      let body = '', label = esc(sec.label || (sec.table && sec.table.title) || ''), gichul = '';
+      if (sec.type === 'explain') body = `<p class="cram-explain">${cramBreaks(sec.text)}</p>`;
+      else if (sec.type === 'grid') body = cramMemoryGrid(sec.items || []);
+      else if (sec.type === 'table') body = compareTableBlock(sec.table || {});
+      else if (sec.type === 'cols') {
+        body = sec.intro ? `<p class="cram-explain">${cramBreaks(sec.intro)}</p>` : '';
+        body += (sec.cols || []).map(c => `<div class="cram-subcat"><h6 class="cram-subcat-h">${esc(c.label)}</h6>${cramMemoryGrid(c.items || [])}</div>`).join('');
+        if (sec.tip) body += `<p class="cram-explain">${cramBreaks(sec.tip)}</p>`;
+      } else if (sec.type === 'exam') { body = cramMemoryGrid(sec.items || []); label = '📝 기출 포인트 (이렇게 나온다)'; gichul = ' cram-cat-gichul'; }
+      else return '';
+      return `<details class="cram-cat${gichul}" open><summary class="cram-cat-h">${label}</summary>${body}</details>`;
     }).join('');
   }
   function refCard(card, open) {
