@@ -1120,6 +1120,7 @@
     document.getElementById('cramEntryBtn')?.addEventListener('click', enterCramMode);
     document.getElementById('cramExitBtn')?.addEventListener('click', exitCramMode);
     document.getElementById('cramSearch')?.addEventListener('input', e => { _cramSearch = e.target.value.trim(); renderCramHub(); });
+    document.getElementById('cramFilterToggle')?.addEventListener('click', () => { _cramFiltersOpen = !_cramFiltersOpen; applyCramFilters(); });
     document.getElementById('cramMemToggle')?.addEventListener('click', function () {
       _cramMemMode = !_cramMemMode;
       this.classList.toggle('is-active', _cramMemMode);
@@ -1897,7 +1898,7 @@
   // ─── 🔥 막판 암기노트 허브 ─────────────────────────────
   // 흩어진 고빈출 암기 내용을 한 화면 스크롤+탭 펼침으로. 기존 필드(memory·whyImportant·
   // compareTable·redFlags·cramCapsule)만 모아 빈출 점수로 랭킹. (새 사실 생성 없음)
-  let _cramIndex = null, _cramFilter = '전체', _cramMemMode = false, _cramSearch = '';
+  let _cramIndex = null, _cramFilter = '전체', _cramMemMode = false, _cramSearch = '', _cramFiltersOpen = false;
   const CRAM_TAG_ALIAS = { '피부계': '피부감각계', '감각계': '피부감각계' };
   function cramTagCounts() {
     const c = {};
@@ -2045,6 +2046,17 @@
         <span class="cram-chev" aria-hidden="true">▾</span>
       </summary><div class="cram-body">${refCardSections(card)}</div></details>`;
   }
+  // 막판 암기노트 상단 필터바 접기 — 기본 접힘, 토글로 펼침(스크롤 시 sticky 부담 ↓)
+  function applyCramFilters() {
+    const bar = document.getElementById('cramFilterBar');
+    const tog = document.getElementById('cramFilterToggle');
+    if (bar) bar.classList.toggle('is-open', _cramFiltersOpen);
+    if (tog) {
+      tog.classList.toggle('is-open', _cramFiltersOpen);
+      tog.setAttribute('aria-expanded', _cramFiltersOpen ? 'true' : 'false');
+      tog.textContent = _cramFiltersOpen ? '🔧 필터 닫기 ▴' : `🔧 필터: ${_cramFilter} ▾`;
+    }
+  }
   function buildCramFilterBar() {
     const bar = document.getElementById('cramFilterBar'); if (!bar) return;
     const idx = buildCramIndex();
@@ -2054,7 +2066,7 @@
       `<button class="med-filter-chip${_cramFilter === c ? ' is-active' : ''}" type="button" data-cramf="${esc(c)}">${esc(c)}</button>`
     ).join('');
     bar.querySelectorAll('[data-cramf]').forEach(b => b.addEventListener('click', () => {
-      _cramFilter = b.dataset.cramf; buildCramFilterBar(); renderCramHub();
+      _cramFilter = b.dataset.cramf; _cramFiltersOpen = false; buildCramFilterBar(); applyCramFilters(); renderCramHub();
     }));
   }
   function renderCramHub() {
@@ -2115,6 +2127,7 @@
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
     buildCramFilterBar();
+    applyCramFilters();
     renderCramHub();
   }
   function exitCramMode() {
