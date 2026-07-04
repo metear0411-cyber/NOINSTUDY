@@ -1573,6 +1573,19 @@
     const exams = buildMockExams(state.gichulSource);
     const results = lsGet(LS_MOCK);
     const prog = getMockProg();
+    const realSets = window.NORI_MOCKSETS || [];
+    let realHtml = '';
+    if (realSets.length) {
+      realHtml = `<div class="mock-real-band">🎯 <b>실전 모의고사</b> — 막판암기노트·그림노트·기출의 핵심을 실제 비중(${MOCK_SIZE}문항)으로. 세트 간 중복 없음.</div><div class="mock-grid mock-real-grid">`
+        + realSets.map((ex, i) => {
+          const r = results[ex.id], p = prog[ex.id];
+          const badge = p ? `<span class="mock-badge prog">이어풀기 ${p.current}/${p.ids.length}</span>`
+            : r ? `<span class="mock-badge ${r.pct >= 60 ? 'pass' : 'fail'}">${r.pct}%</span>`
+            : `<span class="mock-badge new">미응시</span>`;
+          const nm = ex.label.replace('🎯 실전 모의고사 ', '');
+          return `<button class="mock-card mock-real-card${p ? ' has-prog' : ''}" type="button" data-real="${i}"><strong>${esc(nm)}</strong><span>${ex.ids.length}문항</span>${badge}</button>`;
+        }).join('') + `</div>`;
+    }
     let html = `<div class="mock-intro"><p>📋 <b>${esc(state.gichulSource)} 모의고사</b> — 한 회 <b>${MOCK_SIZE}문항</b>, 실제 출제비중에 맞춰 구성됩니다. 중간에 나가도 <b>이어풀기</b>로 저장돼요.</p></div>`;
 
     // 전체 섞기 타일 (이어풀기 지원)
@@ -1593,7 +1606,7 @@
       html += `<button class="mock-card${p ? ' has-prog' : ''}" type="button" data-batch="${i}"><strong>${i + 1}회</strong><span>${ex.questions.length}문항</span>${badge}</button>`;
     });
     html += `</div>`;
-    el.innerHTML = html;
+    el.innerHTML = realHtml + html;
 
     el.querySelector('#mockShuffleBtn')?.addEventListener('click', startShuffleAll);
     el.querySelector('#mockShuffleRestart')?.addEventListener('click', () => {
@@ -1603,6 +1616,14 @@
       const ex = exams[+b.dataset.batch];
       if (prog[ex.id]) { resumeMock(ex.id); return; }  // 이어풀기
       startGichulSession(ex.questions, { mock: true, batchId: ex.id, batchLabel: ex.label });
+    }));
+    el.querySelectorAll('[data-real]').forEach(b => b.addEventListener('click', () => {
+      const ex = realSets[+b.dataset.real];
+      if (prog[ex.id]) { resumeMock(ex.id); return; }
+      const byId = allQuestionsById();
+      const qs = ex.ids.map(id => byId[id]).filter(Boolean);
+      if (!qs.length) return;
+      startGichulSession(qs, { mock: true, batchId: ex.id, batchLabel: ex.label });
     }));
   }
   function renderDailyIntro() {
