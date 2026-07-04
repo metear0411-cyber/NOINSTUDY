@@ -1305,6 +1305,12 @@ body.focus-mode .part-panel { display: none; }
   border-bottom: 2px solid var(--teal-soft, #dcefeb); padding-bottom: 5px;
 }
 .cram-gcount { color: #bbb; font-weight: 600; font-size: 12px; }
+/* 🚄 기출만 — 제목+기출만 이어지는 초경량 스크롤(아코디언 없음) */
+.examonly-card {
+  border-left: 3px solid var(--teal-dark, #1f7a74); background: #fff;
+  padding: 7px 10px; margin-bottom: 9px; border-radius: 0 8px 8px 0;
+}
+.examonly-title { margin: 0 0 4px; font-size: 13px; font-weight: 800; color: var(--navy, #243b53); }
 .cram-card {
   border: 1px solid var(--line, #dfe6e2); border-radius: 11px; background: #fff;
   margin-bottom: 8px; overflow: hidden;
