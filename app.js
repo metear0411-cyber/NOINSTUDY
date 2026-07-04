@@ -2078,11 +2078,23 @@
       tog.textContent = _cramFiltersOpen ? '🔧 필터 닫기 ▴' : `🔧 필터: ${_cramFilter} ▾`;
     }
   }
+  // 🚄 기출만 — 제목 + 기출 포인트만 이어지는 초경량 스크롤(이동 중 빠른 복습용)
+  function examOnlyCard(it) {
+    const sheet = (window.NORI_CRAMSHEETS && window.NORI_CRAMSHEETS[it.tid]) || {};
+    const pts = sheet['기출'] || [];
+    if (!pts.length) return '';
+    return `<div class="examonly-card"><h5 class="examonly-title">${esc(it.title)}</h5>${cramMemoryGrid(pts)}</div>`;
+  }
+  function examOnlyRefCard(card) {
+    const sec = (card.sections || []).find(s => s.type === 'exam');
+    if (!sec || !sec.items || !sec.items.length) return '';
+    return `<div class="examonly-card"><h5 class="examonly-title">${esc(card.icon || '')} ${esc(card.title)}</h5>${cramMemoryGrid(sec.items)}</div>`;
+  }
   function buildCramFilterBar() {
     const bar = document.getElementById('cramFilterBar'); if (!bar) return;
     const idx = buildCramIndex();
     const cats = [...new Set(idx.map(i => i.category))];
-    const chips = ['전체', '🔥 최빈출', '⚠ 내 약점', '📅 오늘 분량', '📋 총정리', ...cats];
+    const chips = ['전체', '🔥 최빈출', '⚠ 내 약점', '📅 오늘 분량', '📋 총정리', '🚄 기출만', ...cats];
     bar.innerHTML = chips.map(c =>
       `<button class="med-filter-chip${_cramFilter === c ? ' is-active' : ''}" type="button" data-cramf="${esc(c)}">${esc(c)}</button>`
     ).join('');
@@ -2096,6 +2108,24 @@
     const s = _cramSearch.toLowerCase();
     const dday = cramDaysLeft();
     const perDay = Math.max(1, Math.ceil(idx.length / dday));
+    // 🚄 기출만 — 제목 + 기출 포인트만, 아코디언 없이 이어지는 초경량 스크롤(이동 중 복습용)
+    if (_cramFilter === '🚄 기출만') {
+      const refCards = window.NORI_REFCARDS || [];
+      let items2 = idx.slice();
+      if (s) items2 = items2.filter(i => i.title.toLowerCase().includes(s));
+      let h = `<div class="cram-plan">🚄 이동 중 빠른 복습 — 제목 + 기출 포인트만</div>`;
+      if (!s) {
+        const refHtml = refCards.map(examOnlyRefCard).filter(Boolean).join('');
+        if (refHtml) h += `<div class="cram-group"><h4>📋 비교·총정리 <span class="cram-gcount">${refCards.length}</span></h4>${refHtml}</div>`;
+      }
+      const groups = {};
+      items2.forEach(i => { (groups[i.category] = groups[i.category] || []).push(i); });
+      h += Object.entries(groups).sort((a, b) => b[1][0].yieldScore - a[1][0].yieldScore)
+        .map(([cat, arr]) => `<div class="cram-group"><h4>${esc(cat)} <span class="cram-gcount">${arr.length}</span></h4>${arr.map(examOnlyCard).join('')}</div>`).join('');
+      el.classList.remove('mem-mode');
+      el.innerHTML = h;
+      bindCramHub(el); return;
+    }
     // 📋 총정리 탭 — 토픽 기반이 아닌 비교·총정리 카드 모음
     if (_cramFilter === '📋 총정리') {
       el.classList.toggle('mem-mode', _cramMemMode);
