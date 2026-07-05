@@ -1345,6 +1345,8 @@ body.focus-mode .part-panel { display: none; }
 .cram-ref.ref-neuroexam .cram-title { color:#6b4ea6; }
 .cram-ref.ref-drugpair { border-color:#cfe0c2; background:#fcfff9; }
 .cram-ref.ref-drugpair .cram-title { color:#5a7a36; }
+.cram-ref.ref-frame { border-color:#ecd9b8; background:#fffdf9; }
+.cram-ref.ref-frame .cram-title { color:#8a5a1e; }
 
 /* ── 2차시험(사례 서술형) 대비 ── */
 .case2-intro { border:1px solid #ccdff0; background:#f6faff; border-radius:12px; padding:13px 15px; margin-bottom:14px; }
@@ -1387,6 +1389,13 @@ body.focus-mode .part-panel { display: none; }
 .case2-casescore { font-size:.74rem; font-weight:700; border-radius:20px; padding:2px 9px; white-space:nowrap; }
 .case2-casescore.pass { color:#2f7a5e; background:#e3f3ea; }
 .case2-casescore.low { color:#b8323a; background:#fbe6e8; }
+/* 답안 틀(framework) 토글 */
+.case2-frame { margin:6px 0 8px; }
+.case2-frame > summary { list-style:none; cursor:pointer; font-size:.82rem; font-weight:600; color:#8a5a1e; background:#fdf6ec; border:1px solid #ecd9b8; border-radius:8px; padding:6px 10px; display:inline-block; }
+.case2-frame > summary::-webkit-details-marker { display:none; }
+.case2-frame[open] > summary { border-radius:8px 8px 0 0; }
+.case2-frame-body { margin:0; border:1px solid #ecd9b8; border-top:none; border-radius:0 0 8px 8px; background:#fffdf9; padding:9px 12px 9px 28px; }
+.case2-frame-body li { line-height:1.55; margin:3px 0; font-size:.86rem; color:#5a4a30; }
 .case2-notes-h { font-size:.78rem; font-weight:700; color:#2c5f96; margin:8px 0 3px; }
 .case2-notes { margin:0; padding-left:19px; }
 .case2-notes li { line-height:1.5; margin:2px 0; font-size:.86rem; color:#3a4656; }

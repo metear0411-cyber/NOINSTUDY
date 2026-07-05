@@ -2287,6 +2287,60 @@
       _case2Filter = b.dataset.c2f; buildCase2FilterBar(); renderCase2();
     }));
   }
+  // 문항 유형(키워드)에 맞는 서술형 답안 틀(framework) — 근거: framework 명시교육이 구성형 답안 점수 대효과(Graham & Perin 2007).
+  // sq.frameHint가 있으면 우선 사용, 없으면 질문 텍스트 키워드로 자동 매핑.
+  const CASE2_FRAMES = {
+    diagnosis: { label: '🧩 답안 틀 · 간호진단(ADPIE/NANDA)', lines: [
+      "**진술 형식**: [증상·사정자료]**와 관련된** [진단명] (NANDA 표준 '~와 관련된 ~')",
+      "예: '부동 및 실금과 관련된 피부통합성 장애 위험성'",
+      "각 진단마다 **중재 N개 + 각 근거 1줄** → 요구 개수 꼭 채우기",
+      "노인은 **보호자 교육**을 중재/목표에 포함(감점 방지)",
+    ] },
+    test: { label: '🧩 답안 틀 · 검사와 목적', lines: [
+      "**검사명 : 목적(왜 하는지)** 을 1:1로 짝지어 번호 매김",
+      "'목적'을 물으면 항목만 쓰지 말고 근거를 반드시 함께",
+      "요구 개수만큼(예: 5가지) 빠짐없이",
+    ] },
+    ddx: { label: '🧩 답안 틀 · 감별진단(비교표)', lines: [
+      "**비교 축**: 발생시기 · 대칭성 · 조조강직(시간) · 침범 부위 · 전신증상",
+      "**+ 임상병리검사** (예: RF·anti-CCP·ESR·CRP) **+ 치료** 차이",
+      "표 형태로 좌/우 대조하면 누락 없음",
+    ] },
+    drug: { label: '🧩 답안 틀 · 약물간호 4단', lines: [
+      "**① 기전 → ② 주요 부작용 → ③ 모니터링 지표(수치·검사) → ④ 환자·보호자 교육**",
+      "예(항응고제): INR 2~3 유지 확인 / 출혈 징후 / 비타민K 일관 섭취",
+      "부작용·교육은 요구 개수만큼 번호 매김",
+    ] },
+    assess: { label: '🧩 답안 틀 · 포괄적노인평가(CGA)', lines: [
+      "**도메인 나열**: 신체(동반질환·다약제) · 기능(ADL/IADL) · 인지(MMSE) · 정서(GDS·섬망) · 영양 · 사회/환경 · 노인증후군(낙상·요실금·욕창)",
+      "도구명을 넣으면 가점: Morse(낙상)·Braden(욕창)·MMSE·GDS·Beers",
+    ] },
+    risk: { label: '🧩 답안 틀 · 위험요인 나열', lines: [
+      "요구 개수만큼 **번호**를 매겨 빠짐없이 (개수 미달=감점 1위)",
+      "**내적**(감각·인지·보행/균형·기립성 저혈압·근력·약물) **vs 외적**(조명·바닥·신발·보조기구) 이분법으로 개수 확보",
+    ] },
+    edu: { label: '🧩 답안 틀 · 퇴원·보호자 교육', lines: [
+      "**약물(복용법·부작용) · 식이 · 활동 · 증상 악화 시 대처 · 추적** 축으로",
+      "'잘 관찰한다'류 모호표현 금지 → **구체적 수치·도구·행동**으로",
+      "요구 개수만큼 번호",
+    ] },
+    generic: { label: '🧩 답안 틀 · 서술형 기본', lines: [
+      "요구 **개수만큼 번호**를 매겨 나열 (공란·개수 미달이 최대 손해)",
+      "각 항목에 **근거 한 줄** 붙이기, 모호표현 대신 전문용어·수치",
+    ] },
+  };
+  function case2FrameHint(sq) {
+    if (sq.frameHint && CASE2_FRAMES[sq.frameHint]) return CASE2_FRAMES[sq.frameHint];
+    const q = sq.q || '';
+    if (/간호진단|간호문제|진단명|중재/.test(q)) return CASE2_FRAMES.diagnosis;
+    if (/감별|비교|vs|차이/.test(q)) return CASE2_FRAMES.ddx;
+    if (/검사|사정할|진단검사/.test(q) && /목적|가지/.test(q)) return CASE2_FRAMES.test;
+    if (/약물|투약|복용|부작용|항응고|levodopa/i.test(q)) return CASE2_FRAMES.drug;
+    if (/위험요인|요인/.test(q)) return CASE2_FRAMES.risk;
+    if (/교육|퇴원|보호자/.test(q)) return CASE2_FRAMES.edu;
+    if (/사정|포괄|평가/.test(q)) return CASE2_FRAMES.assess;
+    return CASE2_FRAMES.generic;
+  }
   // 사례 카드. opts.keyBase = 답안 저장 키 프리픽스, opts.badge = 좌측 배지 텍스트, opts.open = 기본 펼침.
   function case2Card(c, idx, opts) {
     opts = opts || {};
@@ -2307,8 +2361,11 @@
       const tot = pointsArr.length;
       const pct = tot ? Math.round(cov / tot * 100) : 0;
       const scoreLine = tot ? `<div class="case2-subscore${checked ? ' scored' : ''}" data-c2score="${esc(key)}">${checked ? `내 채점: ${cov}/${tot} (${pct}%)` : `채점 포인트 ${tot}개 — 답 작성 후 커버한 항목을 체크하세요`}</div>` : '';
+      const fh = case2FrameHint(sq);
+      const frameHtml = `<details class="case2-frame"><summary>${esc(fh.label)}</summary><ul class="case2-frame-body">${fh.lines.map(l => `<li>${emph(esc(l))}</li>`).join('')}</ul></details>`;
       return `<div class="case2-sub">
         <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
+        ${frameHtml}
         <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
         <details class="case2-model">
           <summary>✅ 모범답안 · 채점 포인트 보기</summary>
