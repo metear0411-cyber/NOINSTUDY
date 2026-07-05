@@ -7,6 +7,7 @@
   const EXAM_DATE = new Date(2026, 6, 5);  // 2026-07-05 로컬 자정 (월은 0-indexed) — UTC 파싱 시 타임존 오차로 D-Day 하루 밀림 방지
   const EXAM2_DATE = new Date(2026, 7, 23); // 2026-08-23 2차시험(사례 서술형)
   const LS_CASE2_KEY = 'nori_case2_ans_v1'; // 2차 사례 서술형 내 답안 저장
+  const LS_CASE2_SCORE = 'nori_case2_score_v1'; // 2차 자가채점: {"keyBase::subIdx": [체크한 채점포인트 인덱스]}
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
   const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
@@ -2218,6 +2219,40 @@
   function saveCase2Ans(map) {
     try { localStorage.setItem(LS_CASE2_KEY, JSON.stringify(map)); } catch (e) {}
   }
+  function loadCase2Score() {
+    try { return JSON.parse(localStorage.getItem(LS_CASE2_SCORE)) || {}; }
+    catch (e) { return {}; }
+  }
+  function saveCase2Score(map) {
+    try { localStorage.setItem(LS_CASE2_SCORE, JSON.stringify(map)); } catch (e) {}
+  }
+  // 한 사례의 자가채점 집계: {covered, total, pct, answered} — answered=채점 시도한 문항 수
+  function case2CaseScore(c, keyBase) {
+    const sc = loadCase2Score();
+    let covered = 0, total = 0, answered = 0;
+    (c.subquestions || []).forEach((sq, qi) => {
+      const pts = sq.points || [];
+      if (!pts.length) return;
+      total += pts.length;
+      const chk = sc[`${keyBase}::${qi}`];
+      if (Array.isArray(chk)) { answered++; covered += chk.filter(x => x != null).length; }
+    });
+    return { covered, total, pct: total ? Math.round(covered / total * 100) : 0, answered };
+  }
+  // 채점한 사례 중 60% 미만이 하나라도 있으면 '복습 필요' 필터 노출
+  function case2AllCases() {
+    const d = window.NORI_CASE2 || {};
+    const out = [];
+    (d.cases || []).forEach((c, i) => out.push({ c, keyBase: c.id || ('case' + i), group: '연습' }));
+    (d.pastExams || []).forEach(y => (y.cases || []).forEach((c, i) => out.push({ c, keyBase: `past-${y.year}-${i}`, group: '기출', year: y.year })));
+    return out;
+  }
+  function case2HasReview() {
+    return case2AllCases().some(x => {
+      const s = case2CaseScore(x.c, x.keyBase);
+      return s.answered && s.pct < 60;
+    });
+  }
   function enterCase2Mode() {
     document.getElementById('overviewBand').style.display = 'none';
     document.getElementById('contentGrid').style.display  = 'none';
@@ -2242,7 +2277,9 @@
     const systems = [...new Set(cases.map(c => c.system))];
     const chips = [];
     if ((data.pastExams || []).length) chips.push('📚 역대 기출');
-    chips.push('🧩 연습 전체', ...systems);
+    chips.push('🧩 연습 전체');
+    if (case2HasReview()) chips.push('🔁 복습 필요');
+    chips.push(...systems);
     bar.innerHTML = chips.map(c =>
       `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`
     ).join('');
@@ -2254,11 +2291,22 @@
   function case2Card(c, idx, opts) {
     opts = opts || {};
     const ans = loadCase2Ans();
+    const sc = loadCase2Score();
     const keyBase = opts.keyBase || c.id || ('case' + idx);
     const subs = (c.subquestions || []).map((sq, qi) => {
       const key = `${keyBase}::${qi}`;
       const saved = esc(ans[key] || '');
-      const pts = (sq.points || []).map(p => `<li>${emph(esc(p))}</li>`).join('');
+      const checked = Array.isArray(sc[key]) ? sc[key] : null;
+      const pointsArr = sq.points || [];
+      // 채점포인트를 체크박스 리스트로 — 답 쓴 뒤 모범답안 열고 커버한 항목 체크 → 자가채점
+      const pts = pointsArr.map((p, pi) => {
+        const on = checked && checked.indexOf(pi) !== -1;
+        return `<li><label class="case2-pt"><input type="checkbox" class="case2-ck" data-c2ck="${esc(key)}" data-pi="${pi}"${on ? ' checked' : ''}><span>${emph(esc(p))}</span></label></li>`;
+      }).join('');
+      const cov = checked ? checked.length : 0;
+      const tot = pointsArr.length;
+      const pct = tot ? Math.round(cov / tot * 100) : 0;
+      const scoreLine = tot ? `<div class="case2-subscore${checked ? ' scored' : ''}" data-c2score="${esc(key)}">${checked ? `내 채점: ${cov}/${tot} (${pct}%)` : `채점 포인트 ${tot}개 — 답 작성 후 커버한 항목을 체크하세요`}</div>` : '';
       return `<div class="case2-sub">
         <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
         <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
@@ -2266,16 +2314,21 @@
           <summary>✅ 모범답안 · 채점 포인트 보기</summary>
           <div class="case2-model-body">
             <p class="case2-model-answer">${emph(esc(sq.answer))}</p>
-            ${pts ? `<div class="case2-points-h">채점 핵심 포인트</div><ul class="case2-points">${pts}</ul>` : ''}
+            ${pts ? `<div class="case2-points-h">채점 핵심 포인트 (커버한 항목 체크)</div><ul class="case2-points case2-points-ck">${pts}</ul>${scoreLine}` : ''}
           </div>
         </details>
       </div>`;
     }).join('');
     const badge = opts.badge || c.system || '';
-    return `<details class="case2-case"${opts.open ? ' open' : ''}>
+    const cs = case2CaseScore(c, keyBase);
+    const scoreBadge = cs.answered
+      ? `<span class="case2-casescore${cs.pct >= 60 ? ' pass' : ' low'}" data-c2casescore="${esc(keyBase)}">채점 ${cs.pct}%${cs.pct < 60 ? ' 🔁' : ''}</span>`
+      : '';
+    return `<details class="case2-case"${opts.open ? ' open' : ''} data-c2case="${esc(keyBase)}">
       <summary class="case2-sum">
         <span class="case2-sys">${esc(badge)}</span>
         <span class="case2-title">${esc(c.title)}</span>
+        ${scoreBadge}
         <span class="cram-chev" aria-hidden="true">▾</span>
       </summary>
       <div class="case2-body">
@@ -2297,6 +2350,19 @@
       <p class="case2-dday">2차시험 ${esc(data.examDate || '2026-08-23')} · <b>${ddayTxt}</b></p>
     </div>`;
     const s = _case2Search.toLowerCase();
+
+    // 🔁 복습 필요 — 자가채점 60% 미만 사례(기출+연습 통합), 낮은 점수 순
+    if (_case2Filter === '🔁 복습 필요') {
+      let low = case2AllCases()
+        .map(x => ({ ...x, score: case2CaseScore(x.c, x.keyBase) }))
+        .filter(x => x.score.answered && x.score.pct < 60)
+        .sort((a, b) => a.score.pct - b.score.pct);
+      if (s) low = low.filter(x => (x.c.title + ' ' + x.c.scenario).toLowerCase().includes(s));
+      h += `<p class="case2-section-note">🔁 자가채점 60% 미만 사례 — 인출연습(retrieval)은 틀린 것을 다시 풀 때 가장 효과적입니다. 낮은 점수부터 다시 써 보세요.</p>`;
+      if (!low.length) { el.innerHTML = h + `<p class="case2-empty">복습할 사례가 없습니다 (모두 60% 이상).</p>`; return; }
+      h += low.map((x, i) => case2Card(x.c, i, { keyBase: x.keyBase, badge: x.year ? `${x.year} 기출` : x.c.system, open: i === 0 })).join('');
+      el.innerHTML = h; bindCase2(el); return;
+    }
 
     // 📚 역대 기출 — 연도별 실제 기출 케이스 + 모범답안
     if (_case2Filter === '📚 역대 기출') {
@@ -2334,6 +2400,54 @@
         const v = ta.value;
         if (v.trim()) map[ta.dataset.c2key] = v; else delete map[ta.dataset.c2key];
         saveCase2Ans(map);
+      });
+    });
+    // 자가채점 체크박스 — 커버한 채점포인트 저장 + 문항/사례 점수 라이브 갱신
+    el.querySelectorAll('.case2-ck').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const key = cb.dataset.c2ck;
+        const sub = cb.closest('.case2-sub');
+        const boxes = sub ? [...sub.querySelectorAll('.case2-ck')] : [cb];
+        const checked = boxes.filter(b => b.checked).map(b => +b.dataset.pi).sort((a, b) => a - b);
+        const total = boxes.length;
+        const map = loadCase2Score();
+        map[key] = checked; // 빈 배열도 '채점 시도함'으로 저장
+        saveCase2Score(map);
+        // 문항 점수 라인 갱신
+        const line = sub && sub.querySelector('[data-c2score]');
+        if (line) {
+          const pct = total ? Math.round(checked.length / total * 100) : 0;
+          line.classList.add('scored');
+          line.textContent = `내 채점: ${checked.length}/${total} (${pct}%)`;
+        }
+        // 사례 배지 갱신
+        const caseEl = cb.closest('.case2-case');
+        const keyBase = caseEl && caseEl.dataset.c2case;
+        if (keyBase) {
+          const sc = loadCase2Score();
+          let cov = 0, tot = 0, answered = 0;
+          caseEl.querySelectorAll('.case2-sub').forEach(sb => {
+            const arr = [...sb.querySelectorAll('.case2-ck')];
+            if (!arr.length) return;
+            tot += arr.length;
+            const anyKey = arr[0].dataset.c2ck;
+            if (Array.isArray(sc[anyKey])) { answered++; cov += arr.filter(b => b.checked).length; }
+          });
+          const pct = tot ? Math.round(cov / tot * 100) : 0;
+          let badge = caseEl.querySelector('[data-c2casescore]');
+          if (answered) {
+            if (!badge) {
+              badge = document.createElement('span');
+              badge.className = 'case2-casescore';
+              badge.setAttribute('data-c2casescore', keyBase);
+              const titleEl = caseEl.querySelector('.case2-title');
+              if (titleEl) titleEl.insertAdjacentElement('afterend', badge);
+            }
+            badge.classList.toggle('pass', pct >= 60);
+            badge.classList.toggle('low', pct < 60);
+            badge.textContent = `채점 ${pct}%${pct < 60 ? ' 🔁' : ''}`;
+          }
+        }
       });
     });
   }

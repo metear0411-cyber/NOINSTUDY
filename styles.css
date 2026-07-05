@@ -1376,6 +1376,17 @@ body.focus-mode .part-panel { display: none; }
 .case2-points-h { font-size:.76rem; font-weight:700; color:#2f7a5e; margin-bottom:4px; }
 .case2-points { margin:0; padding-left:19px; }
 .case2-points li { line-height:1.5; margin:3px 0; color:#3a4a42; }
+/* 자가채점 체크리스트 */
+.case2-points-ck { list-style:none; padding-left:0; }
+.case2-points-ck li { margin:5px 0; }
+.case2-pt { display:flex; align-items:flex-start; gap:8px; cursor:pointer; line-height:1.5; }
+.case2-pt input { margin-top:3px; flex-shrink:0; width:16px; height:16px; accent-color:#2f7a5e; cursor:pointer; }
+.case2-pt input:checked + span { color:#2f7a5e; font-weight:600; }
+.case2-subscore { margin-top:8px; font-size:.82rem; font-weight:600; color:#8a94a2; padding:5px 9px; background:#f4f6f9; border-radius:6px; }
+.case2-subscore.scored { color:#2f7a5e; background:#eef7f1; }
+.case2-casescore { font-size:.74rem; font-weight:700; border-radius:20px; padding:2px 9px; white-space:nowrap; }
+.case2-casescore.pass { color:#2f7a5e; background:#e3f3ea; }
+.case2-casescore.low { color:#b8323a; background:#fbe6e8; }
 .case2-notes-h { font-size:.78rem; font-weight:700; color:#2c5f96; margin:8px 0 3px; }
 .case2-notes { margin:0; padding-left:19px; }
 .case2-notes li { line-height:1.5; margin:2px 0; font-size:.86rem; color:#3a4656; }
