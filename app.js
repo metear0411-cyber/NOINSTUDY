@@ -5,6 +5,8 @@
   'use strict';
 
   const EXAM_DATE = new Date(2026, 6, 5);  // 2026-07-05 로컬 자정 (월은 0-indexed) — UTC 파싱 시 타임존 오차로 D-Day 하루 밀림 방지
+  const EXAM2_DATE = new Date(2026, 7, 23); // 2026-08-23 2차시험(사례 서술형)
+  const LS_CASE2_KEY = 'nori_case2_ans_v1'; // 2차 사례 서술형 내 답안 저장
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
   const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
@@ -199,6 +201,7 @@
     if (state.gichulMode) exitGichulMode();
     if (document.getElementById('medPanel')?.style.display !== 'none') exitMedMode();
     if (document.getElementById('cramPanel')?.style.display === '') exitCramMode();
+    if (document.getElementById('case2Panel')?.style.display === '') exitCase2Mode();
     state.currentSubjectId = subjectId;
     state.currentTopicId   = null;
 
@@ -362,6 +365,7 @@
     if (state.gichulMode) exitGichulMode();
     if (document.getElementById('medPanel')?.style.display !== 'none') exitMedMode();
     if (document.getElementById('cramPanel')?.style.display === '') exitCramMode();
+    if (document.getElementById('case2Panel')?.style.display === '') exitCase2Mode();
 
     state.currentTopicId = topicId;
     state.quiz  = { questions: [], current: 0, answered: false, scores: [] };
@@ -1134,6 +1138,16 @@
       if (hit) hit.classList.toggle('revealed');
     });
 
+    // 2차시험(사례 서술형) 대비
+    document.getElementById('case2EntryBtn')?.addEventListener('click', enterCase2Mode);
+    document.getElementById('case2ExitBtn')?.addEventListener('click', exitCase2Mode);
+    document.getElementById('case2Search')?.addEventListener('input', e => { _case2Search = e.target.value.trim(); renderCase2(); });
+    document.getElementById('case2RevealAll')?.addEventListener('click', function () {
+      const opened = this.classList.toggle('is-active');
+      document.querySelectorAll('#case2Content .case2-model').forEach(d => { d.open = opened; });
+      this.textContent = opened ? '🙈 모범답안 모두 접기' : '👁 모범답안 모두 보기';
+    });
+
     // 학습 기록 내보내기/불러오기
     document.getElementById('exportMarksBtn')?.addEventListener('click', exportMarks);
     const importInput = document.getElementById('importMarksInput');
@@ -1737,6 +1751,7 @@
     document.getElementById('contentGrid').style.display  = 'none';
     const medP = document.getElementById('medPanel'); if (medP) medP.style.display = 'none';
     const cramP = document.getElementById('cramPanel'); if (cramP) cramP.style.display = 'none';
+    const case2P = document.getElementById('case2Panel'); if (case2P) case2P.style.display = 'none';
     document.getElementById('gichulPanel').style.display  = '';
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
@@ -1825,6 +1840,7 @@
     document.getElementById('contentGrid').style.display  = 'none';
     document.getElementById('gichulPanel').style.display  = 'none';
     const cramP = document.getElementById('cramPanel'); if (cramP) cramP.style.display = 'none';
+    const case2P = document.getElementById('case2Panel'); if (case2P) case2P.style.display = 'none';
     document.getElementById('medPanel').style.display     = '';
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
@@ -2174,6 +2190,7 @@
     document.getElementById('contentGrid').style.display  = 'none';
     document.getElementById('gichulPanel').style.display  = 'none';
     document.getElementById('medPanel').style.display     = 'none';
+    const c2 = document.getElementById('case2Panel'); if (c2) c2.style.display = 'none';
     document.getElementById('cramPanel').style.display    = '';
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
@@ -2185,6 +2202,115 @@
     const p = document.getElementById('cramPanel'); if (p) p.style.display = 'none';
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
+  }
+
+  // ─── 2차시험(사례 서술형) 대비 ───────────────────────────
+  let _case2Filter = '전체';
+  let _case2Search = '';
+  function case2DaysLeft() {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return Math.ceil((EXAM2_DATE - today) / 86400000);
+  }
+  function loadCase2Ans() {
+    try { return JSON.parse(localStorage.getItem(LS_CASE2_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function saveCase2Ans(map) {
+    try { localStorage.setItem(LS_CASE2_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+  function enterCase2Mode() {
+    document.getElementById('overviewBand').style.display = 'none';
+    document.getElementById('contentGrid').style.display  = 'none';
+    document.getElementById('gichulPanel').style.display  = 'none';
+    document.getElementById('medPanel').style.display     = 'none';
+    document.getElementById('cramPanel').style.display    = 'none';
+    document.getElementById('case2Panel').style.display   = '';
+    document.getElementById('subjectRail')?.classList.remove('is-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('is-open');
+    buildCase2FilterBar();
+    renderCase2();
+  }
+  function exitCase2Mode() {
+    const p = document.getElementById('case2Panel'); if (p) p.style.display = 'none';
+    document.getElementById('overviewBand').style.display = '';
+    document.getElementById('contentGrid').style.display  = '';
+  }
+  function buildCase2FilterBar() {
+    const bar = document.getElementById('case2FilterBar'); if (!bar) return;
+    const cases = (window.NORI_CASE2 && window.NORI_CASE2.cases) || [];
+    const systems = [...new Set(cases.map(c => c.system))];
+    const chips = ['전체', ...systems];
+    bar.innerHTML = chips.map(c =>
+      `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`
+    ).join('');
+    bar.querySelectorAll('[data-c2f]').forEach(b => b.addEventListener('click', () => {
+      _case2Filter = b.dataset.c2f; buildCase2FilterBar(); renderCase2();
+    }));
+  }
+  function case2Card(c, idx) {
+    const ans = loadCase2Ans();
+    const subs = (c.subquestions || []).map((sq, qi) => {
+      const key = `${c.id}::${qi}`;
+      const saved = esc(ans[key] || '');
+      const pts = (sq.points || []).map(p => `<li>${emph(esc(p))}</li>`).join('');
+      return `<div class="case2-sub">
+        <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
+        <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
+        <details class="case2-model">
+          <summary>✅ 모범답안 · 채점 포인트 보기</summary>
+          <div class="case2-model-body">
+            <p class="case2-model-answer">${emph(esc(sq.answer))}</p>
+            ${pts ? `<div class="case2-points-h">채점 핵심 포인트</div><ul class="case2-points">${pts}</ul>` : ''}
+          </div>
+        </details>
+      </div>`;
+    }).join('');
+    return `<details class="case2-case"${idx === 0 ? ' open' : ''}>
+      <summary class="case2-sum">
+        <span class="case2-sys">${esc(c.system)}</span>
+        <span class="case2-title">${esc(c.title)}</span>
+        <span class="cram-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="case2-body">
+        <div class="case2-scenario"><span class="case2-scenario-tag">🩺 사례</span><p>${emph(esc(c.scenario))}</p></div>
+        ${subs}
+      </div>
+    </details>`;
+  }
+  function renderCase2() {
+    const el = document.getElementById('case2Content'); if (!el) return;
+    const data = window.NORI_CASE2 || { cases: [] };
+    let cases = data.cases || [];
+    const dleft = case2DaysLeft();
+    const ddayTxt = dleft > 0 ? `D-${dleft}` : dleft === 0 ? 'D-Day!' : `D+${Math.abs(dleft)}`;
+    let h = `<div class="case2-intro">
+      <strong>📋 2차시험 대비 — 사례기반 서술형</strong>
+      <p>2차시험은 <b>${esc(data.format || '사례기반 서술형 필기시험')}</b> — 객관식이 아니라 환자 사례를 읽고 서술형으로 답하는 시험입니다. 아래 사례에 직접 답안을 써 보고 모범답안·채점 포인트와 대조하세요.</p>
+      <p class="case2-dday">2차시험 ${esc(data.examDate || '2026-08-23')} · <b>${ddayTxt}</b></p>
+    </div>`;
+    if (!cases.length) {
+      el.innerHTML = h + `<p class="case2-empty">사례 데이터를 준비 중입니다.</p>`;
+      return;
+    }
+    if (_case2Filter !== '전체') cases = cases.filter(c => c.system === _case2Filter);
+    const s = _case2Search.toLowerCase();
+    if (s) cases = cases.filter(c =>
+      (c.title + ' ' + c.system + ' ' + c.scenario).toLowerCase().includes(s) ||
+      (c.subquestions || []).some(sq => (sq.q + ' ' + sq.answer).toLowerCase().includes(s)));
+    if (!cases.length) { el.innerHTML = h + `<p class="case2-empty">검색·필터 결과가 없습니다.</p>`; return; }
+    h += cases.map((c, i) => case2Card(c, i)).join('');
+    el.innerHTML = h;
+    bindCase2(el);
+  }
+  function bindCase2(el) {
+    el.querySelectorAll('.case2-ans').forEach(ta => {
+      ta.addEventListener('input', () => {
+        const map = loadCase2Ans();
+        const v = ta.value;
+        if (v.trim()) map[ta.dataset.c2key] = v; else delete map[ta.dataset.c2key];
+        saveCase2Ans(map);
+      });
+    });
   }
 
   function renderGichulQuestion() {
