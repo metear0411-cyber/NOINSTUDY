@@ -1376,6 +1376,12 @@ body.focus-mode .part-panel { display: none; }
 .case2-points-h { font-size:.76rem; font-weight:700; color:#2f7a5e; margin-bottom:4px; }
 .case2-points { margin:0; padding-left:19px; }
 .case2-points li { line-height:1.5; margin:3px 0; color:#3a4a42; }
+.case2-notes-h { font-size:.78rem; font-weight:700; color:#2c5f96; margin:8px 0 3px; }
+.case2-notes { margin:0; padding-left:19px; }
+.case2-notes li { line-height:1.5; margin:2px 0; font-size:.86rem; color:#3a4656; }
+.case2-section-note { font-size:.85rem; color:#5a6675; line-height:1.5; margin:6px 0 12px; padding:8px 11px; background:#f4f6f9; border-radius:8px; }
+.case2-year { margin-bottom:18px; }
+.case2-year-h { font-size:.95rem; font-weight:700; color:#b23a4c; margin:0 0 8px; padding-bottom:5px; border-bottom:2px solid #f0d6da; }
 .case2-entry-btn { }
 @media (max-width:480px) { .case2-title { flex:1 1 100%; } }
 .cram-sum {
