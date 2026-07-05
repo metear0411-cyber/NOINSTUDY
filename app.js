@@ -2205,7 +2205,7 @@
   }
 
   // ─── 2차시험(사례 서술형) 대비 ───────────────────────────
-  let _case2Filter = '전체';
+  let _case2Filter = '📚 역대 기출';
   let _case2Search = '';
   function case2DaysLeft() {
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -2237,9 +2237,12 @@
   }
   function buildCase2FilterBar() {
     const bar = document.getElementById('case2FilterBar'); if (!bar) return;
-    const cases = (window.NORI_CASE2 && window.NORI_CASE2.cases) || [];
+    const data = window.NORI_CASE2 || {};
+    const cases = data.cases || [];
     const systems = [...new Set(cases.map(c => c.system))];
-    const chips = ['전체', ...systems];
+    const chips = [];
+    if ((data.pastExams || []).length) chips.push('📚 역대 기출');
+    chips.push('🧩 연습 전체', ...systems);
     bar.innerHTML = chips.map(c =>
       `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`
     ).join('');
@@ -2247,10 +2250,13 @@
       _case2Filter = b.dataset.c2f; buildCase2FilterBar(); renderCase2();
     }));
   }
-  function case2Card(c, idx) {
+  // 사례 카드. opts.keyBase = 답안 저장 키 프리픽스, opts.badge = 좌측 배지 텍스트, opts.open = 기본 펼침.
+  function case2Card(c, idx, opts) {
+    opts = opts || {};
     const ans = loadCase2Ans();
+    const keyBase = opts.keyBase || c.id || ('case' + idx);
     const subs = (c.subquestions || []).map((sq, qi) => {
-      const key = `${c.id}::${qi}`;
+      const key = `${keyBase}::${qi}`;
       const saved = esc(ans[key] || '');
       const pts = (sq.points || []).map(p => `<li>${emph(esc(p))}</li>`).join('');
       return `<div class="case2-sub">
@@ -2265,9 +2271,10 @@
         </details>
       </div>`;
     }).join('');
-    return `<details class="case2-case"${idx === 0 ? ' open' : ''}>
+    const badge = opts.badge || c.system || '';
+    return `<details class="case2-case"${opts.open ? ' open' : ''}>
       <summary class="case2-sum">
-        <span class="case2-sys">${esc(c.system)}</span>
+        <span class="case2-sys">${esc(badge)}</span>
         <span class="case2-title">${esc(c.title)}</span>
         <span class="cram-chev" aria-hidden="true">▾</span>
       </summary>
@@ -2280,25 +2287,43 @@
   function renderCase2() {
     const el = document.getElementById('case2Content'); if (!el) return;
     const data = window.NORI_CASE2 || { cases: [] };
-    let cases = data.cases || [];
     const dleft = case2DaysLeft();
     const ddayTxt = dleft > 0 ? `D-${dleft}` : dleft === 0 ? 'D-Day!' : `D+${Math.abs(dleft)}`;
+    const notes = (data.formatNotes || []).map(n => `<li>${emph(esc(n))}</li>`).join('');
     let h = `<div class="case2-intro">
       <strong>📋 2차시험 대비 — 사례기반 서술형</strong>
-      <p>2차시험은 <b>${esc(data.format || '사례기반 서술형 필기시험')}</b> — 객관식이 아니라 환자 사례를 읽고 서술형으로 답하는 시험입니다. 아래 사례에 직접 답안을 써 보고 모범답안·채점 포인트와 대조하세요.</p>
+      <p>2차시험은 <b>${esc(data.format || '사례기반 서술형 필기시험')}</b> — 객관식이 아니라 환자 사례를 읽고 서술형으로 답하는 시험입니다.</p>
+      ${notes ? `<div class="case2-notes-h">실제 기출 특징</div><ul class="case2-notes">${notes}</ul>` : ''}
       <p class="case2-dday">2차시험 ${esc(data.examDate || '2026-08-23')} · <b>${ddayTxt}</b></p>
     </div>`;
-    if (!cases.length) {
-      el.innerHTML = h + `<p class="case2-empty">사례 데이터를 준비 중입니다.</p>`;
-      return;
-    }
-    if (_case2Filter !== '전체') cases = cases.filter(c => c.system === _case2Filter);
     const s = _case2Search.toLowerCase();
+
+    // 📚 역대 기출 — 연도별 실제 기출 케이스 + 모범답안
+    if (_case2Filter === '📚 역대 기출') {
+      let years = data.pastExams || [];
+      let any = false;
+      const yearHtml = years.map(y => {
+        let cs = y.cases || [];
+        if (s) cs = cs.filter(c => (c.title + ' ' + c.scenario + ' ' + (c.subquestions || []).map(q => q.q + q.answer).join(' ')).toLowerCase().includes(s));
+        if (!cs.length) return '';
+        any = true;
+        const cards = cs.map((c, i) => case2Card(c, i, { keyBase: `past-${y.year}-${i}`, badge: `${y.year} 기출`, open: false })).join('');
+        return `<div class="case2-year"><h4 class="case2-year-h">📅 ${esc(String(y.year))}년도 기출</h4>${cards}</div>`;
+      }).join('');
+      h += `<p class="case2-section-note">역대 실제 2차 기출(사용자 제공 자료, 2017~2023) — 각 케이스에 직접 답을 써 보고 모범답안과 대조하세요.</p>`;
+      h += any ? yearHtml : `<p class="case2-empty">검색 결과가 없습니다.</p>`;
+      el.innerHTML = h; bindCase2(el); return;
+    }
+
+    // 🧩 연습(생성) — 계통별
+    let cases = data.cases || [];
+    if (_case2Filter !== '🧩 연습 전체') cases = cases.filter(c => c.system === _case2Filter);
     if (s) cases = cases.filter(c =>
       (c.title + ' ' + c.system + ' ' + c.scenario).toLowerCase().includes(s) ||
       (c.subquestions || []).some(sq => (sq.q + ' ' + sq.answer).toLowerCase().includes(s)));
+    h += `<p class="case2-section-note">계통별 연습 사례(앱 자료 기반 생성·검수) — 실제 시험은 여러 계통이 한 케이스에 섞여 나오니, 계통별로 익힌 뒤 역대 기출로 통합 연습하세요.</p>`;
     if (!cases.length) { el.innerHTML = h + `<p class="case2-empty">검색·필터 결과가 없습니다.</p>`; return; }
-    h += cases.map((c, i) => case2Card(c, i)).join('');
+    h += cases.map((c, i) => case2Card(c, i, { open: i === 0 })).join('');
     el.innerHTML = h;
     bindCase2(el);
   }
