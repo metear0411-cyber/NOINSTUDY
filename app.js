@@ -2208,6 +2208,9 @@
   // ─── 2차시험(사례 서술형) 대비 ───────────────────────────
   let _case2Filter = '📚 역대 기출';
   let _case2Search = '';
+  let _case2Sim = null;      // {items:[{c,keyBase,badge}], startAt, submitted}
+  let _case2SimTimer = null; // setInterval 핸들
+  const CASE2_SIM_MS = 100 * 60 * 1000; // 100분
   function case2DaysLeft() {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     return Math.ceil((EXAM2_DATE - today) / 86400000);
@@ -2253,6 +2256,39 @@
       return s.answered && s.pct < 60;
     });
   }
+  // ── O-3: 100분·2사례 실전 시뮬(주간 최고습관 — 인출·시간압박·틀적용·피드백 통합) ──
+  function startCase2Sim() {
+    // 연습 사례 풀에서 서로 다른 2개 무작위 선택(복합질환 실전형 우선 노출됨)
+    const pool = (window.NORI_CASE2 && window.NORI_CASE2.cases) || [];
+    if (pool.length < 2) return;
+    const idxs = pool.map((_, i) => i);
+    for (let i = idxs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idxs[i], idxs[j]] = [idxs[j], idxs[i]]; }
+    const pick = idxs.slice(0, 2);
+    _case2Sim = {
+      items: pick.map(i => ({ c: pool[i], keyBase: `sim-${pool[i].id || i}`, badge: pool[i].system })),
+      startAt: Date.now(), submitted: false,
+    };
+    renderCase2();
+  }
+  function submitCase2Sim() {
+    if (_case2Sim) _case2Sim.submitted = true;
+    if (_case2SimTimer) { clearInterval(_case2SimTimer); _case2SimTimer = null; }
+    renderCase2();
+  }
+  function exitCase2Sim() {
+    _case2Sim = null;
+    if (_case2SimTimer) { clearInterval(_case2SimTimer); _case2SimTimer = null; }
+    renderCase2();
+  }
+  function case2SimTick() {
+    const banner = document.getElementById('case2SimClock');
+    if (!banner || !_case2Sim || _case2Sim.submitted) return;
+    const left = CASE2_SIM_MS - (Date.now() - _case2Sim.startAt);
+    if (left <= 0) { banner.textContent = '00:00'; submitCase2Sim(); return; }
+    const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+    banner.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    banner.classList.toggle('urgent', left <= 10 * 60 * 1000);
+  }
   function enterCase2Mode() {
     document.getElementById('overviewBand').style.display = 'none';
     document.getElementById('contentGrid').style.display  = 'none';
@@ -2266,6 +2302,7 @@
     renderCase2();
   }
   function exitCase2Mode() {
+    if (_case2SimTimer) { clearInterval(_case2SimTimer); _case2SimTimer = null; }
     const p = document.getElementById('case2Panel'); if (p) p.style.display = 'none';
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
@@ -2362,18 +2399,20 @@
       const pct = tot ? Math.round(cov / tot * 100) : 0;
       const scoreLine = tot ? `<div class="case2-subscore${checked ? ' scored' : ''}" data-c2score="${esc(key)}">${checked ? `내 채점: ${cov}/${tot} (${pct}%)` : `채점 포인트 ${tot}개 — 답 작성 후 커버한 항목을 체크하세요`}</div>` : '';
       const fh = case2FrameHint(sq);
-      const frameHtml = `<details class="case2-frame"><summary>${esc(fh.label)}</summary><ul class="case2-frame-body">${fh.lines.map(l => `<li>${emph(esc(l))}</li>`).join('')}</ul></details>`;
-      return `<div class="case2-sub">
-        <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
-        ${frameHtml}
-        <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
-        <details class="case2-model">
+      // 시뮬 진행 중(lock)엔 답안 틀·모범답안을 숨겨 실전처럼 — 제출 후 공개
+      const frameHtml = opts.lock ? '' : `<details class="case2-frame"><summary>${esc(fh.label)}</summary><ul class="case2-frame-body">${fh.lines.map(l => `<li>${emph(esc(l))}</li>`).join('')}</ul></details>`;
+      const modelHtml = opts.lock ? '' : `<details class="case2-model">
           <summary>✅ 모범답안 · 채점 포인트 보기</summary>
           <div class="case2-model-body">
             <p class="case2-model-answer">${emph(esc(sq.answer))}</p>
             ${pts ? `<div class="case2-points-h">채점 핵심 포인트 (커버한 항목 체크)</div><ul class="case2-points case2-points-ck">${pts}</ul>${scoreLine}` : ''}
           </div>
-        </details>
+        </details>`;
+      return `<div class="case2-sub">
+        <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
+        ${frameHtml}
+        <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
+        ${modelHtml}
       </div>`;
     }).join('');
     const badge = opts.badge || c.system || '';
@@ -2397,14 +2436,20 @@
   function renderCase2() {
     const el = document.getElementById('case2Content'); if (!el) return;
     const data = window.NORI_CASE2 || { cases: [] };
+
+    // 🔴 실전 모의 진행/채점 모드 — 필터·인트로 대신 시뮬 화면
+    if (_case2Sim) { renderCase2Sim(el); return; }
+
     const dleft = case2DaysLeft();
     const ddayTxt = dleft > 0 ? `D-${dleft}` : dleft === 0 ? 'D-Day!' : `D+${Math.abs(dleft)}`;
     const notes = (data.formatNotes || []).map(n => `<li>${emph(esc(n))}</li>`).join('');
+    const canSim = (data.cases || []).length >= 2;
     let h = `<div class="case2-intro">
       <strong>📋 2차시험 대비 — 사례기반 서술형</strong>
       <p>2차시험은 <b>${esc(data.format || '사례기반 서술형 필기시험')}</b> — 객관식이 아니라 환자 사례를 읽고 서술형으로 답하는 시험입니다.</p>
       ${notes ? `<div class="case2-notes-h">실제 기출 특징</div><ul class="case2-notes">${notes}</ul>` : ''}
       <p class="case2-dday">2차시험 ${esc(data.examDate || '2026-08-23')} · <b>${ddayTxt}</b></p>
+      ${canSim ? `<button class="case2-sim-start" id="case2SimStart" type="button">🔴 실전 모의 시작 (100분 · 2사례)</button>` : ''}
     </div>`;
     const s = _case2Search.toLowerCase();
 
@@ -2450,7 +2495,52 @@
     el.innerHTML = h;
     bindCase2(el);
   }
+  // 🔴 실전 모의 화면(진행/채점)
+  function renderCase2Sim(el) {
+    const sim = _case2Sim;
+    if (_case2SimTimer) { clearInterval(_case2SimTimer); _case2SimTimer = null; }
+    if (!sim.submitted) {
+      // 진행 중: 타이머 + 잠긴 사례 2개(답만 작성) + 제출
+      let h = `<div class="case2-sim-bar">
+        <span class="case2-sim-tag">🔴 실전 모의 · 2사례 100분</span>
+        <span class="case2-sim-clock" id="case2SimClock">100:00</span>
+        <button class="case2-sim-submit" id="case2SimSubmit" type="button">제출하고 채점</button>
+        <button class="case2-sim-quit" id="case2SimQuit" type="button">나가기</button>
+      </div>
+      <p class="case2-section-note">실제처럼 <b>모범답안·답안 틀은 잠겨</b> 있습니다. 사례당 약 50분, 요구 개수만큼 번호 매겨 작성 후 <b>제출</b>하면 자가채점으로 넘어갑니다.</p>`;
+      h += sim.items.map((it, i) => case2Card(it.c, i, { keyBase: it.keyBase, badge: `사례 ${i + 1}`, open: true, lock: true })).join('');
+      el.innerHTML = h;
+      bindCase2(el);
+      document.getElementById('case2SimSubmit')?.addEventListener('click', submitCase2Sim);
+      document.getElementById('case2SimQuit')?.addEventListener('click', () => { if (confirm('실전 모의를 종료할까요? 작성한 답안은 저장됩니다.')) exitCase2Sim(); });
+      case2SimTick();
+      _case2SimTimer = setInterval(case2SimTick, 1000);
+      return;
+    }
+    // 채점 모드: 잠금 해제 + 자가채점 + 총점
+    let agg = { cov: 0, tot: 0 };
+    sim.items.forEach(it => { const s = case2CaseScore(it.c, it.keyBase); agg.cov += s.covered; agg.tot += s.total; });
+    const overall = agg.tot ? Math.round(agg.cov / agg.tot * 100) : 0;
+    let h = `<div class="case2-sim-bar done">
+      <span class="case2-sim-tag">🟢 채점 모드</span>
+      <span class="case2-sim-total" id="case2SimTotal">총점 ${overall}%</span>
+      <button class="case2-sim-quit" id="case2SimQuit" type="button">모의 종료</button>
+    </div>
+    <p class="case2-section-note">각 문항의 <b>✅ 모범답안</b>을 열고 커버한 채점 포인트를 체크하세요 → 아래 총점이 실시간 갱신됩니다. 60% 미만 사례는 '🔁 복습 필요'에 모입니다.</p>`;
+    h += sim.items.map((it, i) => case2Card(it.c, i, { keyBase: it.keyBase, badge: `사례 ${i + 1}`, open: true })).join('');
+    el.innerHTML = h;
+    bindCase2(el);
+    document.getElementById('case2SimQuit')?.addEventListener('click', exitCase2Sim);
+    // 채점 체크 시 총점 라이브 갱신
+    el.querySelectorAll('.case2-ck').forEach(cb => cb.addEventListener('change', () => {
+      let a = { cov: 0, tot: 0 };
+      sim.items.forEach(it => { const s = case2CaseScore(it.c, it.keyBase); a.cov += s.covered; a.tot += s.total; });
+      const t = document.getElementById('case2SimTotal');
+      if (t) t.textContent = `총점 ${a.tot ? Math.round(a.cov / a.tot * 100) : 0}%`;
+    }));
+  }
   function bindCase2(el) {
+    document.getElementById('case2SimStart')?.addEventListener('click', startCase2Sim);
     el.querySelectorAll('.case2-ans').forEach(ta => {
       ta.addEventListener('input', () => {
         const map = loadCase2Ans();
