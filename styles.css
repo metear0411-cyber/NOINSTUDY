@@ -1396,6 +1396,19 @@ body.focus-mode .part-panel { display: none; }
 .case2-frame[open] > summary { border-radius:8px 8px 0 0; }
 .case2-frame-body { margin:0; border:1px solid #ecd9b8; border-top:none; border-radius:0 0 8px 8px; background:#fffdf9; padding:9px 12px 9px 28px; }
 .case2-frame-body li { line-height:1.55; margin:3px 0; font-size:.86rem; color:#5a4a30; }
+/* 실전 모의(타이머) */
+.case2-sim-start { display:block; width:100%; margin-top:10px; padding:11px; border:none; border-radius:10px; background:#b8323a; color:#fff; font-weight:700; font-size:.95rem; cursor:pointer; }
+.case2-sim-start:hover { background:#a12831; }
+.case2-sim-bar { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:11px 13px; margin-bottom:12px; border-radius:12px; background:#fbe6e8; border:1px solid #f0c2c6; }
+.case2-sim-bar.done { background:#e3f3ea; border-color:#bfe0cd; }
+.case2-sim-tag { font-weight:700; color:#b8323a; font-size:.86rem; }
+.case2-sim-bar.done .case2-sim-tag { color:#2f7a5e; }
+.case2-sim-clock { font-family:'IBM Plex Sans KR',monospace; font-size:1.4rem; font-weight:700; color:#b8323a; letter-spacing:1px; margin-left:auto; }
+.case2-sim-clock.urgent { animation:case2pulse 1s infinite; }
+@keyframes case2pulse { 0%,100%{opacity:1;} 50%{opacity:.45;} }
+.case2-sim-total { font-size:1.15rem; font-weight:700; color:#2f7a5e; margin-left:auto; }
+.case2-sim-submit { padding:8px 14px; border:none; border-radius:8px; background:#b8323a; color:#fff; font-weight:700; cursor:pointer; }
+.case2-sim-quit { padding:8px 12px; border:1px solid #cfd8e3; border-radius:8px; background:#fff; color:#5a6675; cursor:pointer; }
 .case2-notes-h { font-size:.78rem; font-weight:700; color:#2c5f96; margin:8px 0 3px; }
 .case2-notes { margin:0; padding-left:19px; }
 .case2-notes li { line-height:1.5; margin:2px 0; font-size:.86rem; color:#3a4656; }
