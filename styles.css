@@ -1333,6 +1333,18 @@ body.focus-mode .part-panel { display: none; }
 .cram-ref.ref-wound .cram-title { color:#9a6a2a; }
 .cram-ref.ref-tb { border-color:#cfe0c2; background:#fcfff9; }
 .cram-ref.ref-tb .cram-title { color:#5a7a36; }
+.cram-ref.ref-qi { border-color:#c9dcf0; background:#fafcff; }
+.cram-ref.ref-qi .cram-title { color:#3060a0; }
+.cram-ref.ref-hyperk { border-color:#f0d9b8; background:#fffdf7; }
+.cram-ref.ref-hyperk .cram-title { color:#a86a1e; }
+.cram-ref.ref-arrest { border-color:#f2bfc0; background:#fffafa; }
+.cram-ref.ref-arrest .cram-title { color:#b8323a; }
+.cram-ref.ref-pad { border-color:#c6d9d0; background:#fafffc; }
+.cram-ref.ref-pad .cram-title { color:#2f7a5e; }
+.cram-ref.ref-neuroexam { border-color:#d9c9f0; background:#fdfbff; }
+.cram-ref.ref-neuroexam .cram-title { color:#6b4ea6; }
+.cram-ref.ref-drugpair { border-color:#cfe0c2; background:#fcfff9; }
+.cram-ref.ref-drugpair .cram-title { color:#5a7a36; }
 .cram-sum {
   list-style: none; cursor: pointer; padding: 11px 13px; display: grid;
   grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center;
