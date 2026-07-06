@@ -8,6 +8,7 @@
   const EXAM2_DATE = new Date(2026, 7, 23); // 2026-08-23 2차시험(사례 서술형)
   const LS_CASE2_KEY = 'nori_case2_ans_v1'; // 2차 사례 서술형 내 답안 저장
   const LS_CASE2_SCORE = 'nori_case2_score_v1'; // 2차 자가채점: {"keyBase::subIdx": [체크한 채점포인트 인덱스]}
+  const LS_DXDRILL = 'nori_dxdrill_v1'; // 증상→간호진단 드릴 자가평가: {cardId: 'known'|'fuzzy'}
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
   const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
@@ -2314,6 +2315,7 @@
     const systems = [...new Set(cases.map(c => c.system))];
     const chips = [];
     if ((data.pastExams || []).length) chips.push('📚 역대 기출');
+    if (((window.NORI_DXDRILLS || {}).cards || []).length) chips.push('🎯 진단 드릴');
     chips.push('🧩 연습 전체');
     if (case2HasReview()) chips.push('🔁 복습 필요');
     chips.push(...systems);
@@ -2433,12 +2435,96 @@
       </div>
     </details>`;
   }
+  // ── 증상→간호진단 인출 드릴(retrieval practice) ──
+  let _dxDeck = null;   // {order:[idx...], pos, revealed, onlyFuzzy}
+  function loadDxState() { try { return JSON.parse(localStorage.getItem(LS_DXDRILL)) || {}; } catch (e) { return {}; } }
+  function saveDxState(m) { try { localStorage.setItem(LS_DXDRILL, JSON.stringify(m)); } catch (e) {} }
+  function dxCards() { return ((window.NORI_DXDRILLS || {}).cards) || []; }
+  function buildDxDeck(onlyFuzzy) {
+    const st = loadDxState();
+    const all = dxCards();
+    let idxs = all.map((_, i) => i);
+    if (onlyFuzzy) idxs = idxs.filter(i => st[all[i].id] === 'fuzzy');
+    for (let i = idxs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idxs[i], idxs[j]] = [idxs[j], idxs[i]]; }
+    _dxDeck = { order: idxs, pos: 0, revealed: false, onlyFuzzy: !!onlyFuzzy };
+  }
+  function dxRate(rating) {
+    if (!_dxDeck) return;
+    const card = dxCards()[_dxDeck.order[_dxDeck.pos]];
+    if (card) { const m = loadDxState(); m[card.id] = rating; saveDxState(m); }
+    _dxDeck.pos++; _dxDeck.revealed = false;
+    renderCase2();
+  }
+  function renderDxDrill(el) {
+    const all = dxCards();
+    const st = loadDxState();
+    const knownN = all.filter(c => st[c.id] === 'known').length;
+    const fuzzyN = all.filter(c => st[c.id] === 'fuzzy').length;
+    if (!_dxDeck) buildDxDeck(false);
+    const deck = _dxDeck;
+    const head = `<div class="dx-head">
+      <div class="dx-head-top"><strong>🎯 증상 → 간호진단 인출 드릴</strong>
+        <span class="dx-stat">✓ ${knownN} · △ ${fuzzyN} / ${all.length}</span></div>
+      <p>증상·소견만 보고 <b>NANDA 간호진단</b>을 먼저 떠올린 뒤 정답을 확인하세요(인출연습). ${deck.onlyFuzzy ? '<b>△ 헷갈림</b>만 다시 도는 중.' : ''}</p>
+      <div class="dx-head-btns">
+        <button class="dx-mini" type="button" data-dx="reshuffle">🔀 전체 다시 섞기</button>
+        ${fuzzyN ? `<button class="dx-mini${deck.onlyFuzzy ? ' on' : ''}" type="button" data-dx="fuzzyonly">△ 헷갈린 것만(${fuzzyN})</button>` : ''}
+      </div>
+    </div>`;
+    if (deck.pos >= deck.order.length) {
+      el.innerHTML = head + `<div class="dx-done">🎉 이 덱을 다 돌았어요! (${deck.order.length}장)<br><button class="dx-again" type="button" data-dx="reshuffle">다시 섞어 한 번 더</button></div>`;
+      bindDxDrill(el); return;
+    }
+    const card = all[deck.order[deck.pos]];
+    const prog = `${deck.pos + 1} / ${deck.order.length}`;
+    const cues = (card.cues || []).map(q => `<li>${emph(esc(q))}</li>`).join('');
+    const rated = st[card.id];
+    let body;
+    if (!deck.revealed) {
+      body = `<div class="dx-card">
+        <div class="dx-card-top"><span class="dx-sys">${esc(card.system || '')}</span><span class="dx-prog">${prog}</span></div>
+        <div class="dx-cue-h">이 증상·소견이 가리키는 간호진단은?</div>
+        <ul class="dx-cues">${cues}</ul>
+        <button class="dx-reveal" type="button" data-dx="reveal">🤔 떠올렸으면 · 정답 보기</button>
+      </div>`;
+    } else {
+      const ivs = (card.interventions || []).map(x => `<li>${emph(esc(x))}</li>`).join('');
+      body = `<div class="dx-card revealed">
+        <div class="dx-card-top"><span class="dx-sys">${esc(card.system || '')}</span><span class="dx-prog">${prog}</span></div>
+        <div class="dx-cue-h">증상·소견</div>
+        <ul class="dx-cues">${cues}</ul>
+        <div class="dx-dx"><span class="dx-dx-tag">간호진단</span>${emph(esc(card.dx))}</div>
+        ${card.rationale ? `<p class="dx-rationale">${emph(esc(card.rationale))}</p>` : ''}
+        ${ivs ? `<div class="dx-iv-h">핵심 중재</div><ul class="dx-ivs">${ivs}</ul>` : ''}
+        <div class="dx-rate">
+          <span>스스로 평가:</span>
+          <button class="dx-rate-btn known${rated === 'known' ? ' on' : ''}" type="button" data-dx="known">✓ 바로 떠올림</button>
+          <button class="dx-rate-btn fuzzy${rated === 'fuzzy' ? ' on' : ''}" type="button" data-dx="fuzzy">△ 헷갈림 (다시)</button>
+        </div>
+      </div>`;
+    }
+    el.innerHTML = head + body;
+    bindDxDrill(el);
+  }
+  function bindDxDrill(el) {
+    el.querySelectorAll('[data-dx]').forEach(b => b.addEventListener('click', () => {
+      const a = b.dataset.dx;
+      if (a === 'reveal') { _dxDeck.revealed = true; renderCase2(); }
+      else if (a === 'known') dxRate('known');
+      else if (a === 'fuzzy') dxRate('fuzzy');
+      else if (a === 'reshuffle') { buildDxDeck(false); renderCase2(); }
+      else if (a === 'fuzzyonly') { buildDxDeck(true); renderCase2(); }
+    }));
+  }
   function renderCase2() {
     const el = document.getElementById('case2Content'); if (!el) return;
     const data = window.NORI_CASE2 || { cases: [] };
 
     // 🔴 실전 모의 진행/채점 모드 — 필터·인트로 대신 시뮬 화면
     if (_case2Sim) { renderCase2Sim(el); return; }
+
+    // 🎯 증상→간호진단 인출 드릴 모드
+    if (_case2Filter === '🎯 진단 드릴') { renderDxDrill(el); return; }
 
     const dleft = case2DaysLeft();
     const ddayTxt = dleft > 0 ? `D-${dleft}` : dleft === 0 ? 'D-Day!' : `D+${Math.abs(dleft)}`;
