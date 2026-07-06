@@ -1409,6 +1409,38 @@ body.focus-mode .part-panel { display: none; }
 .case2-sim-total { font-size:1.15rem; font-weight:700; color:#2f7a5e; margin-left:auto; }
 .case2-sim-submit { padding:8px 14px; border:none; border-radius:8px; background:#b8323a; color:#fff; font-weight:700; cursor:pointer; }
 .case2-sim-quit { padding:8px 12px; border:1px solid #cfd8e3; border-radius:8px; background:#fff; color:#5a6675; cursor:pointer; }
+/* 증상→간호진단 인출 드릴 */
+.dx-head { border:1px solid #d6dee8; background:#f8fafc; border-radius:12px; padding:12px 14px; margin-bottom:14px; }
+.dx-head-top { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.dx-head-top strong { font-size:1.02rem; color:#2a3340; }
+.dx-stat { font-size:.8rem; font-weight:700; color:#2f7a5e; background:#eef7f1; border-radius:20px; padding:2px 10px; }
+.dx-head p { margin:6px 0 0; font-size:.88rem; line-height:1.55; color:#3a4656; }
+.dx-head-btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:9px; }
+.dx-mini { font-size:.82rem; padding:6px 11px; border:1px solid #cfd8e3; border-radius:8px; background:#fff; color:#3a4656; cursor:pointer; }
+.dx-mini.on { background:#fdf6ec; border-color:#ecd9b8; color:#8a5a1e; font-weight:600; }
+.dx-card { border:1px solid #d6dee8; border-radius:14px; background:#fff; padding:16px 16px 18px; box-shadow:0 2px 10px rgba(31,45,50,.06); }
+.dx-card.revealed { border-color:#bfe0cd; }
+.dx-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.dx-sys { font-size:.74rem; font-weight:700; color:#2c6ba0; background:#e6f0fa; border-radius:20px; padding:2px 10px; }
+.dx-prog { font-size:.82rem; font-weight:600; color:#8a94a2; font-variant-numeric:tabular-nums; }
+.dx-cue-h { font-size:.78rem; font-weight:700; color:#8a5a1e; margin-bottom:6px; }
+.dx-cues { margin:0 0 4px; padding-left:20px; }
+.dx-cues li { line-height:1.6; margin:5px 0; font-size:1rem; color:#2a3340; }
+.dx-reveal { display:block; width:100%; margin-top:14px; padding:12px; border:none; border-radius:10px; background:#2c6ba0; color:#fff; font-weight:700; font-size:.95rem; cursor:pointer; }
+.dx-reveal:hover { background:#255a89; }
+.dx-dx { margin:14px 0 8px; padding:12px 14px; background:#eef7f1; border-radius:10px; font-size:1.05rem; font-weight:700; line-height:1.5; color:#215c46; }
+.dx-dx-tag { display:block; font-size:.72rem; font-weight:700; color:#2f7a5e; margin-bottom:4px; }
+.dx-rationale { margin:0 0 10px; font-size:.9rem; line-height:1.6; color:#4a5663; }
+.dx-iv-h { font-size:.78rem; font-weight:700; color:#2c5f96; margin:8px 0 3px; }
+.dx-ivs { margin:0 0 4px; padding-left:20px; }
+.dx-ivs li { line-height:1.55; margin:4px 0; color:#3a4656; }
+.dx-rate { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:13px; border-top:1px dashed #e2e8f0; }
+.dx-rate > span { font-size:.85rem; color:#8a94a2; }
+.dx-rate-btn { padding:9px 15px; border-radius:9px; border:1px solid #cfd8e3; background:#fff; font-weight:700; font-size:.9rem; cursor:pointer; }
+.dx-rate-btn.known { color:#2f7a5e; } .dx-rate-btn.known.on,.dx-rate-btn.known:hover { background:#e3f3ea; border-color:#bfe0cd; }
+.dx-rate-btn.fuzzy { color:#b8872f; } .dx-rate-btn.fuzzy.on,.dx-rate-btn.fuzzy:hover { background:#f5ebd5; border-color:#e6d09a; }
+.dx-done { text-align:center; padding:30px 16px; color:#2f7a5e; font-size:1.05rem; font-weight:600; line-height:1.7; }
+.dx-again { display:inline-block; margin-top:12px; padding:10px 18px; border:none; border-radius:10px; background:#2c6ba0; color:#fff; font-weight:700; cursor:pointer; }
 .case2-notes-h { font-size:.78rem; font-weight:700; color:#2c5f96; margin:8px 0 3px; }
 .case2-notes { margin:0; padding-left:19px; }
 .case2-notes li { line-height:1.5; margin:2px 0; font-size:.86rem; color:#3a4656; }
