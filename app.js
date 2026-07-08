@@ -2425,7 +2425,7 @@
     return `<details class="case2-case"${opts.open ? ' open' : ''} data-c2case="${esc(keyBase)}">
       <summary class="case2-sum">
         <span class="case2-sys">${esc(badge)}</span>
-        <span class="case2-title">${esc(c.title)}</span>
+        <span class="case2-title">사례 ${idx + 1}</span>
         ${scoreBadge}
         <span class="cram-chev" aria-hidden="true">▾</span>
       </summary>
@@ -2594,7 +2594,7 @@
         <button class="case2-sim-quit" id="case2SimQuit" type="button">나가기</button>
       </div>
       <p class="case2-section-note">실제처럼 <b>모범답안·답안 틀은 잠겨</b> 있습니다. 사례당 약 50분, 요구 개수만큼 번호 매겨 작성 후 <b>제출</b>하면 자가채점으로 넘어갑니다.</p>`;
-      h += sim.items.map((it, i) => case2Card(it.c, i, { keyBase: it.keyBase, badge: `사례 ${i + 1}`, open: true, lock: true })).join('');
+      h += sim.items.map((it, i) => case2Card(it.c, i, { keyBase: it.keyBase, badge: it.c.system || '', open: true, lock: true })).join('');
       el.innerHTML = h;
       bindCase2(el);
       document.getElementById('case2SimSubmit')?.addEventListener('click', submitCase2Sim);
@@ -2613,7 +2613,7 @@
       <button class="case2-sim-quit" id="case2SimQuit" type="button">모의 종료</button>
     </div>
     <p class="case2-section-note">각 문항의 <b>✅ 모범답안</b>을 열고 커버한 채점 포인트를 체크하세요 → 아래 총점이 실시간 갱신됩니다. 60% 미만 사례는 '🔁 복습 필요'에 모입니다.</p>`;
-    h += sim.items.map((it, i) => case2Card(it.c, i, { keyBase: it.keyBase, badge: `사례 ${i + 1}`, open: true })).join('');
+    h += sim.items.map((it, i) => case2Card(it.c, i, { keyBase: it.keyBase, badge: it.c.system || '', open: true })).join('');
     el.innerHTML = h;
     bindCase2(el);
     document.getElementById('case2SimQuit')?.addEventListener('click', exitCase2Sim);
