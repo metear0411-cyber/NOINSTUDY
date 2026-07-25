@@ -2412,8 +2412,15 @@
             ${pts ? `<div class="case2-points-h">채점 핵심 포인트 (커버한 항목 체크)</div><ul class="case2-points case2-points-ck">${pts}</ul>${scoreLine}` : ''}
           </div>
         </details>`;
-      return `<div class="case2-sub">
+      // 🧠 이 문항이 인출하는 답안 블록 — 누르면 매트릭스로 이동. 실전 모의(lock) 중엔 힌트가 되므로 숨김.
+      const blk = (!opts.lock && sq.blockRef) ? blockAt(sq.blockRef) : null;
+      const blkHtml = blk
+        ? `<button type="button" class="case2-blockref" data-c2blk="${esc(blk.id)}"
+             title="답안 블록 매트릭스에서 이 블록 열기">🧠 ${esc(blk.topic.label)} · ${esc(blk.type.label)} 블록</button>`
+        : '';
+      return `<div class="case2-sub" data-c2sub="${esc(key)}">
         <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
+        ${blkHtml}
         ${frameHtml}
         <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
         ${modelHtml}
@@ -2526,6 +2533,7 @@
   let _blockShown = false; // 가린 상태에서 공개했는지
   let _blockScrollX = 0;   // 그리드 가로 스크롤 위치 보존
   let _blockFocus = false; // 방금 칸을 눌렀는지(카드로 스크롤)
+  let _case2Jump  = null;  // {caseId, qi} — 블록에서 사례 문항으로 건너뛴 직후 1회 펼침·스크롤
   function loadBlocksDone() { try { return JSON.parse(localStorage.getItem(LS_BLOCKS_DONE)) || {}; } catch (e) { return {}; } }
   function saveBlocksDone(m) { try { localStorage.setItem(LS_BLOCKS_DONE, JSON.stringify(m)); } catch (e) {} }
   function blockAt(id) {
@@ -2539,6 +2547,21 @@
     return { topic, type: type || { key: yk, label: yk }, block: b, id: `${tk}.${yk}` };
   }
   function blockCount(b) { return (b && b.items || []).length; }
+  // blockRef("topicKey.typeKey") → 그 블록을 연습하는 사례 문항 목록. 매트릭스↔사례 왕복 이동에 사용.
+  let _blockRefIdx = null;
+  function blockRefIndex() {
+    if (_blockRefIdx) return _blockRefIdx;
+    const m = {};
+    ((window.NORI_CASE2 || {}).cases || []).forEach(c => {
+      (c.subquestions || []).forEach((sq, qi) => {
+        if (!sq.blockRef) return;
+        (m[sq.blockRef] = m[sq.blockRef] || []).push({ caseId: c.id, title: c.title, qi });
+      });
+    });
+    _blockRefIdx = m;
+    return m;
+  }
+  function blockRefCases(id) { return blockRefIndex()[id] || []; }
   function renderBlockMatrix(el) {
     const d = window.NORI_BLOCKS || {};
     const types  = d.types  || [];
@@ -2612,6 +2635,7 @@
       ? `<details class="blockmx-note"><summary>💡 쓰는 요령 · 감점 포인트</summary><p>${emph(esc(noteTxt))}</p></details>`
       : `<p class="blockmx-note-inline">💡 ${emph(esc(noteTxt))}</p>`);
     const blind = _blockBlind && !_blockShown;
+    const practice = blockRefCases(sel.id);
     return `<div class="blockmx-card" id="blockmxCard">
       <div class="blockmx-card-head">
         <span class="blockmx-badge">${esc(sel.topic.label)} · ${esc(sel.type.label)}</span>
@@ -2620,6 +2644,7 @@
       <div class="blockmx-tools">
         <button type="button" class="blockmx-btn${_blockBlind ? ' on' : ''}" data-bmx-act="blind">${_blockBlind ? '🙈 백지 인출 켜짐' : '🙈 백지 인출'}</button>
         <label class="blockmx-done"><input type="checkbox" data-bmx-act="done"${isDone ? ' checked' : ''}><span>암기 완료</span></label>
+        ${practice.length ? `<button type="button" class="blockmx-btn is-practice" data-bmx-act="practice">📝 이 블록으로 연습 (${practice.length}문항)</button>` : ''}
       </div>
       <div class="blockmx-body${blind ? ' is-blind' : ''}"${blind ? ' role="button" tabindex="0" aria-label="탭하면 공개"' : ''}>
         ${blind ? `<span class="blockmx-hint">탭하면 공개</span>` : ''}
@@ -2641,6 +2666,18 @@
     const blindBtn = el.querySelector('[data-bmx-act="blind"]');
     if (blindBtn) blindBtn.addEventListener('click', () => {
       _blockBlind = !_blockBlind; _blockShown = false; renderBlockMatrix(el);
+    });
+    // 📝 이 블록으로 연습 — 해당 blockRef를 가진 첫 사례 문항으로 이동(연습 전체 필터로 전환)
+    const pracBtn = el.querySelector('[data-bmx-act="practice"]');
+    if (pracBtn) pracBtn.addEventListener('click', () => {
+      const hit = blockRefCases(_blockSel)[0];
+      if (!hit) return;
+      _case2Jump = { caseId: hit.caseId, qi: hit.qi };
+      _case2Filter = '🧩 연습 전체';
+      _case2Search = '';
+      const box = document.getElementById('case2Search'); if (box) box.value = '';
+      buildCase2FilterBar();
+      renderCase2();
     });
     const doneCk = el.querySelector('input[data-bmx-act="done"]');
     if (doneCk) doneCk.addEventListener('change', () => {
@@ -2726,9 +2763,22 @@
       (c.subquestions || []).some(sq => (sq.q + ' ' + sq.answer).toLowerCase().includes(s)));
     h += `<p class="case2-section-note">계통별 연습 사례(앱 자료 기반 생성·검수) — 실제 시험은 여러 계통이 한 케이스에 섞여 나오니, 계통별로 익힌 뒤 역대 기출로 통합 연습하세요.</p>`;
     if (!cases.length) { el.innerHTML = h + `<p class="case2-empty">검색·필터 결과가 없습니다.</p>`; return; }
-    h += cases.map((c, i) => case2Card(c, i, { open: i === 0 })).join('');
+    // 블록에서 건너뛰어 온 경우 그 사례만 펼치고 해당 문항으로 스크롤(1회)
+    const jump = _case2Jump; _case2Jump = null;
+    h += cases.map((c, i) => case2Card(c, i, {
+      open: jump ? c.id === jump.caseId : i === 0,
+    })).join('');
     el.innerHTML = h;
     bindCase2(el);
+    if (jump) {
+      const sub = el.querySelector(`[data-c2sub="${jump.caseId}::${jump.qi}"]`);
+      if (sub && sub.scrollIntoView) {
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        sub.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+        sub.classList.add('is-jumped');
+        setTimeout(() => sub.classList.remove('is-jumped'), 2000);
+      }
+    }
   }
   // 🔴 실전 모의 화면(진행/채점)
   function renderCase2Sim(el) {
@@ -2776,6 +2826,14 @@
   }
   function bindCase2(el) {
     document.getElementById('case2SimStart')?.addEventListener('click', startCase2Sim);
+    // 🧠 문항의 블록 배지 — 답안 블록 매트릭스의 해당 칸을 열어 준다
+    el.querySelectorAll('[data-c2blk]').forEach(b => b.addEventListener('click', ev => {
+      ev.preventDefault(); ev.stopPropagation();
+      _blockSel = b.dataset.c2blk; _blockShown = false; _blockFocus = true;
+      _case2Filter = '🧠 답안 블록';
+      buildCase2FilterBar();
+      renderCase2();
+    }));
     el.querySelectorAll('.case2-ans').forEach(ta => {
       ta.addEventListener('input', () => {
         const map = loadCase2Ans();
