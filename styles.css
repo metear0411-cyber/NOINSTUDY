@@ -2333,3 +2333,152 @@ details.cram-cat:not([open]) > summary.cram-cat-h::after { transform: rotate(-90
 .mock-real-grid { margin-bottom: 14px; }
 .mock-real-card { border-color: #1f7a74 !important; }
 .mock-real-card strong { color: #1f7a74; }
+
+/* ============================================
+   🧠 답안 블록 매트릭스 (2차 탭) — 주제 × 유형
+   ============================================ */
+.blockmx-head {
+  margin: 2px 0 16px; padding: 16px 18px; border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--teal-soft), #f7fbfa);
+  border: 1px solid #cfe6e0;
+}
+.blockmx-head-top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.blockmx-head-top strong { font-family: var(--font-display); font-size: 15px; color: var(--teal-dark); letter-spacing: -0.01em; }
+.blockmx-stat {
+  font-family: var(--font-data); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+  font-size: 12.5px; font-weight: 700; color: var(--teal-dark);
+  background: #fff; border: 1px solid #cfe6e0; border-radius: 999px; padding: 3px 11px;
+}
+.blockmx-head p { margin: 0; font-size: 13px; line-height: 1.75; color: #2c5a54; }
+.blockmx-head b { color: var(--teal-dark); font-weight: 700; }
+
+/* ── 그리드 ── */
+.blockmx-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line); border-radius: var(--radius); background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.blockmx-grid { display: grid; gap: 4px; padding: 10px; min-width: max-content; }
+.blockmx-colhead, .blockmx-rowhead {
+  font-family: var(--font-display); font-size: 11.5px; font-weight: 700;
+  color: var(--muted); letter-spacing: -0.01em; line-height: 1.35;
+  display: flex; align-items: center; padding: 6px 8px;
+}
+.blockmx-colhead { justify-content: center; text-align: center; }
+.blockmx-rowhead {
+  position: sticky; left: 0; z-index: 2; background: #fff;
+  color: var(--ink); font-size: 12.5px;
+  box-shadow: 1px 0 0 var(--line);
+}
+.blockmx-corner { color: var(--muted); font-size: 11px; font-weight: 600; }
+.blockmx-cell {
+  min-height: 44px; min-width: 44px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid transparent; border-radius: 8px; background: transparent;
+  color: var(--muted); font-size: 13px; font-family: inherit; padding: 0;
+}
+.blockmx-cell.is-empty { color: #c3ccd1; cursor: default; }
+.blockmx-cell.is-filled {
+  background: var(--teal-soft); border-color: #cfe6e0; color: var(--teal-dark); cursor: pointer;
+}
+.blockmx-cell.is-filled:hover { border-color: var(--teal); }
+.blockmx-cell.is-done { background: var(--teal); border-color: var(--teal); color: #fff; }
+.blockmx-cell.is-sel { outline: 2px solid var(--teal); outline-offset: -1px; }
+.blockmx-cell-n {
+  font-family: var(--font-data); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+  font-size: 13px; font-weight: 700;
+}
+.blockmx-legend {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+  margin: 10px 2px 0; font-size: 11.5px; color: var(--muted); line-height: 1.6;
+}
+.blockmx-key {
+  display: inline-block; width: 15px; height: 15px; border-radius: 4px; vertical-align: -3px;
+  margin-right: 3px; border: 1px solid var(--line);
+}
+.blockmx-key.is-filled { background: var(--teal-soft); border-color: #cfe6e0; }
+.blockmx-key.is-done { background: var(--teal); border-color: var(--teal); }
+.blockmx-key.is-empty {
+  border: 0; width: auto; height: auto; color: #c3ccd1; font-weight: 700;
+}
+
+/* ── 블록 카드 ── */
+.blockmx-card {
+  margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: #fff; box-shadow: var(--shadow-sm);
+}
+.blockmx-card-head { margin-bottom: 14px; }
+.blockmx-badge {
+  display: inline-block; margin-bottom: 8px; padding: 3px 10px; border-radius: 999px;
+  background: var(--gold-soft); color: #7d5b16; font-size: 11.5px; font-weight: 700;
+}
+.blockmx-title {
+  margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  color: var(--ink); line-height: 1.55; letter-spacing: -0.01em;
+}
+.blockmx-tools {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding-bottom: 14px; margin-bottom: 4px; border-bottom: 1px solid var(--line);
+}
+.blockmx-btn {
+  min-height: 40px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper); color: var(--ink); font-family: inherit; font-size: 12.5px;
+  font-weight: 700; cursor: pointer;
+}
+.blockmx-btn.on { background: var(--clay-soft); border-color: var(--clay); color: var(--clay); }
+.blockmx-done {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 12px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--paper);
+  font-size: 12.5px; font-weight: 700; color: var(--ink); cursor: pointer;
+}
+.blockmx-done input { width: 17px; height: 17px; accent-color: var(--teal); cursor: pointer; }
+.blockmx-body { position: relative; padding-top: 14px; }
+.blockmx-body.is-blind { cursor: pointer; }
+.blockmx-body.is-blind .blockmx-blurwrap { filter: blur(6px); user-select: none; pointer-events: none; }
+.blockmx-blurwrap { transition: filter 0.18s ease; }
+.blockmx-hint {
+  position: absolute; z-index: 3; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  padding: 8px 16px; border-radius: 999px; background: rgba(24, 37, 44, 0.86); color: #fff;
+  font-size: 12.5px; font-weight: 700; white-space: nowrap; pointer-events: none;
+  box-shadow: var(--shadow-md);
+}
+.blockmx-items { margin: 0; padding-left: 22px; }
+.blockmx-items > li {
+  margin-bottom: 8px; font-size: 13.5px; line-height: 1.65; color: var(--ink);
+  padding-left: 3px;
+}
+.blockmx-items > li::marker {
+  font-family: var(--font-data); font-variant-numeric: tabular-nums;
+  font-weight: 700; color: var(--teal);
+}
+.blockmx-dxlist > li { margin-bottom: 16px; }
+.blockmx-dx { font-weight: 700; color: var(--teal-dark); line-height: 1.6; margin-bottom: 8px; }
+.blockmx-ivs { margin: 0 0 0 4px; padding-left: 20px; }
+.blockmx-ivs > li {
+  margin-bottom: 6px; font-size: 13px; line-height: 1.65; color: #35464e;
+}
+.blockmx-ivs > li::marker { font-family: var(--font-data); color: var(--muted); }
+.blockmx-note, .blockmx-note-inline {
+  margin: 16px 0 0; padding: 13px 15px; border-radius: 9px;
+  background: var(--gold-soft); border: 1px solid #e8d6ac;
+  font-size: 12.5px; line-height: 1.75; color: #5f4a1d;
+}
+.blockmx-note-inline { margin-bottom: 0; }
+.blockmx-note > summary {
+  cursor: pointer; font-weight: 700; color: #7d5b16; list-style: none;
+}
+.blockmx-note > summary::-webkit-details-marker { display: none; }
+.blockmx-note > summary::after { content: ' ▾'; }
+.blockmx-note[open] > summary::after { content: ' ▴'; }
+.blockmx-note > p { margin: 10px 0 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .blockmx-blurwrap { transition: none; }
+}
+@media (max-width: 520px) {
+  .blockmx-head { padding: 14px; }
+  .blockmx-card { padding: 15px; }
+  .blockmx-items { padding-left: 20px; }
+}
