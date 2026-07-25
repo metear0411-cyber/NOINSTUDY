@@ -1,26 +1,29 @@
 // 노인전문간호사 2026 — Service Worker
 // 버전을 올리면 캐시 갱신됨
-const CACHE_NAME = 'nori-study-v86';
+const CACHE_NAME = 'nori-study-v89';
 
 // 설치 시 미리 캐시할 핵심 파일
 // app.js·styles.css는 index.html과 동일한 ?v= 버전으로 받아 브라우저 HTTP 캐시를 우회한다
 // (배포 시 CACHE_NAME 숫자와 아래 ?v= 날짜를 함께 올릴 것)
-const ASSET_VER = '20260705i';
+const ASSET_VER = '20260726a';
 const PRECACHE_URLS = [
   './index.html',
   './app.js?v=' + ASSET_VER,
   './styles.css?v=' + ASSET_VER,
   './data/gichul.js?v=' + ASSET_VER,
   './data/variation.js?v=' + ASSET_VER,
+  // 답안 블록 매트릭스 데이터 — index.html과 동일한 ?v= 를 써야 프리캐시가 실제로 적중한다
+  './data/answer-blocks.js?v=20260726a',
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg',
-  './notes-bridge.js?v=20260531',
+  './notes-bridge.js?v=20260726a',
 ];
 
 // 그림노트(학습노트) — best-effort 프리캐시(오프라인 보강). 파일명에 한글·· 포함 →
 // encodeURI로 인코딩, addAll 실패해도 install이 안 깨지게 .catch로 격리.
 const NOTE_URLS = [
+  './00_공부법_사용설명서.html',
   './00_학습허브_시작.html',
   './01_피부감각계_학습노트.html',
   './02_심혈관계_학습노트.html',

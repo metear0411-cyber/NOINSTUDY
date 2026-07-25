@@ -8,6 +8,7 @@
   'use strict';
 
   var NOTES = [
+    { icon: '🧭', label: '공부법 사용설명서', desc: '무엇을 어떤 순서로 · NANDA 속성 · 4주 계획', file: '00_공부법_사용설명서.html' },
     { icon: '🧠', label: '신경계',        desc: '뇌졸중·치매·섬망·파킨슨',         file: '05_신경계_학습노트.html' },
     { icon: '❤️', label: '심혈관계',      desc: 'ECG·죽상경화·심근표지자·심방세동', file: '02_심혈관계_학습노트.html' },
     { icon: '🫁', label: '호흡기계',      desc: '천식·COPD·폐렴·결핵·폐암',       file: '03_호흡기계_학습노트.html' },

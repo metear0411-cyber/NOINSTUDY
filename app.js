@@ -9,6 +9,7 @@
   const LS_CASE2_KEY = 'nori_case2_ans_v1'; // 2차 사례 서술형 내 답안 저장
   const LS_CASE2_SCORE = 'nori_case2_score_v1'; // 2차 자가채점: {"keyBase::subIdx": [체크한 채점포인트 인덱스]}
   const LS_DXDRILL = 'nori_dxdrill_v1'; // 증상→간호진단 드릴 자가평가: {cardId: 'known'|'fuzzy'}
+  const LS_BLOCKS_DONE = 'nori_blocks_done_v1'; // 답안 블록 암기 완료: {"<topicKey>.<typeKey>": true}
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
   const LS_MOCK    = 'nori_mock_v1';  // 모의고사 회차별 결과 { batchId: {pct,correct,total,doneAt} }
@@ -2316,6 +2317,7 @@
     const chips = [];
     if ((data.pastExams || []).length) chips.push('📚 역대 기출');
     if (((window.NORI_DXDRILLS || {}).cards || []).length) chips.push('🎯 진단 드릴');
+    if (((window.NORI_BLOCKS || {}).topics || []).length) chips.push('🧠 답안 블록');
     chips.push('🧩 연습 전체');
     if (case2HasReview()) chips.push('🔁 복습 필요');
     chips.push(...systems);
@@ -2410,8 +2412,15 @@
             ${pts ? `<div class="case2-points-h">채점 핵심 포인트 (커버한 항목 체크)</div><ul class="case2-points case2-points-ck">${pts}</ul>${scoreLine}` : ''}
           </div>
         </details>`;
-      return `<div class="case2-sub">
+      // 🧠 이 문항이 인출하는 답안 블록 — 누르면 매트릭스로 이동. 실전 모의(lock) 중엔 힌트가 되므로 숨김.
+      const blk = (!opts.lock && sq.blockRef) ? blockAt(sq.blockRef) : null;
+      const blkHtml = blk
+        ? `<button type="button" class="case2-blockref" data-c2blk="${esc(blk.id)}"
+             title="답안 블록 매트릭스에서 이 블록 열기">🧠 ${esc(blk.topic.label)} · ${esc(blk.type.label)} 블록</button>`
+        : '';
+      return `<div class="case2-sub" data-c2sub="${esc(key)}">
         <p class="case2-q"><span class="case2-qn">문 ${qi + 1}.</span> ${emph(esc(sq.q))}</p>
+        ${blkHtml}
         ${frameHtml}
         <textarea class="case2-ans" data-c2key="${esc(key)}" placeholder="여기에 서술형 답안을 작성하세요 (자동 저장)">${saved}</textarea>
         ${modelHtml}
@@ -2516,6 +2525,180 @@
       else if (a === 'fuzzyonly') { buildDxDeck(true); renderCase2(); }
     }));
   }
+  // ── 🧠 답안 블록 매트릭스(주제 × 유형) + 백지 인출 ──────────────
+  // 원리: 서술형은 "무엇을 몇 개 쓰는가"가 점수 → 주제×유형 격자로 빈칸을 눈으로 확인하고,
+  //       블록을 가린 채(백지 인출) 스스로 떠올린 뒤 공개하는 것이 가장 강한 암기법.
+  let _blockSel   = null;  // "topicKey.typeKey"
+  let _blockBlind = false; // 백지 인출(가리기) 모드 — 칸을 바꿔도 유지
+  let _blockShown = false; // 가린 상태에서 공개했는지
+  let _blockScrollX = 0;   // 그리드 가로 스크롤 위치 보존
+  let _blockFocus = false; // 방금 칸을 눌렀는지(카드로 스크롤)
+  let _case2Jump  = null;  // {caseId, qi} — 블록에서 사례 문항으로 건너뛴 직후 1회 펼침·스크롤
+  function loadBlocksDone() { try { return JSON.parse(localStorage.getItem(LS_BLOCKS_DONE)) || {}; } catch (e) { return {}; } }
+  function saveBlocksDone(m) { try { localStorage.setItem(LS_BLOCKS_DONE, JSON.stringify(m)); } catch (e) {} }
+  function blockAt(id) {
+    const d = window.NORI_BLOCKS || {};
+    const [tk, yk] = String(id || '').split('.');
+    const topic = (d.topics || []).find(t => t.key === tk);
+    if (!topic) return null;
+    const b = (topic.blocks || {})[yk];
+    if (!b) return null;
+    const type = (d.types || []).find(x => x.key === yk);
+    return { topic, type: type || { key: yk, label: yk }, block: b, id: `${tk}.${yk}` };
+  }
+  function blockCount(b) { return (b && b.items || []).length; }
+  // blockRef("topicKey.typeKey") → 그 블록을 연습하는 사례 문항 목록. 매트릭스↔사례 왕복 이동에 사용.
+  let _blockRefIdx = null;
+  function blockRefIndex() {
+    if (_blockRefIdx) return _blockRefIdx;
+    const m = {};
+    ((window.NORI_CASE2 || {}).cases || []).forEach(c => {
+      (c.subquestions || []).forEach((sq, qi) => {
+        if (!sq.blockRef) return;
+        (m[sq.blockRef] = m[sq.blockRef] || []).push({ caseId: c.id, title: c.title, qi });
+      });
+    });
+    _blockRefIdx = m;
+    return m;
+  }
+  function blockRefCases(id) { return blockRefIndex()[id] || []; }
+  function renderBlockMatrix(el) {
+    const d = window.NORI_BLOCKS || {};
+    const types  = d.types  || [];
+    const topics = d.topics || [];
+    const done = loadBlocksDone();
+    let total = 0, doneN = 0;
+    topics.forEach(t => types.forEach(y => {
+      if ((t.blocks || {})[y.key]) { total++; if (done[`${t.key}.${y.key}`]) doneN++; }
+    }));
+    // 선택 칸이 없으면(첫 진입) 첫 블록을 자동 선택
+    if (!_blockSel || !blockAt(_blockSel)) {
+      const first = topics.find(t => types.some(y => (t.blocks || {})[y.key]));
+      if (first) {
+        const y = types.find(x => (first.blocks || {})[x.key]);
+        _blockSel = `${first.key}.${y.key}`; _blockShown = false;
+      }
+    }
+
+    const head = `<div class="blockmx-head">
+      <div class="blockmx-head-top">
+        <strong>🧠 답안 블록 — 주제 × 유형 매트릭스</strong>
+        <span class="blockmx-stat">암기 ${doneN} / ${total}</span>
+      </div>
+      <p>서술형은 <b>외운 덩어리(블록)를 그대로 옮겨 적는 시험</b>입니다. 칸을 눌러 블록을 열고,
+      <b>🙈 백지 인출</b>로 가린 채 스스로 떠올린 뒤 공개하세요. 다 외운 칸은 <b>암기 완료</b>로 체크해 ✓로 관리합니다.</p>
+    </div>`;
+
+    // 그리드: 1(주제) + 유형 수 열. 첫 열은 sticky, 가로 스크롤은 래퍼가 담당.
+    const cols = `minmax(104px, 132px) repeat(${types.length}, minmax(88px, 1fr))`;
+    let cells = `<div class="blockmx-corner blockmx-rowhead">주제 \\ 유형</div>`;
+    types.forEach(y => { cells += `<div class="blockmx-colhead">${esc(y.label)}</div>`; });
+    topics.forEach(t => {
+      cells += `<div class="blockmx-rowhead">${esc(t.label)}</div>`;
+      types.forEach(y => {
+        const b = (t.blocks || {})[y.key];
+        const id = `${t.key}.${y.key}`;
+        if (!b) { cells += `<div class="blockmx-cell is-empty" aria-hidden="true">—</div>`; return; }
+        const isDone = !!done[id];
+        const isSel  = _blockSel === id;
+        const n = blockCount(b);
+        const label = `${t.label} · ${y.label} ${n}개${isDone ? ' (암기 완료)' : ''}`;
+        cells += `<button type="button" class="blockmx-cell is-filled${isDone ? ' is-done' : ''}${isSel ? ' is-sel' : ''}"
+          data-bmx="${esc(id)}" aria-pressed="${isSel ? 'true' : 'false'}" title="${esc(label)}" aria-label="${esc(label)}">
+          <span class="blockmx-cell-n">${isDone ? '✓' : esc(String(n))}</span></button>`;
+      });
+    });
+    const grid = `<div class="blockmx-scroll"><div class="blockmx-grid" style="grid-template-columns:${cols}">${cells}</div></div>
+      <p class="blockmx-legend"><span class="blockmx-key is-filled"></span> 블록 있음(숫자=항목 수)
+        <span class="blockmx-key is-done"></span> 암기 완료 <span class="blockmx-key is-empty">—</span> 해당 유형 없음</p>`;
+
+    el.innerHTML = head + grid + blockCardHtml(done);
+    bindBlockMatrix(el);
+  }
+  function blockCardHtml(done) {
+    const sel = blockAt(_blockSel);
+    if (!sel) return `<p class="case2-empty">표시할 답안 블록이 없습니다.</p>`;
+    const b = sel.block;
+    const isDone = !!done[sel.id];
+    const isDx = sel.type.key === 'dx';
+    let items;
+    if (isDx) {
+      items = `<ol class="blockmx-items blockmx-dxlist">` + (b.items || []).map(it => {
+        const ivs = (it.interventions || []).map(v => `<li>${emph(esc(v))}</li>`).join('');
+        return `<li><div class="blockmx-dx">${emph(esc(it.diagnosis || ''))}</div>${ivs ? `<ol class="blockmx-ivs">${ivs}</ol>` : ''}</li>`;
+      }).join('') + `</ol>`;
+    } else {
+      items = `<ol class="blockmx-items">` + (b.items || []).map(x => `<li>${emph(esc(String(x)))}</li>`).join('') + `</ol>`;
+    }
+    const noteTxt = b.note || '';
+    const note = !noteTxt ? '' : (noteTxt.length > 150
+      ? `<details class="blockmx-note"><summary>💡 쓰는 요령 · 감점 포인트</summary><p>${emph(esc(noteTxt))}</p></details>`
+      : `<p class="blockmx-note-inline">💡 ${emph(esc(noteTxt))}</p>`);
+    const blind = _blockBlind && !_blockShown;
+    const practice = blockRefCases(sel.id);
+    return `<div class="blockmx-card" id="blockmxCard">
+      <div class="blockmx-card-head">
+        <span class="blockmx-badge">${esc(sel.topic.label)} · ${esc(sel.type.label)}</span>
+        <h4 class="blockmx-title">${emph(esc(b.title || ''))}</h4>
+      </div>
+      <div class="blockmx-tools">
+        <button type="button" class="blockmx-btn${_blockBlind ? ' on' : ''}" data-bmx-act="blind">${_blockBlind ? '🙈 백지 인출 켜짐' : '🙈 백지 인출'}</button>
+        <label class="blockmx-done"><input type="checkbox" data-bmx-act="done"${isDone ? ' checked' : ''}><span>암기 완료</span></label>
+        ${practice.length ? `<button type="button" class="blockmx-btn is-practice" data-bmx-act="practice">📝 이 블록으로 연습 (${practice.length}문항)</button>` : ''}
+      </div>
+      <div class="blockmx-body${blind ? ' is-blind' : ''}"${blind ? ' role="button" tabindex="0" aria-label="탭하면 공개"' : ''}>
+        ${blind ? `<span class="blockmx-hint">탭하면 공개</span>` : ''}
+        <div class="blockmx-blurwrap">${items}${note}</div>
+      </div>
+    </div>`;
+  }
+  function bindBlockMatrix(el) {
+    const scroller = el.querySelector('.blockmx-scroll');
+    if (scroller) {
+      scroller.scrollLeft = _blockScrollX;
+      scroller.addEventListener('scroll', () => { _blockScrollX = scroller.scrollLeft; });
+    }
+    el.querySelectorAll('[data-bmx]').forEach(b => b.addEventListener('click', () => {
+      if (_blockSel !== b.dataset.bmx) { _blockSel = b.dataset.bmx; _blockShown = false; }
+      _blockFocus = true;
+      renderBlockMatrix(el);
+    }));
+    const blindBtn = el.querySelector('[data-bmx-act="blind"]');
+    if (blindBtn) blindBtn.addEventListener('click', () => {
+      _blockBlind = !_blockBlind; _blockShown = false; renderBlockMatrix(el);
+    });
+    // 📝 이 블록으로 연습 — 해당 blockRef를 가진 첫 사례 문항으로 이동(연습 전체 필터로 전환)
+    const pracBtn = el.querySelector('[data-bmx-act="practice"]');
+    if (pracBtn) pracBtn.addEventListener('click', () => {
+      const hit = blockRefCases(_blockSel)[0];
+      if (!hit) return;
+      _case2Jump = { caseId: hit.caseId, qi: hit.qi };
+      _case2Filter = '🧩 연습 전체';
+      _case2Search = '';
+      const box = document.getElementById('case2Search'); if (box) box.value = '';
+      buildCase2FilterBar();
+      renderCase2();
+    });
+    const doneCk = el.querySelector('input[data-bmx-act="done"]');
+    if (doneCk) doneCk.addEventListener('change', () => {
+      const m = loadBlocksDone();
+      if (doneCk.checked) m[_blockSel] = true; else delete m[_blockSel];
+      saveBlocksDone(m);
+      renderBlockMatrix(el);
+    });
+    const body = el.querySelector('.blockmx-body.is-blind');
+    if (body) {
+      const reveal = () => { _blockShown = true; renderBlockMatrix(el); };
+      body.addEventListener('click', reveal);
+      body.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); reveal(); } });
+    }
+    if (_blockFocus) {
+      _blockFocus = false;
+      const card = el.querySelector('#blockmxCard');
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (card && card.scrollIntoView) card.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    }
+  }
   function renderCase2() {
     const el = document.getElementById('case2Content'); if (!el) return;
     const data = window.NORI_CASE2 || { cases: [] };
@@ -2525,6 +2708,9 @@
 
     // 🎯 증상→간호진단 인출 드릴 모드
     if (_case2Filter === '🎯 진단 드릴') { renderDxDrill(el); return; }
+
+    // 🧠 답안 블록 — 주제×유형 매트릭스 + 백지 인출
+    if (_case2Filter === '🧠 답안 블록') { renderBlockMatrix(el); return; }
 
     const dleft = case2DaysLeft();
     const ddayTxt = dleft > 0 ? `D-${dleft}` : dleft === 0 ? 'D-Day!' : `D+${Math.abs(dleft)}`;
@@ -2577,9 +2763,22 @@
       (c.subquestions || []).some(sq => (sq.q + ' ' + sq.answer).toLowerCase().includes(s)));
     h += `<p class="case2-section-note">계통별 연습 사례(앱 자료 기반 생성·검수) — 실제 시험은 여러 계통이 한 케이스에 섞여 나오니, 계통별로 익힌 뒤 역대 기출로 통합 연습하세요.</p>`;
     if (!cases.length) { el.innerHTML = h + `<p class="case2-empty">검색·필터 결과가 없습니다.</p>`; return; }
-    h += cases.map((c, i) => case2Card(c, i, { open: i === 0 })).join('');
+    // 블록에서 건너뛰어 온 경우 그 사례만 펼치고 해당 문항으로 스크롤(1회)
+    const jump = _case2Jump; _case2Jump = null;
+    h += cases.map((c, i) => case2Card(c, i, {
+      open: jump ? c.id === jump.caseId : i === 0,
+    })).join('');
     el.innerHTML = h;
     bindCase2(el);
+    if (jump) {
+      const sub = el.querySelector(`[data-c2sub="${jump.caseId}::${jump.qi}"]`);
+      if (sub && sub.scrollIntoView) {
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        sub.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+        sub.classList.add('is-jumped');
+        setTimeout(() => sub.classList.remove('is-jumped'), 2000);
+      }
+    }
   }
   // 🔴 실전 모의 화면(진행/채점)
   function renderCase2Sim(el) {
@@ -2627,6 +2826,14 @@
   }
   function bindCase2(el) {
     document.getElementById('case2SimStart')?.addEventListener('click', startCase2Sim);
+    // 🧠 문항의 블록 배지 — 답안 블록 매트릭스의 해당 칸을 열어 준다
+    el.querySelectorAll('[data-c2blk]').forEach(b => b.addEventListener('click', ev => {
+      ev.preventDefault(); ev.stopPropagation();
+      _blockSel = b.dataset.c2blk; _blockShown = false; _blockFocus = true;
+      _case2Filter = '🧠 답안 블록';
+      buildCase2FilterBar();
+      renderCase2();
+    }));
     el.querySelectorAll('.case2-ans').forEach(ta => {
       ta.addEventListener('input', () => {
         const map = loadCase2Ans();
