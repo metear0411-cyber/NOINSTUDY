@@ -26,7 +26,7 @@ PROMPT='NOINSTUDY 2차시험 [블록연습] 사례 작업을 이어서 끝내라
 
 제약: main/master 푸시 금지, 강제푸시 금지, 머지 금지. 커밋 메시지는 한국어로 쓰고 `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>` 로 끝낼 것.'
 
-claude -p "$PROMPT" \
+/home/lsa9005/.local/bin/claude -p "$PROMPT" \
   --model claude-opus-5 \
   --permission-mode bypassPermissions \
   --add-dir "$WT"
