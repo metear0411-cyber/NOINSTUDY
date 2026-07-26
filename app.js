@@ -2341,9 +2341,11 @@
 
     const chip = c =>
       `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`;
-    // 접혀 있어도 현재 계통이 보이도록 라벨에 선택값을 넣는다
-    const sysSel = systems.indexOf(_case2Filter) !== -1 ? _case2Filter : '전체';
-    const togLabel = _case2SysOpen ? '🔧 계통 닫기 ▴' : `🔧 계통: ${sysSel} ▾`;
+    // 접혀 있어도 현재 계통이 보이도록 라벨에 선택값을 넣는다.
+    // 고른 계통이 없을 때는 sysBar에 없는 '전체' 대신 칩 개수를 보여 준다.
+    const sysSel = systems.indexOf(_case2Filter) !== -1 ? _case2Filter : '';
+    const togLabel = _case2SysOpen ? '🔧 계통 닫기 ▴'
+      : (sysSel ? `🔧 계통: ${sysSel} ▾` : `🔧 계통 ${systems.length}개 ▾`);
     bar.innerHTML = main.map(chip).join('')
       + `<button class="med-filter-chip case2-sys-toggle${_case2SysOpen ? ' is-open' : ''}" type="button"`
       + ` id="case2SysToggle" aria-expanded="${_case2SysOpen}" aria-controls="case2SysBar">${esc(togLabel)}</button>`;
@@ -2351,8 +2353,12 @@
       sysBar.innerHTML = systems.map(chip).join('');
       sysBar.classList.toggle('is-open', _case2SysOpen);
     }
-    document.getElementById('case2SysToggle')?.addEventListener('click', () => {
+    document.getElementById('case2SysToggle')?.addEventListener('click', (e) => {
+      // 재빌드가 bar.innerHTML을 통째로 갈아 끼워 토글 버튼 자신이 사라지므로
+      // 키보드로 조작 중이었다면 새 버튼으로 포커스를 되돌린다.
+      const hadFocus = document.activeElement === e.currentTarget;
       _case2SysOpen = !_case2SysOpen; buildCase2FilterBar();
+      if (hadFocus) document.getElementById('case2SysToggle')?.focus();
     });
     [bar, sysBar].forEach(el => el && el.querySelectorAll('[data-c2f]').forEach(b =>
       b.addEventListener('click', () => {
@@ -2642,7 +2648,7 @@
           <span class="blockmx-cell-n">${isDone ? '✓' : esc(String(n))}</span></button>`;
       });
     });
-    const grid = `<div class="blockmx-scroll"><div class="blockmx-grid" style="grid-template-columns:${cols}">${cells}</div></div>
+    const grid = `<div class="blockmx-scrollwrap"><div class="blockmx-scroll"><div class="blockmx-grid" style="grid-template-columns:${cols}">${cells}</div></div></div>
       <p class="blockmx-legend"><span class="blockmx-key is-filled"></span> 블록 있음(숫자=항목 수)
         <span class="blockmx-key is-done"></span> 암기 완료 <span class="blockmx-key is-empty">—</span> 해당 유형 없음</p>`;
 
@@ -2693,7 +2699,8 @@
         // 재렌더로 el.innerHTML이 교체되면 캡처된 scroller는 낡은 참조가 되므로
         // 호출 시점의 현재 스크롤러를 다시 찾는다.
         const cur = document.querySelector('.blockmx-scroll');
-        if (cur) cur.classList.toggle(
+        // has-more는 스크롤하지 않는 래퍼에 건다(페이드가 래퍼의 ::after라서).
+        if (cur && cur.parentElement) cur.parentElement.classList.toggle(
           'has-more', cur.scrollLeft + cur.clientWidth < cur.scrollWidth - 1);
       };
       scroller.scrollLeft = _blockScrollX;

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=20260726b">
+  <link rel="stylesheet" href="styles.css?v=20260726c">
 
   <!-- 데이터 파일 (전역 window 변수 방식 — file:// CORS 우회) -->
   <!-- v=20260428 : 캐시 갱신용 버전 — 데이터 수정 시 숫자 증가 -->
@@ -179,7 +179,7 @@
         </div>
         <div class="med-toolbar">
           <input type="search" id="cramSearch" placeholder="토픽·키워드 검색" autocomplete="off">
-          <button id="cramFilterToggle" class="cram-filter-toggle" type="button" aria-expanded="false">🔧 필터·카테고리 ▾</button>
+          <button id="cramFilterToggle" class="cram-filter-toggle" type="button" aria-expanded="false" aria-controls="cramFilterBar">🔧 필터·카테고리 ▾</button>
           <div id="cramFilterBar" class="med-filter-bar"></div>
         </div>
         <div id="cramContent" class="lesson-body med-content"></div>
@@ -197,7 +197,7 @@
         <div class="med-toolbar">
           <input type="search" id="case2Search" placeholder="사례·계통·키워드 검색" autocomplete="off">
           <div id="case2FilterBar" class="med-filter-bar"></div>
-          <div id="case2SysBar" class="med-filter-bar case2-sys-bar"></div>
+          <div id="case2SysBar" class="med-filter-bar"></div>
         </div>
         <div id="case2Content" class="lesson-body med-content"></div>
       </div>
@@ -254,7 +254,7 @@
   <!-- 집중모드 플로팅 토글 (스크롤 위치 무관 좌하단 상시 노출) -->
   <button class="focus-fab" id="focusToggleFloat" type="button" title="넓게 보기 / 펼치기" aria-pressed="false">⤢ 펼치기</button>
 
-  <script src="app.js?v=20260726b"></script>
+  <script src="app.js?v=20260726c"></script>
   <script src="notes-bridge.js?v=20260726a"></script>
   <!-- Service Worker 등록 -->
   <script>
