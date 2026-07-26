@@ -2565,6 +2565,7 @@
   let _blockBlind = false; // 백지 인출(가리기) 모드 — 칸을 바꿔도 유지
   let _blockShown = false; // 가린 상태에서 공개했는지
   let _blockScrollX = 0;   // 그리드 가로 스크롤 위치 보존
+  let _blockResizeBound = false;   // window resize 리스너는 최초 1회만 등록
   let _blockFocus = false; // 방금 칸을 눌렀는지(카드로 스크롤)
   let _case2Jump  = null;  // {caseId, qi} — 블록에서 사례 문항으로 건너뛴 직후 1회 펼침·스크롤
   function loadBlocksDone() { try { return JSON.parse(localStorage.getItem(LS_BLOCKS_DONE)) || {}; } catch (e) { return {}; } }
@@ -2688,11 +2689,19 @@
   function bindBlockMatrix(el) {
     const scroller = el.querySelector('.blockmx-scroll');
     if (scroller) {
-      const syncMore = () => scroller.classList.toggle(
-        'has-more', scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1);
+      const syncMore = () => {
+        // 재렌더로 el.innerHTML이 교체되면 캡처된 scroller는 낡은 참조가 되므로
+        // 호출 시점의 현재 스크롤러를 다시 찾는다.
+        const cur = document.querySelector('.blockmx-scroll');
+        if (cur) cur.classList.toggle(
+          'has-more', cur.scrollLeft + cur.clientWidth < cur.scrollWidth - 1);
+      };
       scroller.scrollLeft = _blockScrollX;
       scroller.addEventListener('scroll', () => { _blockScrollX = scroller.scrollLeft; syncMore(); });
-      window.addEventListener('resize', syncMore);
+      if (!_blockResizeBound) {
+        _blockResizeBound = true;
+        window.addEventListener('resize', syncMore);
+      }
       syncMore();
     }
     el.querySelectorAll('[data-bmx]').forEach(b => b.addEventListener('click', () => {
