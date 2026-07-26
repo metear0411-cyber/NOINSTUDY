@@ -1231,10 +1231,12 @@ body.focus-mode .part-panel { display: none; }
   width: 100%; box-sizing: border-box; padding: 10px 13px; font-size: 14px;
   border: 1px solid var(--line, #dfe6e2); border-radius: 10px; font-family: inherit; margin-bottom: 9px;
 }
-.med-filter-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.med-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; }
 .med-filter-chip {
-  padding: 6px 12px; border: 1px solid var(--line, #dfe6e2); border-radius: 999px;
+  display: inline-flex; align-items: center;
+  padding: 9px 14px; border: 1px solid var(--line, #dfe6e2); border-radius: 999px;
   background: #fff; font-size: 12.5px; font-weight: 600; color: #555; cursor: pointer; font-family: inherit;
+  min-height: 42px;
 }
 .med-filter-chip.is-active { background: #1f7a74; color: #fff; border-color: #1f7a74; }
 /* 2차 탭 — 계통 칩만 접는다(기능 칩은 상시 노출). 규약은 막판 암기노트와 동일 */
@@ -1359,17 +1361,17 @@ body.focus-mode .part-panel { display: none; }
 .case2-intro p { margin:4px 0; font-size:.9rem; line-height:1.55; color:#3a4656; }
 .case2-dday { font-weight:600; color:#b23a4c !important; }
 .case2-empty { color:#8a94a2; padding:18px; text-align:center; }
-.case2-case { border:1px solid #d6dee8; border-radius:12px; margin-bottom:12px; background:#fff; overflow:hidden; }
+.case2-case { border:1px solid #d6dee8; border-radius:12px; margin-bottom:16px; background:#fff; overflow:hidden; }
 .case2-sum { list-style:none; cursor:pointer; padding:13px 15px; display:flex; align-items:center; gap:9px; flex-wrap:wrap; background:#f8fafc; }
 .case2-sum::-webkit-details-marker { display:none; }
 .case2-sys { font-size:.74rem; font-weight:700; color:#2c6ba0; background:#e6f0fa; border-radius:20px; padding:2px 10px; }
 .case2-title { font-weight:700; color:#2a3340; font-size:.98rem; flex:1; }
 .case2-case[open] .cram-chev { transform:rotate(180deg); }
-.case2-body { padding:6px 15px 15px; }
+.case2-body { padding:10px 16px 18px; }
 .case2-scenario { border-left:3px solid #7fb0dd; background:#f7fbff; border-radius:0 8px 8px 0; padding:11px 13px; margin:10px 0 14px; }
 .case2-scenario-tag { display:inline-block; font-size:.75rem; font-weight:700; color:#2c6ba0; margin-bottom:5px; }
 .case2-scenario p { margin:0; line-height:1.65; color:#33404e; white-space:pre-wrap; }
-.case2-sub { border-top:1px dashed #e2e8f0; padding-top:12px; margin-top:12px; border-radius:8px; transition:background-color .3s ease; }
+.case2-sub { border-top:1px dashed #e2e8f0; padding-top:18px; margin-top:22px; border-radius:8px; transition:background-color .3s ease; }
 /* 답안 블록에서 건너뛰어 온 문항을 잠깐 강조 */
 .case2-sub.is-jumped { background:#fff6e5; box-shadow:0 0 0 2px #f0c785; }
 .case2-q { font-weight:600; color:#2a3340; line-height:1.55; margin:0 0 8px; }
@@ -1878,7 +1880,8 @@ details.cram-cat:not([open]) > summary.cram-cat-h::after { transform: rotate(-90
 
 @media (max-width: 480px) {
   .content-grid { gap: 10px; }
-  .lesson-body { padding: 14px 14px 20px; }
+  /* 하단 96px — 우하단·좌하단 플로팅 버튼(그림 노트·넓게)이 마지막 줄을 덮지 않도록 */
+  .lesson-body { padding: 16px 16px 96px; }
   .memory-list { grid-template-columns: 1fr; }
   .quiz-option { padding: 9px 11px; font-size: 13px; }
 }
