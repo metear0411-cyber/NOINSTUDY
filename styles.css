@@ -2342,7 +2342,7 @@ details.cram-cat:not([open]) > summary.cram-cat-h::after { transform: rotate(-90
 }
 .cram-filter-toggle.is-open { background: var(--teal-soft, #dcefeb); border-style: solid; }
 #cramFilterBar { display: none; }
-#cramFilterBar.is-open { display: flex; flex-wrap: wrap; gap: 6px; }
+#cramFilterBar.is-open { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* 약물 탭도 같은 접기 규약을 쓴다 */
 #medFilterBar { display: none; }
