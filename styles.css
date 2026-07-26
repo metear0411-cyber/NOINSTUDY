@@ -1227,9 +1227,11 @@ body.focus-mode .part-panel { display: none; }
 .med-entry-btn { margin-top: 6px; background: #fff; color: var(--teal-dark); border: 1px solid var(--teal); }
 .med-entry-btn:hover { background: var(--teal-soft); opacity: 1; }
 .med-toolbar { padding: 10px 14px 4px; }
-#medSearch {
+#medSearch, #case2Search {
   width: 100%; box-sizing: border-box; padding: 10px 13px; font-size: 14px;
-  border: 1px solid var(--line, #dfe6e2); border-radius: 10px; font-family: inherit; margin-bottom: 9px;
+  border: 1px solid var(--line, #dfe6e2); border-radius: 10px; font-family: inherit;
+  /* 검색창과 필터칩이 붙어 보이지 않게 — 칩 gap(8px)보다 확실히 크게 */
+  margin-bottom: 14px;
 }
 .med-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; }
 .med-filter-chip {
@@ -1294,7 +1296,7 @@ body.focus-mode .part-panel { display: none; }
 .cram-entry-btn:hover { background: #ffe9d4; opacity: 1; }
 #cramSearch {
   width: 100%; box-sizing: border-box; padding: 10px 13px; font-size: 14px;
-  border: 1px solid var(--line, #dfe6e2); border-radius: 10px; font-family: inherit; margin-bottom: 9px;
+  border: 1px solid var(--line, #dfe6e2); border-radius: 10px; font-family: inherit; margin-bottom: 14px;
 }
 .cram-plan {
   margin: 4px 0 12px; padding: 10px 13px; border-radius: 10px;
@@ -2339,7 +2341,7 @@ details.cram-cat:not([open]) > summary.cram-cat-h::after { transform: rotate(-90
 
 /* 막판 암기노트 상단 필터바 접기 (기본 접힘) */
 .cram-filter-toggle {
-  display: block; width: 100%; box-sizing: border-box; margin: 2px 0 6px;
+  display: block; width: 100%; box-sizing: border-box; margin: 0 0 8px;
   padding: 7px 12px; border: 1px dashed var(--line, #dfe6e2); border-radius: 9px;
   background: #f8fafa; color: var(--teal-dark, #1f7a74);
   font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: left;

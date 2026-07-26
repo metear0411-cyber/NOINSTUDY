@@ -8,7 +8,7 @@
   const EXAM2_DATE = new Date(2026, 7, 23); // 2026-08-23 2차시험(사례 서술형)
   const LS_CASE2_KEY = 'nori_case2_ans_v1'; // 2차 사례 서술형 내 답안 저장
   const LS_CASE2_SCORE = 'nori_case2_score_v1'; // 2차 자가채점: {"keyBase::subIdx": [체크한 채점포인트 인덱스]}
-  const LS_DXDRILL = 'nori_dxdrill_v1'; // 증상→간호진단 드릴 자가평가: {cardId: 'known'|'fuzzy'}
+  const LS_DXDRILL = 'nori_dxdrill_v1'; // 증상→진단 연습 자가평가: {cardId: 'known'|'fuzzy'}
   const LS_BLOCKS_DONE = 'nori_blocks_done_v1'; // 답안 블록 암기 완료: {"<topicKey>.<typeKey>": true}
   const LS_KEY     = 'nori_marks_v2';
   const LS_CAT_KEY = 'nori_cat_v2';   // 카테고리 접힘 상태
@@ -2334,7 +2334,7 @@
     const systems = [...new Set(cases.map(c => c.system))];
     const main = [];
     if ((data.pastExams || []).length) main.push('📚 역대 기출');
-    if (((window.NORI_DXDRILLS || {}).cards || []).length) main.push('🎯 진단 드릴');
+    if (((window.NORI_DXDRILLS || {}).cards || []).length) main.push('🎯 증상→진단 연습');
     if (((window.NORI_BLOCKS || {}).topics || []).length) main.push('🧠 답안 블록');
     main.push('🧩 연습 전체');
     if (case2HasReview()) main.push('🔁 복습 필요');
@@ -2483,7 +2483,7 @@
       </div>
     </details>`;
   }
-  // ── 증상→간호진단 인출 드릴(retrieval practice) ──
+  // ── 증상→진단 연습 — 증상만 보고 간호진단을 떠올리는 인출 연습(retrieval practice) ──
   let _dxDeck = null;   // {order:[idx...], pos, revealed, onlyFuzzy}
   function loadDxState() { try { return JSON.parse(localStorage.getItem(LS_DXDRILL)) || {}; } catch (e) { return {}; } }
   function saveDxState(m) { try { localStorage.setItem(LS_DXDRILL, JSON.stringify(m)); } catch (e) {} }
@@ -2511,7 +2511,7 @@
     if (!_dxDeck) buildDxDeck(false);
     const deck = _dxDeck;
     const head = `<div class="dx-head">
-      <div class="dx-head-top"><strong>🎯 증상 → 간호진단 인출 드릴</strong>
+      <div class="dx-head-top"><strong>🎯 증상을 보고 간호진단 떠올리기</strong>
         <span class="dx-stat">✓ ${knownN} · △ ${fuzzyN} / ${all.length}</span></div>
       <p>증상·소견만 보고 <b>NANDA 간호진단</b>을 먼저 떠올린 뒤 정답을 확인하세요(인출연습). ${deck.onlyFuzzy ? '<b>△ 헷갈림</b>만 다시 도는 중.' : ''}</p>
       <div class="dx-head-btns">
@@ -2759,8 +2759,8 @@
     // 🔴 실전 모의 진행/채점 모드 — 필터·인트로 대신 시뮬 화면
     if (_case2Sim) { renderCase2Sim(el); return; }
 
-    // 🎯 증상→간호진단 인출 드릴 모드
-    if (_case2Filter === '🎯 진단 드릴') { renderDxDrill(el); return; }
+    // 🎯 증상→진단 연습 모드
+    if (_case2Filter === '🎯 증상→진단 연습') { renderDxDrill(el); return; }
 
     // 🧠 답안 블록 — 주제×유형 매트릭스 + 백지 인출
     if (_case2Filter === '🧠 답안 블록') { renderBlockMatrix(el); return; }

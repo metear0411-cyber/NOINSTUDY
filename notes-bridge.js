@@ -77,12 +77,37 @@
       panel.classList.toggle('open', show);
       overlay.classList.toggle('open', show);
     }
-    fab.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+
+    // 2차시험 대비 패널에서는 목록을 열지 않고 공부법 사용설명서로 바로 보낸다.
+    // 그 탭에서 필요한 문서가 그것 하나뿐이라 한 단계를 줄인다.
+    var GUIDE = '00_공부법_사용설명서.html';
+    function inCase2() {
+      var p = document.getElementById('case2Panel');
+      return !!p && p.style.display !== 'none';
+    }
+    function syncFab() {
+      var c2 = inCase2();
+      fab.innerHTML = c2 ? '🧭 2차 준비법' : '📖 그림 노트';
+      fab.setAttribute('title', c2 ? '공부법 사용설명서 열기' : '그림 학습노트 목록 열기');
+      if (c2) toggle(false);   // 탭을 옮기며 열려 있던 목록은 닫는다
+    }
+    fab.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (inCase2()) { window.open(GUIDE, '_blank', 'noopener'); return; }
+      toggle();
+    });
     overlay.addEventListener('click', function () { toggle(false); });
 
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
     document.body.appendChild(fab);
+
+    // 패널 전환은 style.display 조작으로 이뤄지므로 그 변화를 관찰한다.
+    var c2panel = document.getElementById('case2Panel');
+    if (c2panel && window.MutationObserver) {
+      new MutationObserver(syncFab).observe(c2panel, { attributes: true, attributeFilter: ['style'] });
+    }
+    syncFab();
   }
 
   if (document.readyState === 'loading') {
