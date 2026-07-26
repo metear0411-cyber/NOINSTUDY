@@ -76,6 +76,11 @@ body {
   color: var(--ink);
   font-size: 15px;
   line-height: 1.65;
+  /* 한글은 어절 단위로 끊는다. 없으면 브라우저가 단어 중간에서 잘라
+     '한 글자만 다음 줄로 내려가는' 모양이 된다. 긴 영문·약물명이
+     칸보다 넓을 때만 overflow-wrap이 받아 준다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 h1, h2, h3, h4, p, ul, ol { margin-top: 0; }
