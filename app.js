@@ -1128,6 +1128,7 @@
     document.getElementById('cramExitBtn')?.addEventListener('click', exitCramMode);
     document.getElementById('cramSearch')?.addEventListener('input', e => { _cramSearch = e.target.value.trim(); renderCramHub(); });
     document.getElementById('cramFilterToggle')?.addEventListener('click', () => { _cramFiltersOpen = !_cramFiltersOpen; applyCramFilters(); });
+    document.getElementById('medFilterToggle')?.addEventListener('click', () => { _medFiltersOpen = !_medFiltersOpen; applyMedFilters(); });
     document.getElementById('cramMemToggle')?.addEventListener('click', function () {
       _cramMemMode = !_cramMemMode;
       this.classList.toggle('is-active', _cramMemMode);
@@ -1777,7 +1778,7 @@
   }
 
   // ─── 💊 약물 총정리 ────────────────────────────────
-  let _medIndex = null, _medCorpus = null, _medMemMode = false, _medFilter = '전체', _medSearch = '';
+  let _medIndex = null, _medCorpus = null, _medMemMode = false, _medFilter = '전체', _medSearch = '', _medFiltersOpen = false;
   function medCorpus() {
     if (_medCorpus != null) return _medCorpus;
     let c = '';
@@ -1848,12 +1849,24 @@
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
     buildMedFilterBar();
+    applyMedFilters();
     renderMedView();
   }
   function exitMedMode() {
     document.getElementById('medPanel').style.display    = 'none';
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
+  }
+  // 약물 탭 상단 필터바 접기 — 기본 접힘. 규약은 막판 암기노트와 동일.
+  function applyMedFilters() {
+    const bar = document.getElementById('medFilterBar');
+    const tog = document.getElementById('medFilterToggle');
+    if (bar) bar.classList.toggle('is-open', _medFiltersOpen);
+    if (tog) {
+      tog.classList.toggle('is-open', _medFiltersOpen);
+      tog.setAttribute('aria-expanded', _medFiltersOpen ? 'true' : 'false');
+      tog.textContent = _medFiltersOpen ? '🔧 필터 닫기 ▴' : `🔧 필터: ${_medFilter} ▾`;
+    }
   }
   function buildMedFilterBar() {
     const bar = document.getElementById('medFilterBar'); if (!bar) return;
@@ -1864,7 +1877,8 @@
       `<button class="med-filter-chip${_medFilter === c ? ' is-active' : ''}" type="button" data-medf="${esc(c)}">${esc(c)}</button>`
     ).join('');
     bar.querySelectorAll('[data-medf]').forEach(b => b.addEventListener('click', () => {
-      _medFilter = b.dataset.medf; buildMedFilterBar(); renderMedView();
+      _medFilter = b.dataset.medf; _medFiltersOpen = false;
+      buildMedFilterBar(); applyMedFilters(); renderMedView();
     }));
   }
   function medCard(m) {

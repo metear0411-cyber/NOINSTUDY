@@ -2341,6 +2341,10 @@ details.cram-cat:not([open]) > summary.cram-cat-h::after { transform: rotate(-90
 #cramFilterBar { display: none; }
 #cramFilterBar.is-open { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* 약물 탭도 같은 접기 규약을 쓴다 */
+#medFilterBar { display: none; }
+#medFilterBar.is-open { display: flex; flex-wrap: wrap; gap: 8px; }
+
 /* 실전 모의고사 (핵심 정렬 3세트) */
 .mock-real-band { margin: 2px 0 8px; padding: 9px 12px; border-radius: 10px;
   background: linear-gradient(180deg,#eef7f5,#f7fbfa); border: 1px solid #cfe6e0;
