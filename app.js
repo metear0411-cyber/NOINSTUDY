@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const EXAM_DATE = new Date(2026, 6, 5);  // 2026-07-05 로컬 자정 (월은 0-indexed) — UTC 파싱 시 타임존 오차로 D-Day 하루 밀림 방지
+  const EXAM_DATE = new Date(2026, 7, 23);  // 2026-08-23 2차시험 로컬 자정 (월은 0-indexed). 1차(07-05)는 지났다.
   const EXAM2_DATE = new Date(2026, 7, 23); // 2026-08-23 2차시험(사례 서술형)
   const LS_CASE2_KEY = 'nori_case2_ans_v1'; // 2차 사례 서술형 내 답안 저장
   const LS_CASE2_SCORE = 'nori_case2_score_v1'; // 2차 자가채점: {"keyBase::subIdx": [체크한 채점포인트 인덱스]}
@@ -2698,7 +2698,7 @@
       const syncMore = () => {
         // 재렌더로 el.innerHTML이 교체되면 캡처된 scroller는 낡은 참조가 되므로
         // 호출 시점의 현재 스크롤러를 다시 찾는다.
-        const cur = document.querySelector('.blockmx-scroll');
+        const cur = el.querySelector('.blockmx-scroll');
         // has-more는 스크롤하지 않는 래퍼에 건다(페이드가 래퍼의 ::after라서).
         if (cur && cur.parentElement) cur.parentElement.classList.toggle(
           'has-more', cur.scrollLeft + cur.clientWidth < cur.scrollWidth - 1);
