@@ -1128,6 +1128,7 @@
     document.getElementById('cramExitBtn')?.addEventListener('click', exitCramMode);
     document.getElementById('cramSearch')?.addEventListener('input', e => { _cramSearch = e.target.value.trim(); renderCramHub(); });
     document.getElementById('cramFilterToggle')?.addEventListener('click', () => { _cramFiltersOpen = !_cramFiltersOpen; applyCramFilters(); });
+    document.getElementById('medFilterToggle')?.addEventListener('click', () => { _medFiltersOpen = !_medFiltersOpen; applyMedFilters(); });
     document.getElementById('cramMemToggle')?.addEventListener('click', function () {
       _cramMemMode = !_cramMemMode;
       this.classList.toggle('is-active', _cramMemMode);
@@ -1777,7 +1778,7 @@
   }
 
   // ─── 💊 약물 총정리 ────────────────────────────────
-  let _medIndex = null, _medCorpus = null, _medMemMode = false, _medFilter = '전체', _medSearch = '';
+  let _medIndex = null, _medCorpus = null, _medMemMode = false, _medFilter = '전체', _medSearch = '', _medFiltersOpen = false;
   function medCorpus() {
     if (_medCorpus != null) return _medCorpus;
     let c = '';
@@ -1848,12 +1849,24 @@
     document.getElementById('subjectRail')?.classList.remove('is-open');
     document.getElementById('sidebarOverlay')?.classList.remove('is-open');
     buildMedFilterBar();
+    applyMedFilters();
     renderMedView();
   }
   function exitMedMode() {
     document.getElementById('medPanel').style.display    = 'none';
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
+  }
+  // 약물 탭 상단 필터바 접기 — 기본 접힘. 규약은 막판 암기노트와 동일.
+  function applyMedFilters() {
+    const bar = document.getElementById('medFilterBar');
+    const tog = document.getElementById('medFilterToggle');
+    if (bar) bar.classList.toggle('is-open', _medFiltersOpen);
+    if (tog) {
+      tog.classList.toggle('is-open', _medFiltersOpen);
+      tog.setAttribute('aria-expanded', _medFiltersOpen ? 'true' : 'false');
+      tog.textContent = _medFiltersOpen ? '🔧 필터 닫기 ▴' : `🔧 필터: ${_medFilter} ▾`;
+    }
   }
   function buildMedFilterBar() {
     const bar = document.getElementById('medFilterBar'); if (!bar) return;
@@ -1864,7 +1877,8 @@
       `<button class="med-filter-chip${_medFilter === c ? ' is-active' : ''}" type="button" data-medf="${esc(c)}">${esc(c)}</button>`
     ).join('');
     bar.querySelectorAll('[data-medf]').forEach(b => b.addEventListener('click', () => {
-      _medFilter = b.dataset.medf; buildMedFilterBar(); renderMedView();
+      _medFilter = b.dataset.medf; _medFiltersOpen = false;
+      buildMedFilterBar(); applyMedFilters(); renderMedView();
     }));
   }
   function medCard(m) {
@@ -2209,6 +2223,7 @@
 
   // ─── 2차시험(사례 서술형) 대비 ───────────────────────────
   let _case2Filter = '📚 역대 기출';
+  let _case2SysOpen = false;  // 계통 칩 바 펼침 여부(세션 메모리만, 저장 안 함)
   let _case2Search = '';
   let _case2Sim = null;      // {items:[{c,keyBase,badge}], startAt, submitted}
   let _case2SimTimer = null; // setInterval 핸들
@@ -2309,24 +2324,48 @@
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
   }
+  // 상단 sticky 부담을 줄이려 계통 칩 12개만 접는다. 기능 칩은 항상 노출.
+  // 접기 방식은 기출·막판 암기노트와 동일한 규약(토글 + .is-open).
   function buildCase2FilterBar() {
     const bar = document.getElementById('case2FilterBar'); if (!bar) return;
+    const sysBar = document.getElementById('case2SysBar');
     const data = window.NORI_CASE2 || {};
     const cases = data.cases || [];
     const systems = [...new Set(cases.map(c => c.system))];
-    const chips = [];
-    if ((data.pastExams || []).length) chips.push('📚 역대 기출');
-    if (((window.NORI_DXDRILLS || {}).cards || []).length) chips.push('🎯 진단 드릴');
-    if (((window.NORI_BLOCKS || {}).topics || []).length) chips.push('🧠 답안 블록');
-    chips.push('🧩 연습 전체');
-    if (case2HasReview()) chips.push('🔁 복습 필요');
-    chips.push(...systems);
-    bar.innerHTML = chips.map(c =>
-      `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`
-    ).join('');
-    bar.querySelectorAll('[data-c2f]').forEach(b => b.addEventListener('click', () => {
-      _case2Filter = b.dataset.c2f; buildCase2FilterBar(); renderCase2();
-    }));
+    const main = [];
+    if ((data.pastExams || []).length) main.push('📚 역대 기출');
+    if (((window.NORI_DXDRILLS || {}).cards || []).length) main.push('🎯 진단 드릴');
+    if (((window.NORI_BLOCKS || {}).topics || []).length) main.push('🧠 답안 블록');
+    main.push('🧩 연습 전체');
+    if (case2HasReview()) main.push('🔁 복습 필요');
+
+    const chip = c =>
+      `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`;
+    // 접혀 있어도 현재 계통이 보이도록 라벨에 선택값을 넣는다.
+    // 고른 계통이 없을 때는 sysBar에 없는 '전체' 대신 칩 개수를 보여 준다.
+    const sysSel = systems.indexOf(_case2Filter) !== -1 ? _case2Filter : '';
+    const togLabel = _case2SysOpen ? '🔧 계통 닫기 ▴'
+      : (sysSel ? `🔧 계통: ${sysSel} ▾` : `🔧 계통 ${systems.length}개 ▾`);
+    bar.innerHTML = main.map(chip).join('')
+      + `<button class="med-filter-chip case2-sys-toggle${_case2SysOpen ? ' is-open' : ''}" type="button"`
+      + ` id="case2SysToggle" aria-expanded="${_case2SysOpen}" aria-controls="case2SysBar">${esc(togLabel)}</button>`;
+    if (sysBar) {
+      sysBar.innerHTML = systems.map(chip).join('');
+      sysBar.classList.toggle('is-open', _case2SysOpen);
+    }
+    document.getElementById('case2SysToggle')?.addEventListener('click', (e) => {
+      // 재빌드가 bar.innerHTML을 통째로 갈아 끼워 토글 버튼 자신이 사라지므로
+      // 키보드로 조작 중이었다면 새 버튼으로 포커스를 되돌린다.
+      const hadFocus = document.activeElement === e.currentTarget;
+      _case2SysOpen = !_case2SysOpen; buildCase2FilterBar();
+      if (hadFocus) document.getElementById('case2SysToggle')?.focus();
+    });
+    [bar, sysBar].forEach(el => el && el.querySelectorAll('[data-c2f]').forEach(b =>
+      b.addEventListener('click', () => {
+        _case2Filter = b.dataset.c2f;
+        if (systems.indexOf(_case2Filter) !== -1) _case2SysOpen = false;  // 고르면 닫아 본문을 바로 보여준다
+        buildCase2FilterBar(); renderCase2();
+      })));
   }
   // 문항 유형(키워드)에 맞는 서술형 답안 틀(framework) — 근거: framework 명시교육이 구성형 답안 점수 대효과(Graham & Perin 2007).
   // sq.frameHint가 있으면 우선 사용, 없으면 질문 텍스트 키워드로 자동 매핑.
@@ -2532,6 +2571,7 @@
   let _blockBlind = false; // 백지 인출(가리기) 모드 — 칸을 바꿔도 유지
   let _blockShown = false; // 가린 상태에서 공개했는지
   let _blockScrollX = 0;   // 그리드 가로 스크롤 위치 보존
+  let _blockResizeBound = false;   // window resize 리스너는 최초 1회만 등록
   let _blockFocus = false; // 방금 칸을 눌렀는지(카드로 스크롤)
   let _case2Jump  = null;  // {caseId, qi} — 블록에서 사례 문항으로 건너뛴 직후 1회 펼침·스크롤
   function loadBlocksDone() { try { return JSON.parse(localStorage.getItem(LS_BLOCKS_DONE)) || {}; } catch (e) { return {}; } }
@@ -2608,7 +2648,7 @@
           <span class="blockmx-cell-n">${isDone ? '✓' : esc(String(n))}</span></button>`;
       });
     });
-    const grid = `<div class="blockmx-scroll"><div class="blockmx-grid" style="grid-template-columns:${cols}">${cells}</div></div>
+    const grid = `<div class="blockmx-scrollwrap"><div class="blockmx-scroll"><div class="blockmx-grid" style="grid-template-columns:${cols}">${cells}</div></div></div>
       <p class="blockmx-legend"><span class="blockmx-key is-filled"></span> 블록 있음(숫자=항목 수)
         <span class="blockmx-key is-done"></span> 암기 완료 <span class="blockmx-key is-empty">—</span> 해당 유형 없음</p>`;
 
@@ -2655,8 +2695,21 @@
   function bindBlockMatrix(el) {
     const scroller = el.querySelector('.blockmx-scroll');
     if (scroller) {
+      const syncMore = () => {
+        // 재렌더로 el.innerHTML이 교체되면 캡처된 scroller는 낡은 참조가 되므로
+        // 호출 시점의 현재 스크롤러를 다시 찾는다.
+        const cur = document.querySelector('.blockmx-scroll');
+        // has-more는 스크롤하지 않는 래퍼에 건다(페이드가 래퍼의 ::after라서).
+        if (cur && cur.parentElement) cur.parentElement.classList.toggle(
+          'has-more', cur.scrollLeft + cur.clientWidth < cur.scrollWidth - 1);
+      };
       scroller.scrollLeft = _blockScrollX;
-      scroller.addEventListener('scroll', () => { _blockScrollX = scroller.scrollLeft; });
+      scroller.addEventListener('scroll', () => { _blockScrollX = scroller.scrollLeft; syncMore(); });
+      if (!_blockResizeBound) {
+        _blockResizeBound = true;
+        window.addEventListener('resize', syncMore);
+      }
+      syncMore();
     }
     el.querySelectorAll('[data-bmx]').forEach(b => b.addEventListener('click', () => {
       if (_blockSel !== b.dataset.bmx) { _blockSel = b.dataset.bmx; _blockShown = false; }
