@@ -2209,6 +2209,7 @@
 
   // ─── 2차시험(사례 서술형) 대비 ───────────────────────────
   let _case2Filter = '📚 역대 기출';
+  let _case2SysOpen = false;  // 계통 칩 바 펼침 여부(세션 메모리만, 저장 안 함)
   let _case2Search = '';
   let _case2Sim = null;      // {items:[{c,keyBase,badge}], startAt, submitted}
   let _case2SimTimer = null; // setInterval 핸들
@@ -2309,24 +2310,42 @@
     document.getElementById('overviewBand').style.display = '';
     document.getElementById('contentGrid').style.display  = '';
   }
+  // 상단 sticky 부담을 줄이려 계통 칩 12개만 접는다. 기능 칩은 항상 노출.
+  // 접기 방식은 기출·막판 암기노트와 동일한 규약(토글 + .is-open).
   function buildCase2FilterBar() {
     const bar = document.getElementById('case2FilterBar'); if (!bar) return;
+    const sysBar = document.getElementById('case2SysBar');
     const data = window.NORI_CASE2 || {};
     const cases = data.cases || [];
     const systems = [...new Set(cases.map(c => c.system))];
-    const chips = [];
-    if ((data.pastExams || []).length) chips.push('📚 역대 기출');
-    if (((window.NORI_DXDRILLS || {}).cards || []).length) chips.push('🎯 진단 드릴');
-    if (((window.NORI_BLOCKS || {}).topics || []).length) chips.push('🧠 답안 블록');
-    chips.push('🧩 연습 전체');
-    if (case2HasReview()) chips.push('🔁 복습 필요');
-    chips.push(...systems);
-    bar.innerHTML = chips.map(c =>
-      `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`
-    ).join('');
-    bar.querySelectorAll('[data-c2f]').forEach(b => b.addEventListener('click', () => {
-      _case2Filter = b.dataset.c2f; buildCase2FilterBar(); renderCase2();
-    }));
+    const main = [];
+    if ((data.pastExams || []).length) main.push('📚 역대 기출');
+    if (((window.NORI_DXDRILLS || {}).cards || []).length) main.push('🎯 진단 드릴');
+    if (((window.NORI_BLOCKS || {}).topics || []).length) main.push('🧠 답안 블록');
+    main.push('🧩 연습 전체');
+    if (case2HasReview()) main.push('🔁 복습 필요');
+
+    const chip = c =>
+      `<button class="med-filter-chip${_case2Filter === c ? ' is-active' : ''}" type="button" data-c2f="${esc(c)}">${esc(c)}</button>`;
+    // 접혀 있어도 현재 계통이 보이도록 라벨에 선택값을 넣는다
+    const sysSel = systems.indexOf(_case2Filter) !== -1 ? _case2Filter : '전체';
+    const togLabel = _case2SysOpen ? '🔧 계통 닫기 ▴' : `🔧 계통: ${sysSel} ▾`;
+    bar.innerHTML = main.map(chip).join('')
+      + `<button class="med-filter-chip case2-sys-toggle${_case2SysOpen ? ' is-open' : ''}" type="button"`
+      + ` id="case2SysToggle" aria-expanded="${_case2SysOpen}" aria-controls="case2SysBar">${esc(togLabel)}</button>`;
+    if (sysBar) {
+      sysBar.innerHTML = systems.map(chip).join('');
+      sysBar.classList.toggle('is-open', _case2SysOpen);
+    }
+    document.getElementById('case2SysToggle')?.addEventListener('click', () => {
+      _case2SysOpen = !_case2SysOpen; buildCase2FilterBar();
+    });
+    [bar, sysBar].forEach(el => el && el.querySelectorAll('[data-c2f]').forEach(b =>
+      b.addEventListener('click', () => {
+        _case2Filter = b.dataset.c2f;
+        if (systems.indexOf(_case2Filter) !== -1) _case2SysOpen = false;  // 고르면 닫아 본문을 바로 보여준다
+        buildCase2FilterBar(); renderCase2();
+      })));
   }
   // 문항 유형(키워드)에 맞는 서술형 답안 틀(framework) — 근거: framework 명시교육이 구성형 답안 점수 대효과(Graham & Perin 2007).
   // sq.frameHint가 있으면 우선 사용, 없으면 질문 텍스트 키워드로 자동 매핑.

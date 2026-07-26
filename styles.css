@@ -1237,6 +1237,11 @@ body.focus-mode .part-panel { display: none; }
   background: #fff; font-size: 12.5px; font-weight: 600; color: #555; cursor: pointer; font-family: inherit;
 }
 .med-filter-chip.is-active { background: #1f7a74; color: #fff; border-color: #1f7a74; }
+/* 2차 탭 — 계통 칩만 접는다(기능 칩은 상시 노출). 규약은 막판 암기노트와 동일 */
+#case2SysBar { display: none; }
+#case2SysBar.is-open { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.med-filter-chip.case2-sys-toggle { border-style: dashed; color: #1f7a74; background: #f8fafa; }
+.med-filter-chip.case2-sys-toggle.is-open { border-style: solid; background: #dcefeb; }
 .med-sys-group { margin-top: 14px; }
 .med-sys-group > h4 { margin: 0 0 8px; font-size: 14px; color: #1f7a74; }
 .med-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
