@@ -2688,8 +2688,12 @@
   function bindBlockMatrix(el) {
     const scroller = el.querySelector('.blockmx-scroll');
     if (scroller) {
+      const syncMore = () => scroller.classList.toggle(
+        'has-more', scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1);
       scroller.scrollLeft = _blockScrollX;
-      scroller.addEventListener('scroll', () => { _blockScrollX = scroller.scrollLeft; });
+      scroller.addEventListener('scroll', () => { _blockScrollX = scroller.scrollLeft; syncMore(); });
+      window.addEventListener('resize', syncMore);
+      syncMore();
     }
     el.querySelectorAll('[data-bmx]').forEach(b => b.addEventListener('click', () => {
       if (_blockSel !== b.dataset.bmx) { _blockSel = b.dataset.bmx; _blockShown = false; }
