@@ -133,7 +133,10 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 #quiz .ans::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:800}
 #quiz summary{padding:4px 0}
 #quiz summary:focus-visible,.selfcheck details summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
-</style></head>
+</style><!-- motion-css:start -->
+  <link rel="stylesheet" href="motion/motion.css?v=20261028a">
+  <!-- motion-css:end -->
+  </head>
 <body>
 <header class="top"><div class="wrap">
 <div class="kicker">2026 노인전문간호사 시험대비 · 핵심 학습노트</div>
@@ -219,6 +222,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 
   <div class="card" id="dm-comp">
     <h3>2-1. 합병증 <span class="pill freq">⭐ 빈출</span></h3>
+<div class="nm-slot" data-motion="insulin-glucose"></div>
     <div class="row">
       <div class="txt">
         <div class="callout warn"><span class="lab">⚠ 급성 — 저혈당이 더 위험</span> <b>저혈당</b>(식은땀·떨림·혼돈→의식저하): 의식 있으면 <span class="cz">단순당 섭취</span>, 없으면 포도당 정맥/글루카곤. <b>고혈당 응급</b>: DKA(케톤산증)·<span class="cz">HHS(고삼투압 고혈당, 노인 흔함)</span>.</div>
@@ -244,6 +248,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- 3. 갑상선 -->
 <section class="chap" id="thyroid">
   <h2>3. 갑상샘 질환 (Thyroid) <span class="pill freq">⭐ 빈출</span></h2>
+<div class="nm-slot" data-motion="thyroid-feedback"></div>
   <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:thyroid" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 갑상샘질환 MCQ·플래시카드 풀기 ↗</a></p>
   <div class="card">
     <div class="row">
@@ -317,4 +322,10 @@ function revealAll(){
   document.querySelectorAll('.cz').forEach(e=>e.classList.add('show'));
   document.querySelectorAll('#quiz details, .selfcheck details').forEach(d=>d.open=true);
 }</script>
-</body></html>
+<!-- motion:start -->
+  <script>window.NM_VIDEOS = [];</script>
+  <script src="motion/motion.js?v=20261028a"></script>
+  <script src="motion/scenes/insulin-glucose.js?v=20261028a"></script>
+  <script src="motion/scenes/thyroid-feedback.js?v=20261028a"></script>
+  <!-- motion:end -->
+  </body></html>

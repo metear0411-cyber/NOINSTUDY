@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=20260726g">
+  <link rel="stylesheet" href="styles.css?v=20261028a">
 
   <!-- 데이터 파일 (전역 window 변수 방식 — file:// CORS 우회) -->
   <!-- v=20260428 : 캐시 갱신용 버전 — 데이터 수정 시 숫자 증가 -->
@@ -50,7 +50,10 @@
   <script src="data/case-scenarios.js?v=20260726g"></script>
   <script src="data/dx-drills.js?v=20260705i"></script>
   <script src="data/answer-blocks.js?v=20260726a"></script>
-</head>
+<!-- motion-css:start -->
+  <link rel="stylesheet" href="motion/motion.css?v=20261028a">
+  <!-- motion-css:end -->
+  </head>
 <body>
 
   <!-- 모바일 오버레이 -->
@@ -107,6 +110,9 @@
 
       <!-- 그림노트 모음 (새 탭) -->
       <a class="gichul-entry-btn note-entry-btn" id="noteEntryBtn" href="00_학습허브_시작.html" target="_blank" rel="noopener">📖 그림노트 모음</a>
+
+      <!-- 움직이는 그림 모음 (새 탭) -->
+      <a class="gichul-entry-btn note-entry-btn" id="motionEntryBtn" href="00_움직이는그림_모음.html" target="_blank" rel="noopener">🎬 움직이는 그림</a>
 
       <!-- 과목 목록 -->
       <div class="subject-list" id="subjectList"></div>
@@ -254,8 +260,30 @@
   <!-- 집중모드 플로팅 토글 (스크롤 위치 무관 좌하단 상시 노출) -->
   <button class="focus-fab" id="focusToggleFloat" type="button" title="넓게 보기 / 펼치기" aria-pressed="false">⤢ 펼치기</button>
 
-  <script src="app.js?v=20260726g"></script>
-  <script src="notes-bridge.js?v=20260726g"></script>
+  <!-- motion:start -->
+  <script>window.NM_VIDEOS = [];</script>
+  <script src="motion/motion.js?v=20261028a"></script>
+  <script src="motion/scenes/circulation.js?v=20261028a"></script>
+  <script src="motion/scenes/ecg-pqrst.js?v=20261028a"></script>
+  <script src="motion/scenes/arrhythmia-strips.js?v=20261028a"></script>
+  <script src="motion/scenes/stiff-artery.js?v=20261028a"></script>
+  <script src="motion/scenes/hf-congestion.js?v=20261028a"></script>
+  <script src="motion/scenes/gas-exchange.js?v=20261028a"></script>
+  <script src="motion/scenes/airway-obstruction.js?v=20261028a"></script>
+  <script src="motion/scenes/ach-synapse.js?v=20261028a"></script>
+  <script src="motion/scenes/dopamine-balance.js?v=20261028a"></script>
+  <script src="motion/scenes/stroke-penumbra.js?v=20261028a"></script>
+  <script src="motion/scenes/insulin-glucose.js?v=20261028a"></script>
+  <script src="motion/scenes/thyroid-feedback.js?v=20261028a"></script>
+  <script src="motion/scenes/starling-edema.js?v=20261028a"></script>
+  <script src="motion/scenes/portal-htn.js?v=20261028a"></script>
+  <script src="motion/scenes/bone-remodeling.js?v=20261028a"></script>
+  <script src="motion/scenes/pressure-shear.js?v=20261028a"></script>
+  <script src="motion/scenes/pk-elderly.js?v=20261028a"></script>
+  <script src="motion/scenes/gate-control.js?v=20261028a"></script>
+  <!-- motion:end -->
+  <script src="app.js?v=20261028a"></script>
+  <script src="notes-bridge.js?v=20261028a"></script>
   <!-- Service Worker 등록 -->
   <script>
     if ('serviceWorker' in navigator) {

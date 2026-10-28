@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "PretendardF"; src: url("fonts/Pretendard-Medium.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "PretendardF"; src: url("fonts/Pretendard-Bold.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "PretendardF"; src: url("fonts/Pretendard-ExtraBold.woff2") format("woff2"); font-weight: 800; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: #eff3f4; }
+body { font-family: "PretendardF", sans-serif; color: #18252c; word-break: keep-all; overflow-wrap: break-word; }
+#root { position: relative; width: 1920px; height: 1080px; }
+.kicker { position: absolute; left: 72px; top: 56px; font-size: 26px; font-weight: 700; color: #1f7a74; letter-spacing: .02em; }
+.title { position: absolute; left: 72px; top: 96px; width: 1300px; font-size: 46px; font-weight: 800; line-height: 1.25; text-wrap: balance; }
+.stage { position: absolute; left: 56px; top: 190px; width: 1260px; height: 714px; border-radius: 28px; overflow: hidden;
+  background: #eff3f4; box-shadow: 0 30px 70px rgba(26,43,74,.16), 0 4px 14px rgba(26,43,74,.08); }
+.stage svg { width: 100%; height: 100%; display: block; }
+.stage svg text { font-family: "PretendardF", sans-serif; }
+.panel { position: absolute; left: 1364px; top: 190px; width: 500px; height: 714px; }
+.count { font-size: 26px; font-weight: 700; color: #63717a; }
+.count b { color: #1f7a74; font-size: 34px; }
+.label { margin-top: 18px; font-size: 54px; font-weight: 800; color: #155f5a; line-height: 1.2; text-wrap: balance; }
+.text { margin-top: 26px; font-size: 33px; font-weight: 500; line-height: 1.62; text-wrap: pretty; }
+.text strong { color: #a2462c; font-weight: 800; }
+.chapters { position: absolute; left: 56px; right: 56px; bottom: 58px; display: flex; gap: 10px; }
+.ch { flex: 1 1 0; }
+.ch-bar { height: 8px; border-radius: 8px; background: #d8e0e4; overflow: hidden; }
+.ch-bar i { display: block; height: 100%; width: 0; background: #1f7a74; }
+.ch-l { margin-top: 10px; font-size: 21px; font-weight: 700; color: #8a98a3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch.on .ch-l { color: #155f5a; }
+.src { position: absolute; left: 72px; bottom: 18px; font-size: 18px; color: #8a98a3; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="60" data-width="1920" data-height="1080">
+  <div class="clip" data-start="0" data-duration="60" data-track-index="0" id="film">
+    <div class="kicker">노인전문간호사 · 움직이는 그림</div>
+    <div class="title" id="title"></div>
+    <div class="stage" id="stage"></div>
+    <div class="panel">
+      <div class="count" id="count"></div>
+      <div class="label" id="label"></div>
+      <div class="text" id="text"></div>
+    </div>
+    <div class="chapters" id="chapters"></div>
+    <div class="src" id="src"></div>
+  </div>
+</div>
+<script src="motion/motion.js"></script>
+<script src="motion/scenes/__SCENE__.js"></script>
+<script>
+(function () {
+  var SCENE = '__SCENE__', OPT_IN = __OPT__;
+  var M = window.NoriMotion, def = M.get(SCENE);
+  var opt = {};
+  (def.options || []).forEach(function (o) {
+    var v = OPT_IN[o.key];
+    var hit = o.choices.filter(function (c) { return String(c.value) === String(v); })[0];
+    opt[o.key] = hit ? hit.value : (o.value != null ? o.value : o.choices[0].value);
+  });
+  var steps = (def.stepsFor ? def.stepsFor(opt) : def.steps).slice().sort(function (a, b) { return a.at - b.at; });
+  var dur = def.durationFor ? def.durationFor(opt) : def.duration;
+
+  function esc(s) { return String(s || '').replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function rich(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
+
+  // 단계마다: 천천히 재생 → 설명을 읽을 만큼 멈춤
+  var SPEED = 0.55, segs = [], f0 = 0.6;   // 첫 0.6초는 첫 장면 정지
+  steps.forEach(function (s, i) {
+    var a = s.at, b = i + 1 < steps.length ? steps[i + 1].at : dur;
+    var play = Math.max(0.01, (b - a) / SPEED);
+    var chars = (s.text || '').replace(/\*\*/g, '').length;
+    var len = Math.max(4.5, play + 1.2, chars / 8.5 + 1.2);
+    segs.push({ a: a, b: b, play: play, start: f0, len: len, s: s });
+    f0 += len;
+  });
+  var TOTAL = Math.round((f0 + 1.2) * 10) / 10;
+  ['root', 'film'].forEach(function (id) { document.getElementById(id).setAttribute('data-duration', TOTAL); });
+
+  document.getElementById('title').textContent = def.title;
+  document.getElementById('src').innerHTML = rich(def.source || '');
+  var stage = document.getElementById('stage');
+  var svg = M.kit.el('svg', { viewBox: def.viewBox, preserveAspectRatio: 'xMidYMid meet' }, stage);
+  var render = def.setup(svg, M.kit, opt);
+  var chBox = document.getElementById('chapters');
+  chBox.innerHTML = segs.map(function (g) { return '<div class="ch"><div class="ch-bar"><i></i></div><div class="ch-l">' + esc(g.s.label) + '</div></div>'; }).join('');
+  var chs = [].slice.call(chBox.children);
+  var countEl = document.getElementById('count'), labelEl = document.getElementById('label'), textEl = document.getElementById('text');
+  var cur = -1, fNow = 0;
+
+  function frame(f) {
+    fNow = f;
+    var i = 0;
+    for (var k = 0; k < segs.length; k++) if (f >= segs[k].start) i = k;
+    var g = segs[i], local = Math.max(0, f - g.start);
+    // 설명을 읽는 동안에도 그 단계 움직임을 되풀이(끝에서 0.9초 쉬고 다시)
+    var m = local % (g.play + 0.9);
+    var t = f < segs[0].start ? 0 : g.a + Math.min(1, m / g.play) * (g.b - g.a - 0.001);
+    render(t, opt);
+    if (i !== cur) {
+      cur = i;
+      countEl.innerHTML = '<b>' + (i + 1) + '</b> / ' + segs.length;
+      labelEl.textContent = g.s.label;
+      textEl.innerHTML = rich(g.s.text);
+      chs.forEach(function (c, k) { c.classList.toggle('on', k === i); });
+    }
+    var fade = Math.min(1, local / 0.45);
+    labelEl.style.opacity = fade; textEl.style.opacity = fade;
+    labelEl.style.transform = 'translateY(' + ((1 - fade) * 14).toFixed(1) + 'px)';
+    textEl.style.transform = 'translateY(' + ((1 - fade) * 18).toFixed(1) + 'px)';
+    chs.forEach(function (c, k) {
+      var p = k < i ? 1 : k > i ? 0 : Math.min(1, local / segs[k].len);
+      c.firstChild.firstChild.style.width = (p * 100).toFixed(1) + '%';
+    });
+  }
+
+  // 함수형 속성: GSAP이 탐색할 때마다 frame(값)을 부른다(결정적)
+  var drive = { film: function (v) { if (arguments.length) frame(v); else return fNow; } };
+  var tl = gsap.timeline({ paused: true });
+  tl.fromTo(drive, { film: 0 }, { film: TOTAL, duration: TOTAL, ease: 'none' }, 0);
+  window.__timelines = window.__timelines || {};
+  window.__timelines['main'] = tl;
+  frame(0);
+  tl.seek(0);
+})();
+</script>
+</body>
+</html>

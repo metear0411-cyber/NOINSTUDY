@@ -133,7 +133,10 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 #quiz .ans::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:800}
 #quiz summary{padding:4px 0}
 #quiz summary:focus-visible,.selfcheck details summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
-</style></head>
+</style><!-- motion-css:start -->
+  <link rel="stylesheet" href="motion/motion.css?v=20261028a">
+  <!-- motion-css:end -->
+  </head>
 <body>
 <header class="top"><div class="wrap">
 <div class="kicker">2026 노인전문간호사 시험대비 · 핵심 학습노트</div>
@@ -231,6 +234,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 
 <section class="chap" id="aging">
   <h2>1. 노화에 따른 심혈관계 변화</h2>
+<div class="nm-slot" data-motion="circulation"></div>
   <p class="chap-intro">노인 심혈관 질환의 절반은 “혈관이 딱딱해진다”에서 시작합니다. 이 한 줄이 단독 수축기 고혈압·좌심실비대·이완기 심부전을 모두 설명합니다.</p>
   <div class="card">
     <div class="callout easy"><span class="lab">💡 쉽게 이해</span> 노화된 혈관 = <b>“굳어버린 고무호스”</b>. 호스가 딱딱하면 ① 수축기에 압이 확 튀고(수축기압↑) ② 이완기엔 반동이 없어 압이 뚝 떨어지며(이완기압↓) → 둘의 차이인 <b>맥압이 커집니다</b>. 이게 노인 <b>단독 수축기 고혈압</b>의 정체. 또 이완기압↓ → 관상동맥 혈류↓ → 심근허혈이 쉬워집니다.</div>
@@ -269,6 +273,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 
   <div class="card" id="ihd-ecg">
     <h3>2-2. 심전도(ECG) — IHD 진단의 핵심 <span class="pill freq">⭐ 매우 빈출</span></h3>
+<div class="nm-slot" data-motion="ecg-pqrst"></div>
     <div class="callout easy"><span class="lab">💡 쉽게 이해</span> 허혈이 생기면 ECG는 <b>“T → ST → Q” 순서로</b> 변합니다. 가장 먼저 변하는 건 <b>T파</b>(재분극이 가장 예민). 외워두면 문제에서 “가장 먼저 나타나는 변화?” = T파.</div>
     <dl class="kv">
       <dt>① T파 변화 (가장 먼저)</dt><dd><span class="cz">Coronary T wave</span> = 비대칭·뾰족하고 큰 <b>hyperacute & tall T</b>. STEMI에선 이후 <span class="cz">T파 역전(inversion)</span>.</dd>
@@ -318,6 +323,8 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 3. 심부전 ===== -->
 <section class="chap" id="hf">
   <h2>3. 심부전 (Heart Failure) <span class="pill freq">⭐ 빈출</span></h2>
+<div class="nm-slot" data-motion="hf-congestion"></div>
+<div class="nm-slot" data-motion="starling-edema"></div>
   <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:heart-failure" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 심부전 MCQ·플래시카드 풀기 ↗</a></p>
   <p class="chap-intro">심장 기능 저하로 호흡곤란·부종·피로가 나타나는 <b>임상증후군</b>(질환 아님). 가장 흔한 원인은 심근경색.</p>
   <div class="card">
@@ -345,6 +352,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 4. 부정맥 ===== -->
 <section class="chap" id="arrhythmia">
   <h2>4. 부정맥 (Arrhythmia) <span class="pill freq">⭐ 빈출</span></h2>
+<div class="nm-slot" data-motion="arrhythmia-strips"></div>
   <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:arrhythmia" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 부정맥 MCQ·플래시카드 풀기 ↗</a></p>
   <p class="chap-intro">정상 동성리듬이 아닌 모든 리듬. 노인에 흔하며 가장 흔한 건 <b>심방세동(AF)</b>. 진단의 기본은 <b>12유도 심전도</b>.</p>
 
@@ -402,6 +410,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 6. 고혈압 ===== -->
 <section class="chap" id="htn">
   <h2>6. 고혈압 (Hypertension)</h2>
+<div class="nm-slot" data-motion="stiff-artery"></div>
   <p style="margin:0 0 12px">
     <a class="btn" href="index.html#open=gero-disease:htn" target="_blank" rel="noopener"
        style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">
@@ -484,4 +493,14 @@ function revealAll(){
   document.querySelectorAll('#quiz details, .selfcheck details').forEach(d=>d.open=true);
 }
 </script>
-</body></html>
+<!-- motion:start -->
+  <script>window.NM_VIDEOS = [];</script>
+  <script src="motion/motion.js?v=20261028a"></script>
+  <script src="motion/scenes/circulation.js?v=20261028a"></script>
+  <script src="motion/scenes/ecg-pqrst.js?v=20261028a"></script>
+  <script src="motion/scenes/hf-congestion.js?v=20261028a"></script>
+  <script src="motion/scenes/starling-edema.js?v=20261028a"></script>
+  <script src="motion/scenes/arrhythmia-strips.js?v=20261028a"></script>
+  <script src="motion/scenes/stiff-artery.js?v=20261028a"></script>
+  <!-- motion:end -->
+  </body></html>

@@ -133,7 +133,10 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 #quiz .ans::before{content:"정답";display:inline-block;background:var(--brand);color:#fff;border-radius:6px;padding:1px 8px;font-size:11.5px;font-weight:800}
 #quiz summary{padding:4px 0}
 #quiz summary:focus-visible,.selfcheck details summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
-</style></head>
+</style><!-- motion-css:start -->
+  <link rel="stylesheet" href="motion/motion.css?v=20261028a">
+  <!-- motion-css:end -->
+  </head>
 <body>
 <header class="top"><div class="wrap">
 <div class="kicker">2026 노인전문간호사 시험대비 · 핵심 학습노트</div>
@@ -238,6 +241,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
   <p class="chap-intro">만성기관지염 + 폐기종이 섞인 <b>비가역적 기류 제한</b>. 진단 기준은 기관지확장제 후 <b>FEV1/FVC &lt; 0.7</b>.</p>
   <div class="card" id="asthma-copd">
     <h3>3-1. 천식 vs COPD — 시험의 단골 비교</h3>
+<div class="nm-slot" data-motion="airway-obstruction"></div>
     <div class="callout easy"><span class="lab">💡 한눈에</span> <b>천식 = 발작 사이엔 거의 정상(가역적)</b> / <b>COPD = 평소에도 늘 막혀 있음(비가역적)</b>. 이 한 줄로 대부분의 지문을 구분합니다.</div>
     <table class="tbl">
       <tr><th>구분</th><th>천식 (Asthma)</th><th>COPD</th></tr>
@@ -280,6 +284,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 <!-- ===== 4. 폐렴 ===== -->
 <section class="chap" id="pneumonia">
   <h2>4. 폐렴 (Pneumonia) <span class="pill freq">⭐ 빈출</span></h2>
+<div class="nm-slot" data-motion="gas-exchange"></div>
   <p style="margin:0 0 12px"><a class="btn" href="index.html#open=gero-disease:pneumonia" target="_blank" rel="noopener" style="background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700;text-decoration:none">🎯 합격스터디 앱에서 폐렴 MCQ·플래시카드 풀기 ↗</a></p>
   <div class="card">
     <div class="row">
@@ -392,4 +397,10 @@ function revealAll(){
   document.querySelectorAll('#quiz details, .selfcheck details').forEach(d=>d.open=true);
 }
 </script>
-</body></html>
+<!-- motion:start -->
+  <script>window.NM_VIDEOS = [];</script>
+  <script src="motion/motion.js?v=20261028a"></script>
+  <script src="motion/scenes/airway-obstruction.js?v=20261028a"></script>
+  <script src="motion/scenes/gas-exchange.js?v=20261028a"></script>
+  <!-- motion:end -->
+  </body></html>

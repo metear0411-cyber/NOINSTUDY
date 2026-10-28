@@ -1,0 +1,66 @@
+/* motion/motion.css — 움직이는 그림 재생기 */
+.nm {
+  --nm-teal: #1f7a74; --nm-teal-soft: #dcefeb; --nm-ink: #18252c; --nm-muted: #63717a; --nm-line: #d8e0e4;
+  background: #fff; border: 1px solid var(--nm-line); border-radius: 14px;
+  padding: 14px 14px 12px; margin: 12px 0; box-shadow: 0 2px 8px rgba(31,45,50,.06);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  color: var(--nm-ink); word-break: keep-all; overflow-wrap: break-word;
+}
+.nm-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.nm-tag { font-size: 12.5px; font-weight: 700; color: var(--nm-teal); background: var(--nm-teal-soft);
+  border-radius: 999px; padding: 2px 10px; }
+.nm-title { margin: 0; font-size: 17px; font-weight: 700; text-wrap: balance; }
+.nm-stage { background: #eff3f4; border: 1px solid #e3e9eb; border-radius: 10px; overflow: hidden; }
+.nm-svg { display: block; width: 100%; height: auto; }
+.nm-svgtext { font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif; }
+
+.nm-caption { min-height: 4.4em; margin: 10px 2px 4px; }
+.nm-cap-label { display: block; font-size: 15px; color: var(--nm-teal); margin-bottom: 2px; }
+.nm-cap-text { margin: 0; font-size: 15px; line-height: 1.65; text-wrap: pretty; }
+.nm-cap-text strong { color: #8a3a26; }
+
+.nm-bar { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.nm-btn { flex: 0 0 auto; min-width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--nm-line);
+  background: #fff; color: var(--nm-ink); font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.nm-btn:hover { border-color: var(--nm-teal); color: var(--nm-teal); }
+.nm-play { background: var(--nm-teal); color: #fff; border-color: var(--nm-teal); font-size: 15px; }
+.nm-play:hover { color: #fff; filter: brightness(1.08); }
+.nm-speed { font-size: 14px; min-width: 52px; }
+.nm-film { display: inline-grid; place-items: center; text-decoration: none; font-size: 18px; }
+.nm-steps { flex: 1 1 auto; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.nm-steps::-webkit-scrollbar { display: none; }
+.nm-step { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px;
+  border-radius: 10px; border: 1px solid var(--nm-line); background: #fff; cursor: pointer;
+  font-family: inherit; font-size: 14px; color: var(--nm-muted); white-space: nowrap; }
+.nm-step-n { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  background: #eef2f3; font-size: 12px; font-weight: 700; color: var(--nm-muted); }
+.nm-step.is-on { border-color: var(--nm-teal); color: var(--nm-ink); background: var(--nm-teal-soft); font-weight: 700; }
+.nm-step.is-on .nm-step-n { background: var(--nm-teal); color: #fff; }
+
+.nm-opts { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 8px; }
+.nm-opt { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.nm-opt-l { font-size: 13.5px; font-weight: 700; color: var(--nm-muted); margin-right: 2px; }
+.nm-chip { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--nm-line);
+  background: #fff; font-family: inherit; font-size: 14px; cursor: pointer; color: var(--nm-ink); }
+.nm-chip.is-on { background: var(--nm-ink); color: #fff; border-color: var(--nm-ink); font-weight: 700; }
+
+.nm-progress { height: 3px; background: #eef2f3; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+.nm-progress span { display: block; height: 100%; width: 0; background: var(--nm-teal); }
+.nm.is-paused .nm-progress span { background: #9aa6b4; }
+.nm-src { margin: 8px 2px 0; font-size: 12.5px; color: var(--nm-muted); line-height: 1.5; }
+
+/* 폰: 단계 이름은 숨기고 번호만 */
+@media (max-width: 560px) {
+  .nm { padding: 10px 8px 10px; border-radius: 12px; }
+  .nm-step { padding: 0 10px; }
+  .nm-step:not(.is-on) .nm-step-l { display: none; }
+  .nm-cap-text { font-size: 14.5px; }
+}
+
+/* 앱 안 목록 */
+.nm-list { display: grid; gap: 4px; }
+.nm-gallery-group { margin: 22px 0 6px; font-size: 16px; color: #155f5a; }
+.nm-gallery-intro { color: #63717a; font-size: 14.5px; margin: 4px 0 8px; }
+.nm-gallery-links { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 6px; }
+.nm-gallery-link { font-size: 13px; color: #1f7a74; background: #dcefeb; border-radius: 999px;
+  padding: 3px 10px; text-decoration: none; border: 0; cursor: pointer; font-family: inherit; }

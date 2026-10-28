@@ -138,7 +138,15 @@
     const diff = Math.ceil((EXAM_DATE - today) / 86400000);
     const el = document.getElementById('daysLeft');
     if (!el) return;
-    el.textContent = diff > 0 ? `D-${diff}` : diff === 0 ? 'D-Day!' : `D+${Math.abs(diff)}`;
+    // 2026 시험이 끝났으면 다음 해 공고를 기다린다(날짜를 지어내지 않는다)
+    if (diff < 0) {
+      el.textContent = '다음 시험';
+      el.style.color = 'var(--teal)';
+      const lab = el.nextElementSibling;
+      if (lab) lab.textContent = '2027 시험일 공고 대기';
+      return;
+    }
+    el.textContent = diff > 0 ? `D-${diff}` : 'D-Day!';
     el.style.color = diff <= 14 ? 'var(--clay)' : diff <= 30 ? 'var(--gold)' : 'var(--teal)';
   }
 
@@ -437,6 +445,7 @@
     // 초보자 배너 + 왜 중요한가
     if (topic.beginner)    html += `<div class="beginner-banner"><strong>초보자 포인트&nbsp;</strong>${esc(topic.beginner)}</div>`;
     if (topic.whyImportant) html += `<div class="why-banner"><strong>왜 시험에 나오는가?&nbsp;</strong>${esc(topic.whyImportant)}</div>`;
+    html += motionSection(topic);
 
     // 비교표(빈출 비교 정리) — 상단 노출
     (topic.compareTables || (topic.compareTable ? [topic.compareTable] : [])).forEach(ct => {
@@ -494,6 +503,7 @@
     }
 
     el.innerHTML = html || '<div class="empty-state">학습 내용을 준비 중입니다</div>';
+    mountMotions(el);
   }
 
   // ─── 학습 모드 (레이어드 UI) ──────────────────────
@@ -517,6 +527,9 @@
               + `<span class="note-link-arrow">↗</span></a>`;
     }
     if (glance) html += `<div class="l-glance">${glance}</div>`;
+
+    // 움직이는 그림(motion/) — 이 토픽에 붙은 장면이 있을 때만
+    html += motionSection(topic);
 
     // ── ② 핵심 한 장 정리 ──
     if (topic.coreSummary?.length)
@@ -564,6 +577,7 @@
             + `<div class="l-deep-body">${deep}</div></details>`;
 
     el.innerHTML = html || '<div class="empty-state">학습 내용을 준비 중입니다</div>';
+    mountMotions(el);
   }
 
   // 함정 & 주의사항 — 머리말(:/→/—)만 보이는 접이식 줄. 긴 경고 문장 나열 완화.
@@ -663,6 +677,17 @@
       </div>`;
     }).join('');
     return section('💊 약물치료', `<div class="med-grid">${medsHtml}</div>`);
+  }
+
+  // 움직이는 그림 — motion/motion.js가 등록한 장면 중 이 토픽에 붙은 것
+  function motionSection(topic) {
+    const list = window.NoriMotion ? window.NoriMotion.forTopic(topic.id) : [];
+    if (!list.length) return '';
+    return section('🎬 움직이는 그림으로 이해',
+      list.map(s => `<div data-motion="${esc(s.id)}"></div>`).join(''));
+  }
+  function mountMotions(root) {
+    if (window.NoriMotion) window.NoriMotion.mountAll(root);
   }
 
   function section(title, bodyHtml) {
@@ -2773,7 +2798,7 @@
       <strong>📋 2차시험 대비 — 사례기반 서술형</strong>
       <p>2차시험은 <b>${esc(data.format || '사례기반 서술형 필기시험')}</b> — 객관식이 아니라 환자 사례를 읽고 서술형으로 답하는 시험입니다.</p>
       ${notes ? `<div class="case2-notes-h">실제 기출 특징</div><ul class="case2-notes">${notes}</ul>` : ''}
-      <p class="case2-dday">2차시험 ${esc(data.examDate || '2026-08-23')} · <b>${ddayTxt}</b></p>
+      <p class="case2-dday">${dleft < 0 ? '2026 2차시험(8/23)은 끝났다 · <b>2027 시험일 공고 대기</b>' : `2차시험 ${esc(data.examDate || '2026-08-23')} · <b>${ddayTxt}</b>`}</p>
       ${canSim ? `<button class="case2-sim-start" id="case2SimStart" type="button">🔴 실전 모의 시작 (100분 · 2사례)</button>` : ''}
     </div>`;
     const s = _case2Search.toLowerCase();

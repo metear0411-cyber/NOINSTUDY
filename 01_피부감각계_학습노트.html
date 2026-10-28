@@ -136,7 +136,10 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
 #quiz summary{padding:4px 0}
 #quiz summary:focus-visible,.selfcheck details summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
 </style>
-</head>
+<!-- motion-css:start -->
+  <link rel="stylesheet" href="motion/motion.css?v=20261028a">
+  <!-- motion-css:end -->
+  </head>
 <body>
 <header class="top">
   <div class="wrap">
@@ -354,6 +357,7 @@ mark{background:#fff1a8;padding:0 2px;border-radius:3px}
   <!-- 욕창 -->
   <div class="card" id="pressure">
     <h3>2-6. 욕창 <span class="en">Pressure Injury</span> <span class="pill freq">⭐⭐ 매회 빈출</span></h3>
+<div class="nm-slot" data-motion="pressure-shear"></div>
     <dl class="kv">
       <dt>정의/기전</dt><dd><span class="cz">압력·마찰·전단력(응전력)</span>이 지속·반복 → 모세혈관 순환장애 → <span class="cz">허혈성 조직괴사</span>. 1단계(피부손상 없음)부터 포함하며, <b>의료기기 관련(MDRPI)·점막 욕창</b>도 포함.</dd>
       <dt>원인</dt><dd>압박, 전단력, 마찰, <span class="cz">습기</span>, 기저질환·영양·기능상태.</dd>
@@ -543,4 +547,9 @@ function revealAll(){
   document.querySelectorAll('#quiz details, .selfcheck details').forEach(d=>d.open=true);
 }
 </script>
-</body></html>
+<!-- motion:start -->
+  <script>window.NM_VIDEOS = [];</script>
+  <script src="motion/motion.js?v=20261028a"></script>
+  <script src="motion/scenes/pressure-shear.js?v=20261028a"></script>
+  <!-- motion:end -->
+  </body></html>
