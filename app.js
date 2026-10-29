@@ -2828,7 +2828,7 @@
         const cards = cs.map((c, i) => case2Card(c, i, { keyBase: `past-${y.year}-${i}`, badge: `${y.year} 기출`, open: false })).join('');
         return `<div class="case2-year"><h4 class="case2-year-h">📅 ${esc(String(y.year))}년도 기출</h4>${cards}</div>`;
       }).join('');
-      h += `<p class="case2-section-note">역대 실제 2차 기출(사용자 제공 자료, 2017~2023) — 각 케이스에 직접 답을 써 보고 모범답안과 대조하세요.</p>`;
+      h += `<p class="case2-section-note">역대 실제 2차 기출(사용자 제공 자료 2017~2023, 2026은 응시 동기 증언·후기로 복원) — 각 케이스에 직접 답을 써 보고 모범답안과 대조하세요.</p>`;
       h += any ? yearHtml : `<p class="case2-empty">검색 결과가 없습니다.</p>`;
       el.innerHTML = h; bindCase2(el); return;
     }
